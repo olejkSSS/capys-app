@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Capy Perp Hub",
-  description: "Perp trading hub with the best airdrops and exchanges",
+  description: "Perp DEX farming tools, tier list and calculators",
 }
 
 export default function RootLayout({

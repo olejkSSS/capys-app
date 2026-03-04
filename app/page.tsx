@@ -176,8 +176,42 @@ export default function Home() {
 
       </section>
 
-      <div className="h-32" />
+<div className="fixed right-10 top-56 w-64 bg-slate-900/60 backdrop-blur-xl border border-white/5 rounded-xl p-4">
 
-    </main>
+<h3 className="text-sm text-gray-300 mb-3">Referral Boosts</h3>
+
+<div className="text-sm mb-2">
+<b>Variational</b>
+<div className="text-gray-400 text-xs">+13% point boost</div>
+</div>
+
+<div className="text-sm mb-2">
+<b>Extended</b>
+<div className="text-gray-400 text-xs">10% fee discount</div>
+<div className="text-gray-400 text-xs">+ farming boost</div>
+<div className="text-gray-400 text-xs">+30% fee cashback</div>
+</div>
+
+<div className="text-sm mb-2">
+<b>Hibachi</b>
+<div className="text-gray-400 text-xs">+15% farming boost</div>
+<div className="text-gray-400 text-xs">+15% trading discount</div>
+</div>
+
+<div className="text-sm mb-2">
+<b>Hyena</b>
+<div className="text-gray-400 text-xs">+10% point boost</div>
+</div>
+
+<div className="text-sm">
+<b>Pacifica</b>
+<div className="text-gray-400 text-xs">+15% point boost</div>
+</div>
+
+</div>
+
+<div className="h-32" />
+
+</main>
   )
 }

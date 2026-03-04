@@ -8,56 +8,56 @@ const perps = [
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
-    boost: "+13% points"
+    boost: "+13% points boost + bronze tier"
   },
   {
     tier: "S+",
     name: "Extended",
     ref: "https://app.extended.exchange/join/CAPY",
     logo: "/extended.png",
-    boost: "10% fees"
+    boost: "-10% fees + 5% points boost + 30% refback"
   },
   {
     tier: "S",
     name: "Hibachi",
     ref: "http://hibachi.xyz/r/capy",
     logo: "/hibachi.png",
-    boost: "+15% points"
+    boost: "-15% fees + 15% points boost"
   },
   {
     tier: "S",
     name: "Ethereal",
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     logo: "/ethereal.png",
-    boost: "—"
+    boost: "+15% points boost"
   },
   {
     tier: "S",
     name: "Hyena",
     ref: "https://app.hyena.trade/ref/CAPY",
     logo: "/hyena.png",
-    boost: "+10% points"
+    boost: "+10% points boost"
   },
   {
     tier: "A",
     name: "Pacifica",
     ref: "https://trade.pacifica.fi/ref/CAPY",
     logo: "/pacifica.png",
-    boost: "+15% points"
+    boost: "+15% points boost"
   },
   {
     tier: "A",
     name: "EdgeX",
     ref: "https://app.edgex.exchange/ref/CAPY",
     logo: "/edgex.png",
-    boost: "—"
+    boost: "-10% fees + 10% points boost + VIP1"
   },
   {
     tier: "A",
     name: "Dreamcash",
     ref: "https://app.dreamcash.xyz/ref/CAPY",
     logo: "/dreamcash.png",
-    boost: "—"
+    boost: "boost from 10K to 1M points"
   }
 ]
 

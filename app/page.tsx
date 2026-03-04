@@ -8,64 +8,56 @@ const perps = [
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
-    boost: "+13%",
-    boostType: "point boost"
+    boost: "+13% points"
   },
   {
     tier: "S+",
     name: "Extended",
     ref: "https://app.extended.exchange/join/CAPY",
     logo: "/extended.png",
-    boost: "10%",
-    boostType: "fee discount"
+    boost: "10% fees"
   },
   {
     tier: "S",
     name: "Hibachi",
     ref: "http://hibachi.xyz/r/capy",
     logo: "/hibachi.png",
-    boost: "+15%",
-    boostType: "point boost"
+    boost: "+15% points"
   },
   {
     tier: "S",
     name: "Ethereal",
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     logo: "/ethereal.png",
-    boost: "-",
-    boostType: ""
+    boost: "—"
   },
   {
     tier: "S",
     name: "Hyena",
     ref: "https://app.hyena.trade/ref/CAPY",
     logo: "/hyena.png",
-    boost: "+10%",
-    boostType: "point boost"
+    boost: "+10% points"
   },
   {
     tier: "A",
     name: "Pacifica",
     ref: "https://trade.pacifica.fi/ref/CAPY",
     logo: "/pacifica.png",
-    boost: "+15%",
-    boostType: "point boost"
+    boost: "+15% points"
   },
   {
     tier: "A",
     name: "EdgeX",
     ref: "https://app.edgex.exchange/ref/CAPY",
     logo: "/edgex.png",
-    boost: "-",
-    boostType: ""
+    boost: "—"
   },
   {
     tier: "A",
     name: "Dreamcash",
     ref: "https://app.dreamcash.xyz/ref/CAPY",
     logo: "/dreamcash.png",
-    boost: "-",
-    boostType: ""
+    boost: "—"
   }
 ]
 
@@ -169,18 +161,10 @@ export default function Home() {
             </div>
 
             {/* BOOST */}
-<div className="flex flex-col items-center leading-tight">
-
-  <div className="w-16 text-center px-2 py-1 text-xs rounded-lg border border-emerald-400 text-emerald-300">
+<div className="flex justify-center">
+  <div className="min-w-[90px] text-center px-3 py-1 text-xs font-medium rounded-full border border-emerald-400 text-emerald-300 bg-emerald-400/5">
     {perp.boost}
   </div>
-
-  {perp.boostType && (
-    <div className="text-[10px] text-neutral-400 mt-1">
-      {perp.boostType}
-    </div>
-  )}
-
 </div>
 
             {/* Button */}

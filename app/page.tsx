@@ -106,20 +106,26 @@ export default function Home() {
         <div className="flex justify-center gap-6 mt-6">
 
           <a
-            href="https://x.com/capy_onchain"
-            target="_blank"
-            className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400 transition backdrop-blur bg-white/5"
-          >
-            capy
-          </a>
+  href="https://x.com/capy_onchain"
+  target="_blank"
+  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400 transition backdrop-blur bg-white/5"
+>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
+  </svg>
+  capy
+</a>
 
           <a
-            href="https://t.me/olejk_2k"
-            target="_blank"
-            className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400 transition backdrop-blur bg-white/5"
-          >
-            capy
-          </a>
+  href="https://t.me/olejk_2k"
+  target="_blank"
+  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400 transition backdrop-blur bg-white/5"
+>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M22 2L2 10l5 2 2 6 4-5 6 5z"/>
+  </svg>
+  capy
+</a>
 
         </div>
 
@@ -169,12 +175,12 @@ export default function Home() {
 
             {/* Button */}
             <a
-              href={perp.ref}
-              target="_blank"
-              className="px-6 py-2 rounded-xl border border-emerald-400 text-emerald-300 hover:bg-emerald-400/10 hover:shadow-[0_0_15px_rgba(16,185,129,0.6)] transition font-semibold"
-            >
-              TRADE →
-            </a>
+  href={perp.ref}
+  target="_blank"
+  className="ml-4 px-6 py-2 rounded-xl border border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] transition font-semibold"
+>
+  TRADE →
+</a>
 
           </div>
 

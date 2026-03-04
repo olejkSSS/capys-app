@@ -114,7 +114,7 @@ export default function Home() {
 
           {/* Telegram */}
           <a
-            href="https://t.me/capy"
+            href="https://t.me/olejk_2k"
             target="_blank"
             className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400 transition backdrop-blur bg-white/5"
           >

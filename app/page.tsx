@@ -8,56 +8,64 @@ const perps = [
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
-    boost: "+13%"
+    boost: "+13%",
+    boostType: "point boost"
   },
   {
     tier: "S+",
     name: "Extended",
     ref: "https://app.extended.exchange/join/CAPY",
     logo: "/extended.png",
-    boost: "10%"
+    boost: "10%",
+    boostType: "fee discount"
   },
   {
     tier: "S",
     name: "Hibachi",
     ref: "http://hibachi.xyz/r/capy",
     logo: "/hibachi.png",
-    boost: "+15%"
+    boost: "+15%",
+    boostType: "point boost"
   },
   {
     tier: "S",
     name: "Ethereal",
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     logo: "/ethereal.png",
-    boost: "-"
+    boost: "-",
+    boostType: ""
   },
   {
     tier: "S",
     name: "Hyena",
     ref: "https://app.hyena.trade/ref/CAPY",
     logo: "/hyena.png",
-    boost: "+10%"
+    boost: "+10%",
+    boostType: "point boost"
   },
   {
     tier: "A",
     name: "Pacifica",
     ref: "https://trade.pacifica.fi/ref/CAPY",
     logo: "/pacifica.png",
-    boost: "+15%"
+    boost: "+15%",
+    boostType: "point boost"
   },
   {
     tier: "A",
     name: "EdgeX",
     ref: "https://app.edgex.exchange/ref/CAPY",
     logo: "/edgex.png",
-    boost: "-"
+    boost: "-",
+    boostType: ""
   },
   {
     tier: "A",
     name: "Dreamcash",
     ref: "https://app.dreamcash.xyz/ref/CAPY",
     logo: "/dreamcash.png",
-    boost: "-"
+    boost: "-",
+    boostType: ""
   }
 ]
 
@@ -128,7 +136,7 @@ export default function Home() {
       {/* Perp list */}
       <section className="max-w-5xl mx-auto mt-20 px-6 space-y-6">
 
-        <div className="grid grid-cols-[100px_1fr_120px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
+        <div className="grid grid-cols-[100px_1fr_160px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
           <div>Tier</div>
           <div>Protocol</div>
           <div className="text-center">Boost</div>
@@ -139,7 +147,7 @@ export default function Home() {
 
           <div
             key={i}
-            className="grid grid-cols-[100px_1fr_120px_auto] items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-5 hover:border-cyan-400/40 transition"
+            className="grid grid-cols-[100px_1fr_160px_auto] items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-5 hover:border-cyan-400/40 transition"
           >
 
             {/* Tier */}
@@ -161,11 +169,19 @@ export default function Home() {
             </div>
 
             {/* BOOST */}
-            <div className="flex justify-center">
-              <div className="w-16 text-center px-2 py-1 text-xs rounded-lg border border-emerald-400 text-emerald-300">
-                {perp.boost}
-              </div>
-            </div>
+<div className="flex flex-col items-center leading-tight">
+
+  <div className="w-16 text-center px-2 py-1 text-xs rounded-lg border border-emerald-400 text-emerald-300">
+    {perp.boost}
+  </div>
+
+  {perp.boostType && (
+    <div className="text-[10px] text-neutral-400 mt-1">
+      {perp.boostType}
+    </div>
+  )}
+
+</div>
 
             {/* Button */}
             <a

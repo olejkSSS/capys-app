@@ -8,7 +8,7 @@ const perps = [
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
-    boost: "OMNICAPY: +13% points boost"
+    boost: "OMNICAPY: +16% points boost"
   },
   {
     tier: "S+",

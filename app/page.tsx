@@ -76,19 +76,22 @@ function getTierStyle(tier: string) {
 
 export default function Home() {
   return (
-    <main className="text-white relative z-10 overflow-x-hidden bg-[#070b14]">
+    <main className="text-white relative overflow-x-hidden z-10">
 
       {/* Animated Background */}
 <div className="absolute inset-0 z-0 overflow-hidden">
 
+  {/* base gradient */}
   <div className="absolute inset-0 bg-gradient-to-br from-[#070b14] via-[#0f1630] to-[#050814]" />
 
+  {/* glowing blobs */}
   <div className="absolute top-[-250px] left-[-250px] w-[700px] h-[700px] bg-purple-500/40 rounded-full blur-[200px] animate-blob" />
 
   <div className="absolute bottom-[-250px] right-[-250px] w-[700px] h-[700px] bg-cyan-500/30 rounded-full blur-[200px] animate-blob animation-delay-2000" />
 
   <div className="absolute top-[40%] left-[50%] w-[600px] h-[600px] bg-emerald-500/25 rounded-full blur-[200px] animate-blob animation-delay-4000" />
 
+  {/* grid */}
   <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:60px_60px]" />
 
 </div>
@@ -138,7 +141,7 @@ rel="noopener"
       {/* Perp list */}
       <section className="max-w-5xl mx-auto mt-16 sm:mt-20 px-4 sm:px-6 space-y-6">
 
-        <div className="hidden md:grid grid-cols-[100px_1fr_200px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
+        <div className="hidden md:grid grid-cols-[100px_1fr_220px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
           <div>Tier</div>
           <div>Protocol</div>
           <div className="text-center">Boost</div>
@@ -149,7 +152,7 @@ rel="noopener"
 
           <div
             key={i}
-            className="flex flex-col md:grid md:grid-cols-[100px_1fr_200px_auto] gap-4 items-start md:items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-4 md:p-5 hover:border-cyan-400/40 hover:scale-[1.01] transition"
+            className="flex flex-col md:grid md:grid-cols-[100px_1fr_220px_auto] gap-4 items-start md:items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-4 md:p-5 hover:border-cyan-400/40 hover:scale-[1.01] transition"
           >
 
             {/* Tier */}

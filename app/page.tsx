@@ -151,12 +151,12 @@ export default function Home() {
       {/* Perp list */}
       <section className="max-w-5xl mx-auto mt-16 sm:mt-20 px-4 sm:px-6 space-y-6">
 
-        <div className="hidden md:grid grid-cols-[100px_1fr_220px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
-          <div>Tier</div>
-          <div>Protocol</div>
-          <div className="text-center">Boost</div>
-          <div></div>
-        </div>
+        <div className="hidden md:grid grid-cols-[100px_1fr_220px_120px] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
+  <div className="pl-3">Tier</div>
+  <div>Protocol</div>
+  <div className="text-right">Boost</div>
+  <div></div>
+</div>
 
         {perps.map((perp, i) => (
 

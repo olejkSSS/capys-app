@@ -76,7 +76,7 @@ function getTierStyle(tier: string) {
 
 export default function Home() {
   return (
-    <main className="min-h-screen text-white relative overflow-hidden bg-[#070b14]">
+    <main className="min-h-screen text-white relative overflow-x-hidden bg-[#070b14]">
 
       {/* Background */}
       <div className="absolute inset-0 -z-10">
@@ -92,9 +92,9 @@ export default function Home() {
       </div>
 
       {/* Hero */}
-      <div className="max-w-6xl mx-auto px-6 pt-24 text-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
 
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
           CAPY <span className="text-red-500">PERP</span> HUB
         </h1>
 
@@ -103,12 +103,13 @@ export default function Home() {
         </p>
 
         {/* Socials */}
-        <div className="flex justify-center gap-6 mt-6">
+        <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mt-6">
 
           <a
   href="https://x.com/capy_onchain"
   target="_blank"
-  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400 transition backdrop-blur bg-white/5"
+rel="noopener"
+  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:scale-[1.01] transition backdrop-blur bg-white/5"
 >
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
@@ -119,7 +120,8 @@ export default function Home() {
           <a
   href="https://t.me/olejk_2k"
   target="_blank"
-  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400 transition backdrop-blur bg-white/5"
+rel="noopener"
+  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:scale-[1.01] transition backdrop-blur bg-white/5"
 >
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
     <path d="M22 2L2 10l5 2 2 6 4-5 6 5z"/>
@@ -132,9 +134,9 @@ export default function Home() {
       </div>
 
       {/* Perp list */}
-      <section className="max-w-5xl mx-auto mt-20 px-6 space-y-6">
+      <section className="max-w-5xl mx-auto mt-16 sm:mt-20 px-4 sm:px-6 space-y-6">
 
-        <div className="grid grid-cols-[100px_1fr_160px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
+        <div className="hidden md:grid grid-cols-[100px_1fr_200px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
           <div>Tier</div>
           <div>Protocol</div>
           <div className="text-center">Boost</div>
@@ -145,11 +147,11 @@ export default function Home() {
 
           <div
             key={i}
-            className="grid grid-cols-[100px_1fr_160px_auto] items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-5 hover:border-cyan-400/40 transition"
+            className="flex flex-col md:grid md:grid-cols-[100px_1fr_200px_auto] gap-4 items-start md:items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-4 md:p-5 hover:border-cyan-400/40 hover:scale-[1.01] transition"
           >
 
             {/* Tier */}
-            <div className="flex justify-center">
+            <div className="flex md:justify-center">
               <div className={`w-12 h-12 flex items-center justify-center rounded-xl font-bold border ${getTierStyle(perp.tier)}`}>
                 {perp.tier}
               </div>
@@ -158,17 +160,18 @@ export default function Home() {
             {/* Logo + name */}
             <div className="flex items-center gap-4">
               <Image
-                src={perp.logo}
-                alt={perp.name}
-                width={40}
-                height={40}
-              />
+  src={perp.logo}
+  alt={perp.name}
+  width={32}
+  height={32}
+  className="md:w-[40px] md:h-[40px]"
+/>
               <div className="text-lg font-medium">{perp.name}</div>
             </div>
 
             {/* BOOST */}
-<div className="flex justify-center">
-  <div className="min-w-[90px] text-center px-3 py-1 text-xs font-medium rounded-full border border-emerald-400 text-emerald-300 bg-emerald-400/5">
+<div className="flex md:justify-center">
+  <div className="text-xs sm:text-sm text-center px-3 py-1 font-medium rounded-full border border-emerald-400 text-emerald-300 bg-emerald-400/5 max-w-[220px] md:max-w-full break-words">
     {perp.boost}
   </div>
 </div>
@@ -177,7 +180,8 @@ export default function Home() {
             <a
   href={perp.ref}
   target="_blank"
-  className="ml-4 px-6 py-2 rounded-xl border border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] transition font-semibold"
+rel="noopener"
+  className="w-full md:w-auto mt-2 md:mt-0 md:ml-4 px-6 py-2 text-center rounded-xl border border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] transition font-semibold"
 >
   TRADE →
 </a>

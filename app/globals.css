@@ -22,7 +22,7 @@
 body {
   background: transparent;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
@@ -54,4 +54,17 @@ body::before {
     radial-gradient(circle at 50% 80%, rgba(236,72,153,0.25), transparent 40%);
 
   filter: blur(80px);
+}
+* {
+box-sizing: border-box;
+}
+
+html, body {
+max-width: 100%;
+overflow-x: hidden;
+}
+
+img {
+max-width: 100%;
+height: auto;
 }

@@ -79,7 +79,7 @@ export default function Home() {
     <main className="text-white relative overflow-x-hidden z-10">
 
       {/* Animated Background */}
-<div className="absolute inset-0 z-0 overflow-hidden">
+<div className="absolute inset-0 -z-10 overflow-hidden">
 
   {/* base gradient */}
   <div className="absolute inset-0 bg-gradient-to-br from-[#070b14] via-[#0f1630] to-[#050814]" />
@@ -97,7 +97,7 @@ export default function Home() {
 </div>
 
       {/* Hero */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 text-center">
+      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
 
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
           CAPY <span className="text-red-500">PERP</span> HUB

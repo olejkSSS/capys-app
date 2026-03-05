@@ -8,7 +8,7 @@ const perps = [
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
-    boost: "+13% points boost + bronze tier"
+    boost: "OMNICAPY: +13% points boost"
   },
   {
     tier: "S+",
@@ -162,7 +162,7 @@ export default function Home() {
 
           <div
             key={i}
-            className="flex flex-col md:grid md:grid-cols-[100px_1fr_220px_auto] gap-4 items-start md:items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-4 md:p-5 hover:border-cyan-400/40 hover:scale-[1.01] transition"
+            className="flex flex-col md:grid md:grid-cols-[100px_1fr_220px_auto] gap-4 items-start md:items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-4 md:p-5 hover:border-cyan-400/40 hover:scale-[1.01] hover:shadow-[0_0_25px_rgba(34,211,238,0.15)] transition"
           >
 
             {/* Tier */}
@@ -177,9 +177,9 @@ export default function Home() {
               <Image
   src={perp.logo}
   alt={perp.name}
-  width={32}
-  height={32}
-  className="md:w-[40px] md:h-[40px]"
+  width={40}
+  height={40}
+  className="md:w-[48px] md:h-[48px]"
 />
               <div className="text-lg font-medium">{perp.name}</div>
             </div>
@@ -196,7 +196,7 @@ export default function Home() {
   href={perp.ref}
   target="_blank"
 rel="noopener"
-  className="w-full md:w-auto mt-2 md:mt-0 md:ml-4 px-6 py-2 text-center rounded-xl border border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:shadow-[0_0_15px_rgba(34,211,238,0.6)] transition font-semibold"
+  className="w-full md:w-auto mt-2 md:mt-0 md:ml-4 px-6 py-2 text-center rounded-xl border border-cyan-400 text-cyan-300 bg-cyan-400/5 hover:bg-cyan-400/10 hover:shadow-[0_0_18px_rgba(34,211,238,0.7)] transition font-semibold tracking-wide"
 >
   TRADE →
 </a>

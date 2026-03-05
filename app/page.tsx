@@ -192,7 +192,7 @@ rel="noopener"
 
       </section>
 
-      <div className="h-32" />
+
 
     </main>
   )

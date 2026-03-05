@@ -107,34 +107,44 @@ export default function Home() {
           Crypto-native Perp Tier List
         </p>
 
-        {/* Socials */}
-        <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mt-6">
+        {/* Built by */}
+<div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 mt-6 text-sm">
 
-          <a
-  href="https://x.com/capy_onchain"
-  target="_blank"
-rel="noopener"
-  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:scale-[1.01] transition backdrop-blur bg-white/5"
->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
-  </svg>
-  capy
-</a>
+  <span className="opacity-60">Built by</span>
 
-          <a
-  href="https://t.me/olejk_2k"
-  target="_blank"
-rel="noopener"
-  className="flex items-center gap-2 px-6 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:scale-[1.01] transition backdrop-blur bg-white/5"
->
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M22 2L2 10l5 2 2 6 4-5 6 5z"/>
-  </svg>
-  capy
-</a>
+  {/* X */}
+  <a
+    href="https://x.com/capy_onchain"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 px-5 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
+    </svg>
+    capy
+  </a>
 
-        </div>
+  {/* Telegram */}
+  <a
+    href="https://t.me/olejk_2k"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-2 px-5 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+      10-4.48 10-10S17.52 2 12 2zm4.93 6.36l-1.66 7.84
+      c-.12.56-.44.7-.9.44l-2.48-1.83-1.2 1.15
+      c-.13.13-.24.24-.5.24l.18-2.54 4.63-4.18
+      c.2-.18-.04-.28-.3-.1l-5.72 3.6-2.46-.77
+      c-.53-.17-.54-.53.11-.78l9.61-3.71
+      c.45-.17.84.11.69.78z"/>
+    </svg>
+    capy
+  </a>
+
+</div>
 
       </div>
 

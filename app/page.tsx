@@ -76,20 +76,25 @@ function getTierStyle(tier: string) {
 
 export default function Home() {
   return (
-    <main className="min-h-screen text-white relative overflow-x-hidden bg-[#070b14]">
+    <main className="text-white relative overflow-x-hidden bg-[#070b14]">
 
-      {/* Background */}
-      <div className="absolute inset-0 -z-10">
+      {/* Animated Background */}
+<div className="absolute inset-0 -z-10 overflow-hidden">
 
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0b1020] via-[#0f1630] to-[#050814]" />
+  {/* base gradient */}
+  <div className="absolute inset-0 bg-gradient-to-br from-[#0b1020] via-[#0f1630] to-[#050814]" />
 
-        <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[180px]" />
+  {/* animated blobs */}
+  <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[180px] animate-blob" />
 
-        <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] bg-emerald-500/15 rounded-full blur-[180px]" />
+  <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[180px] animate-blob animation-delay-2000" />
 
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+  <div className="absolute top-[30%] left-[60%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[160px] animate-blob animation-delay-4000" />
 
-      </div>
+  {/* grid */}
+  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+
+</div>
 
       {/* Hero */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">

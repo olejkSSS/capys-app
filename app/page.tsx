@@ -97,7 +97,7 @@ export default function Home() {
 </div>
 
       {/* Hero */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 text-center">
 
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
           CAPY <span className="text-red-500">PERP</span> HUB

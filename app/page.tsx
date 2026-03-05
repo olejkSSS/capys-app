@@ -63,13 +63,13 @@ const perps = [
 
 function getTierStyle(tier: string) {
   if (tier === "S+")
-    return "bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_20px_rgba(168,85,247,0.8)]"
+    return "bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_35px_rgba(168,85,247,0.9)]"
 
   if (tier === "S")
-    return "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_15px_rgba(250,204,21,0.6)]"
+    return "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_22px_rgba(250,204,21,0.7)]"
 
   if (tier === "A")
-    return "bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.6)]"
+    return "bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_22px_rgba(34,211,238,0.7)]"
 
   return ""
 }
@@ -151,10 +151,10 @@ export default function Home() {
       {/* Perp list */}
       <section className="max-w-5xl mx-auto mt-16 sm:mt-20 px-4 sm:px-6 space-y-6">
 
-        <div className="hidden md:grid grid-cols-[100px_1fr_220px_120px] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
-  <div className="pl-3">Tier</div>
-  <div>Protocol</div>
-  <div className="text-right">Boost</div>
+        <div className="hidden md:grid grid-cols-[100px_1fr_220px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
+  <div className="pl-2">Tier</div>
+  <div className="-ml-2">Protocol</div>
+  <div className="text-right pr-6">Boost</div>
   <div></div>
 </div>
 
@@ -162,7 +162,7 @@ export default function Home() {
 
           <div
             key={i}
-            className="flex flex-col md:grid md:grid-cols-[100px_1fr_220px_auto] gap-4 items-start md:items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-4 md:p-5 hover:border-cyan-400/40 hover:scale-[1.01] hover:shadow-[0_0_25px_rgba(34,211,238,0.15)] transition"
+            className="group flex flex-col md:grid md:grid-cols-[100px_1fr_220px_auto] gap-4 items-start md:items-center bg-[#0c1220]/70 backdrop-blur-xl border border-neutral-800 rounded-2xl p-4 md:p-5 hover:scale-[1.01] hover:border-cyan-400/40 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] transition"
           >
 
             {/* Tier */}
@@ -179,14 +179,14 @@ export default function Home() {
   alt={perp.name}
   width={40}
   height={40}
-  className="md:w-[48px] md:h-[48px]"
+  className="md:w-[48px] md:h-[48px] rounded-lg shadow-[0_0_12px_rgba(255,255,255,0.08)]"
 />
               <div className="text-lg font-medium">{perp.name}</div>
             </div>
 
             {/* BOOST */}
 <div className="flex md:justify-center">
-  <div className="text-xs sm:text-sm text-center px-3 py-1 font-medium rounded-full border border-emerald-400 text-emerald-300 bg-emerald-400/5 max-w-[220px] md:max-w-full break-words">
+  <div className="text-xs sm:text-sm text-center px-3 py-1 font-medium rounded-full border border-emerald-400 text-emerald-300 bg-emerald-400/5 shadow-[0_0_10px_rgba(16,185,129,0.25)] max-w-[220px] md:max-w-full break-words">
     {perp.boost}
   </div>
 </div>

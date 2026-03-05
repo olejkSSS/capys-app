@@ -82,17 +82,16 @@ export default function Home() {
 <div className="absolute inset-0 -z-10 overflow-hidden">
 
   {/* base gradient */}
-  <div className="absolute inset-0 bg-gradient-to-br from-[#0b1020] via-[#0f1630] to-[#050814]" />
+  <div className="absolute inset-0 bg-gradient-to-br from-[#050814] via-[#0b1020] to-[#020617]" />
 
-  {/* animated blobs */}
-  <div className="absolute top-[-200px] left-[-200px] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[180px] animate-blob" />
+  {/* BIG PURPLE */}
+  <div className="absolute top-[-150px] left-[-150px] w-[700px] h-[700px] bg-purple-600/50 rounded-full blur-[120px] animate-blob" />
 
-  <div className="absolute bottom-[-200px] right-[-200px] w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[180px] animate-blob animation-delay-2000" />
+  {/* BIG CYAN */}
+  <div className="absolute bottom-[-150px] right-[-150px] w-[700px] h-[700px] bg-cyan-500/50 rounded-full blur-[120px] animate-blob animation-delay-2000" />
 
-  <div className="absolute top-[30%] left-[60%] w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[160px] animate-blob animation-delay-4000" />
-
-  {/* grid */}
-  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px]" />
+  {/* CENTER PINK */}
+  <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-pink-500/40 rounded-full blur-[120px] animate-blob animation-delay-4000" />
 
 </div>
 

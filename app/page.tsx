@@ -98,7 +98,46 @@ export default function Home() {
       </div>
 
       {/* Hero */}
-      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
+<div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
+
+  {/* Made by */}
+  <div className="flex justify-center items-center gap-3 mb-6 text-sm opacity-80">
+
+    <span className="opacity-50">Made by</span>
+
+    {/* X */}
+    <a
+      href="https://x.com/capy_onchain"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
+      </svg>
+      Capy
+    </a>
+
+    {/* Telegram */}
+    <a
+      href="https://t.me/olejk_2k"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+        10-4.48 10-10S17.52 2 12 2zm4.93 6.36l-1.66 7.84
+        c-.12.56-.44.7-.9.44l-2.48-1.83-1.2 1.15
+        c-.13.13-.24.24-.5.24l.18-2.54 4.63-4.18
+        c.2-.18-.04-.28-.3-.1l-5.72 3.6-2.46-.77
+        c-.53-.17-.54-.53.11-.78l9.61-3.71
+        c.45-.17.84.11.69.78z"/>
+      </svg>
+      Capy
+    </a>
+
+  </div>
 
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
           CAPY <span className="text-red-500">PERP</span> HUB
@@ -146,7 +185,7 @@ export default function Home() {
 
           <div className="hidden md:grid grid-cols-[100px_1fr_220px_auto] text-xs uppercase tracking-widest opacity-50 border-b border-neutral-800 pb-4">
             <div className="pl-2">Tier</div>
-            <div>-Protocol</div>
+            <div>Protocol</div>
             <div className="text-right pr-6">Boost</div>
             <div></div>
           </div>

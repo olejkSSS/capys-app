@@ -78,19 +78,64 @@ function getTierStyle(tier: string) {
 export default function Home() {
 
 const [tab,setTab] = useState<"list" | "calculator" | "funding">("list")
+const perpsCalc = {
+  nado: {
+    name: "Nado",
+    fdv: 1.5,
+    totalPoints: 4300000,
+    airdrop: 8
+  },
+  variational: {
+    name: "Variational",
+    fdv: 0.6,
+    totalPoints: 9300000,
+    airdrop: 30
+  },
+  extended: {
+    name: "Extended",
+    fdv: 0.5,
+    totalPoints: 7700000,
+    airdrop: 30
+  },
+  pacifica: {
+    name: "Pacifica",
+    fdv: 0.6,
+    totalPoints: 60000000,
+    airdrop: 20
+  },
+  ethereal: {
+    name: "Ethereal",
+    fdv: 0.5,
+    totalPoints: 10000000,
+    airdrop: 15
+  },
+  edgex: {
+    name: "EdgeX",
+    fdv: 2,
+    totalPoints: 10000000,
+    airdrop: 30
+  },
+  standx: {
+    name: "StandX",
+    fdv: 0.5,
+    totalPoints: 50000000,
+    airdrop: 20
+  },
+  hibachi: {
+    name: "Hibachi",
+    fdv: 0.15,
+    totalPoints: 60000000,
+    airdrop: 15
+  }
+}
+const [calcPerp, setCalcPerp] = useState<keyof typeof perpsCalc>("nado")
+const [myPoints, setMyPoints] = useState(0)
 
-const [calcPerp,setCalcPerp] = useState("Nado")
+const current = perpsCalc[calcPerp]
 
-const [myPoints,setMyPoints] = useState(0)
-const [fdv,setFdv] = useState(1.5)
-const [totalPoints,setTotalPoints] = useState(4300000)
-const [airdrop,setAirdrop] = useState(8)
-
-const pricePerPoint =
-((fdv*1000000000)*(airdrop/100))/totalPoints
-
-const result =
-(myPoints*pricePerPoint)
+const totalAirdropPool = current.fdv * 1000000000 * (current.airdrop / 100)
+const pricePerPoint = totalAirdropPool / current.totalPoints
+const myValue = myPoints * pricePerPoint
 
 return (
     <main className="text-white relative overflow-x-hidden z-10">
@@ -254,110 +299,126 @@ Capy
       {/* CALCULATOR */}
 {tab === "calculator" && (
 
-<section className="max-w-5xl mx-auto mt-16 px-4 space-y-6">
+<section className="max-w-4xl mx-auto mt-20 px-4 space-y-8">
 
-{/* PERP SELECT */}
-<div className="flex flex-wrap gap-2 justify-center">
+<p className="text-center opacity-50">
+Calculate your potential airdrop based on your points balance.
+</p>
 
-{[
-"Nado",
-"Variational",
-"Extended",
-"Pacifica",
-"Ethereal",
-"EdgeX",
-"StandX",
-"Hibachi"
-].map((p) => (
+{/* PERP SELECTOR */}
+
+<div className="flex flex-wrap justify-center gap-3">
+
+{Object.keys(perpsCalc).map((key) => (
 
 <button
-key={p}
-onClick={() => setCalcPerp(p)}
-className={`px-4 py-2 rounded-full border text-sm transition ${
-calcPerp === p
-? "border-cyan-400 text-cyan-300 bg-cyan-400/10"
+key={key}
+onClick={() => setCalcPerp(key as keyof typeof perpsCalc)}
+className={`px-4 py-2 rounded-full text-sm border transition ${
+calcPerp === key
+? "border-cyan-400 text-cyan-300"
 : "border-neutral-700 text-neutral-400"
 }`}
 >
-{p}
+
+{perpsCalc[key as keyof typeof perpsCalc].name}
+
 </button>
 
 ))}
 
 </div>
 
-
 {/* INPUTS */}
 
-<div className="grid md:grid-cols-2 gap-4">
+<div className="grid md:grid-cols-2 gap-6">
+
+<div>
+<p className="text-xs opacity-50 mb-2">MY POINTS</p>
 
 <input
 type="number"
-placeholder="My points"
 value={myPoints}
 onChange={(e)=>setMyPoints(Number(e.target.value))}
-className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
-/>
-
-<input
-type="number"
-placeholder="FDV (billions $)"
-value={fdv}
-onChange={(e)=>setFdv(Number(e.target.value))}
-className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
-/>
-
-<input
-type="number"
-placeholder="Total points"
-value={totalPoints}
-onChange={(e)=>setTotalPoints(Number(e.target.value))}
-className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
-/>
-
-<input
-type="number"
-placeholder="Airdrop % supply"
-value={airdrop}
-onChange={(e)=>setAirdrop(Number(e.target.value))}
-className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 />
 
 </div>
 
+<div>
+<p className="text-xs opacity-50 mb-2">FDV (billions $)</p>
+
+<input
+type="number"
+value={current.fdv}
+readOnly
+className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+/>
+
+</div>
+
+<div>
+<p className="text-xs opacity-50 mb-2">TOTAL POINTS</p>
+
+<input
+type="number"
+value={current.totalPoints}
+readOnly
+className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+/>
+
+</div>
+
+<div>
+<p className="text-xs opacity-50 mb-2">AIRDROP % SUPPLY</p>
+
+<input
+type="number"
+value={current.airdrop}
+readOnly
+className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+/>
+
+</div>
+
+</div>
 
 {/* RESULT */}
 
-<div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-8">
+<div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-8 mt-10">
 
-<div className="text-xl text-cyan-300 mb-2">
-{calcPerp}
+<h2 className="text-xl text-cyan-300 mb-4">
+
+{current.name}
+
+</h2>
+
+<div className="text-4xl font-bold mb-6">
+
+${myValue.toFixed(2)}
+
 </div>
 
-<div className="text-5xl font-bold mb-6">
-${result.toFixed(2)}
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+
+<div className="bg-black/30 p-4 rounded-lg">
+<p className="opacity-50">Total Airdrop Pool</p>
+<p>${(totalAirdropPool/1000000).toFixed(2)}M</p>
 </div>
 
-<div className="grid grid-cols-4 gap-3 text-sm">
-
-<div className="bg-black/40 rounded-xl p-3">
-<div className="opacity-50">Total Airdrop Pool</div>
-${(fdv*1000*(airdrop/100)).toFixed(2)}M
+<div className="bg-black/30 p-4 rounded-lg">
+<p className="opacity-50">My Points</p>
+<p>{myPoints}</p>
 </div>
 
-<div className="bg-black/40 rounded-xl p-3">
-<div className="opacity-50">My Points</div>
-{myPoints}
+<div className="bg-black/30 p-4 rounded-lg">
+<p className="opacity-50">Price per point</p>
+<p>${pricePerPoint.toFixed(2)}</p>
 </div>
 
-<div className="bg-black/40 rounded-xl p-3">
-<div className="opacity-50">Price per point</div>
-${pricePerPoint.toFixed(4)}
-</div>
-
-<div className="bg-black/40 rounded-xl p-3">
-<div className="opacity-50">Airdrop %</div>
-{airdrop}%
+<div className="bg-black/30 p-4 rounded-lg">
+<p className="opacity-50">Airdrop %</p>
+<p>{current.airdrop}%</p>
 </div>
 
 </div>

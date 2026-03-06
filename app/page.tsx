@@ -43,21 +43,21 @@ const perps = [
   {
     tier: "A",
     name: "Pacifica",
-    ref: "https://trade.pacifica.fi/ref/CAPY",
+    ref: "https://app.pacifica.fi/?referral=Capy",
     logo: "/pacifica.png",
     boost: "+15% points boost"
   },
   {
     tier: "A",
     name: "EdgeX",
-    ref: "https://app.edgex.exchange/ref/CAPY",
+    ref: "https://pro.edgex.exchange/referral/OLEJK",
     logo: "/edgex.png",
     boost: "-10% fees + 10% points boost + VIP1"
   },
   {
     tier: "A",
     name: "Dreamcash",
-    ref: "https://app.dreamcash.xyz/ref/CAPY",
+    ref: "https://dreamcash.xyz/share?code=CAPYCR",
     logo: "/dreamcash.png",
     boost: "boost from 10K to 1M points"
   }

@@ -204,7 +204,7 @@ export default function Home() {
       {/* CALCULATOR */}
       {tab === "calculator" && (
 
-        <div className="max-w-4xl mx-auto mt-20 text-center">
+  <div className="max-w-4xl mx-auto mt-20 text-center min-h-[60vh]">
 
           <div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-10">
 

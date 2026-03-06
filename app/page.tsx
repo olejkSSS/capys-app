@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useEffect, useMemo, useRef, useState } from "react"
-import html2canvas from "html2canvas"
+import { toPng } from "html-to-image"
 
 const PERPS = [
   {
@@ -211,38 +211,33 @@ const [airdrop, setAirdrop] = useState<number>(current.airdrop)
   }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
 
   const downloadCard = async () => {
-    if (!cardRef.current || isDownloading) return
+  if (!cardRef.current || isDownloading) return
 
-    try {
-      setIsDownloading(true)
+  try {
+    setIsDownloading(true)
 
-      await document.fonts.ready
-      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
-      await new Promise((resolve) => setTimeout(resolve, 150))
+    await document.fonts.ready
+    await new Promise((resolve) => setTimeout(resolve, 200))
 
-      const canvas = await html2canvas(cardRef.current, {
-        useCORS: true,
-        allowTaint: false,
-        scale: 2,
-        backgroundColor: null,
-        logging: false,
-      })
+    const dataUrl = await toPng(cardRef.current, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: "#0a0f1d",
+    })
 
-      const dataUrl = canvas.toDataURL("image/png")
-
-      const link = document.createElement("a")
-      link.href = dataUrl
-      link.download = `${current.name.toLowerCase()}-airdrop-card.png`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    } catch (error) {
-      console.error("Card download failed:", error)
-      alert("Failed to download card. Try selecting the template again or refreshing the page.")
-    } finally {
-      setIsDownloading(false)
-    }
+    const link = document.createElement("a")
+    link.download = `${current.name.toLowerCase()}-airdrop-card.png`
+    link.href = dataUrl
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  } catch (error) {
+    console.error("Card download failed:", error)
+    alert("Failed to download card.")
+  } finally {
+    setIsDownloading(false)
   }
+}
 
   const shareOnX = () => {
     const text = `My potential ${current.name} airdrop is ${formatMoney(myValue)}.
@@ -469,16 +464,22 @@ Calculate yours on capys.app`
           </div>
 
           <div
-            ref={cardRef}
-            className="relative mt-10 overflow-hidden rounded-2xl border border-neutral-800 bg-[#0a0f1d] bg-cover bg-center p-8"
-            style={{
-              backgroundImage: selectedTemplate
-                ? `url(/templates/${selectedTemplate}.png)`
-                : undefined,
-            }}
-          >
-            <div className="absolute inset-0 bg-black/35" />
-            <div className="relative z-10">
+
+  ref={cardRef}
+  className="relative mt-10 overflow-hidden rounded-2xl border border-neutral-800 bg-[#0a0f1d] p-8"
+>
+  {selectedTemplate && (
+    <img
+      src={`/templates/${selectedTemplate}.png`}
+      alt="Card template"
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+  )}
+
+  <div className="absolute inset-0 bg-black/35" />
+
+  <div className="relative z-10">
+          
               <h2 className="mb-4 text-xl text-cyan-300">{current.name}</h2>
 
               <div className="mb-6 text-4xl font-bold">{formatMoney(myValue)}</div>

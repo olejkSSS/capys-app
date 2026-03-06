@@ -101,36 +101,33 @@ export default function Home() {
       <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
 
         {/* Made by */}
-        <div className="flex justify-center items-center gap-3 mb-6 text-sm opacity-80">
+        <div className="flex justify-center items-center gap-4 mb-6 text-sm">
 
-          <span className="opacity-50">Made by</span>
+<span className="opacity-40">Made by</span>
 
-          <a
-            href="https://x.com/capy_onchain"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
-            </svg>
-            Capy
-          </a>
+<a
+href="https://x.com/capy_onchain"
+target="_blank"
+className="flex items-center gap-2 px-3 py-1 rounded-lg border border-neutral-700 hover:border-cyan-400/40 transition bg-[#0c1220]/60"
+>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+<path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
+</svg>
+Capy
+</a>
 
-          <a
-            href="https://t.me/olejk_2k"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-              10-4.48 10-10S17.52 2 12 2z"/>
-            </svg>
-            Capy
-          </a>
+<a
+href="https://t.me/olejk_2k"
+target="_blank"
+className="flex items-center gap-2 px-3 py-1 rounded-lg border border-neutral-700 hover:border-cyan-400/40 transition bg-[#0c1220]/60"
+>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+<path d="M21.5 2.5L2.7 9.6c-1 .4-1 1.1-.2 1.3l4.8 1.5 1.8 5.7c.2.6.1.8.7.8.5 0 .7-.2 1-.5l2.4-2.3 5 3.7c.9.5 1.5.2 1.8-.8L23 3.7c.4-1.3-.5-1.9-1.5-1.2z"/>
+</svg>
+Capy
+</a>
 
-        </div>
+</div>
 
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
           CAPY <span className="text-red-500">PERP</span> HUB
@@ -242,19 +239,47 @@ export default function Home() {
       )}
 
       {/* CALCULATOR */}
-      {tab === "calculator" && (
-        <div className="max-w-4xl mx-auto mt-20 text-center min-h-screen">
-          <div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-10">
-            <div className="text-xl opacity-60 mb-4">
-              Airdrop Calculator
-            </div>
-            <div className="opacity-40">
-              coming soon
-            </div>
-          </div>
-        </div>
-      )}
+{tab === "calculator" && (
 
-    </main>
-  )
+  <div className="max-w-4xl mx-auto mt-20 text-center min-h-screen">
+
+    <div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-10">
+
+      <div className="text-xl opacity-60 mb-4">
+        Airdrop Calculator
+      </div>
+
+      <div className="opacity-40">
+        coming soon
+      </div>
+
+    </div>
+
+  </div>
+
+)}
+
+{/* FUNDING */}
+{tab === "funding" && (
+
+  <div className="max-w-4xl mx-auto mt-20 text-center min-h-screen">
+
+    <div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-10">
+
+      <div className="text-xl opacity-60 mb-4">
+        Funding Rates
+      </div>
+
+      <div className="opacity-40">
+        funding screener coming soon
+      </div>
+
+    </div>
+
+  </div>
+
+)}
+
+</main>
+)
 }

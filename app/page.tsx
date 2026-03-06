@@ -1,7 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+import html2canvas from "html2canvas"
 
 const perps = [
   {
@@ -78,6 +79,22 @@ function getTierStyle(tier: string) {
 export default function Home() {
 
 const [tab,setTab] = useState<"list" | "calculator" | "funding">("list")
+const templates = [
+  "aurafarming",
+  "capypistol",
+  "cinema",
+  "fck",
+  "heaven",
+  "laughing",
+  "offer",
+  "ohno",
+  "omg",
+  "poor",
+  "punchcover",
+  "rich",
+  "scarcover",
+  "skeletons"
+]
 const perpsCalc = {
   nado: {
     name: "Nado",
@@ -130,6 +147,9 @@ const perpsCalc = {
 }
 const [calcPerp, setCalcPerp] = useState<keyof typeof perpsCalc>("nado")
 const [myPoints, setMyPoints] = useState(0)
+const [templatePicker, setTemplatePicker] = useState(false)
+const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
+const cardRef = useRef<HTMLDivElement>(null)
 const [fdv, setFdv] = useState(perpsCalc.nado.fdv)
 const [totalPoints, setTotalPoints] = useState(perpsCalc.nado.totalPoints)
 const [airdrop, setAirdrop] = useState(perpsCalc.nado.airdrop)
@@ -144,6 +164,35 @@ setAirdrop(current.airdrop)
 const totalAirdropPool = fdv * 1000000000 * (airdrop / 100)
 const pricePerPoint = totalAirdropPool / totalPoints
 const myValue = myPoints * pricePerPoint
+const downloadCard = async () => {
+
+if(!cardRef.current) return
+
+const canvas = await html2canvas(cardRef.current)
+
+const link = document.createElement("a")
+link.download = "airdrop-card.png"
+link.href = canvas.toDataURL()
+link.click()
+
+}
+
+const shareOnX = () => {
+
+const text =
+`My potential ${current.name} airdrop is $${myValue.toFixed(0)}.
+
+Points: ${myPoints}
+Price per point: $${pricePerPoint.toFixed(2)}
+
+Calculate yours on capys.app`
+
+const url =
+`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+
+window.open(url,"_blank")
+
+}
 
 return (
     <main className="text-white relative overflow-x-hidden z-10">
@@ -226,7 +275,7 @@ Capy
                   : "text-neutral-400"
               }`}
             >
-              Airdrop Calculator
+              Perp DEX Airdrop Calculator
             </button>
 
             <button
@@ -310,7 +359,7 @@ Capy
 <section className="max-w-4xl mx-auto mt-20 px-4 space-y-8">
 
 <p className="text-center opacity-50">
-Calculate your potential airdrop based on your points balance.
+Calculate your potential airdrop based on your perp DEX points balance.
 </p>
 
 {/* PERP SELECTOR */}
@@ -358,6 +407,7 @@ className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 
 <input
 type="number"
+step="0.1"
 value={fdv}
 onChange={(e)=>setFdv(Number(e.target.value))}
 className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
@@ -393,7 +443,15 @@ className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 
 {/* RESULT */}
 
-<div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-8 mt-10">
+<div
+ref={cardRef}
+className="border border-neutral-800 rounded-2xl p-8 mt-10 bg-cover bg-center"
+style={{
+backgroundImage: selectedTemplate
+? `url(/templates/${selectedTemplate}.png)`
+: undefined
+}}
+>
 
 <h2 className="text-xl text-cyan-300 mb-4">
 
@@ -421,12 +479,41 @@ ${myValue.toFixed(2)}
 
 <div className="bg-black/30 p-4 rounded-lg">
 <p className="opacity-50">Price per point</p>
-<p>${pricePerPoint.toFixed(2)}</p>
+<p>${pricePerPoint.toFixed(4)}</p>
 </div>
 
 <div className="bg-black/30 p-4 rounded-lg">
 <p className="opacity-50">Airdrop %</p>
-<p>{current.airdrop}%</p>
+<p>{airdrop}%</p>
+</div>
+
+</div>
+
+<div className="flex justify-center gap-4 mt-6">
+
+<div className="flex justify-center gap-4 mt-6">
+
+<button
+onClick={() => setTemplatePicker(true)}
+className="px-6 py-3 rounded-xl border border-neutral-700 hover:border-cyan-400 transition"
+>
+Pick a Template
+</button>
+
+<button
+onClick={downloadCard}
+className="px-6 py-3 rounded-xl border border-neutral-700 hover:border-purple-400 transition"
+>
+Download Card
+</button>
+
+<button
+onClick={shareOnX}
+className="px-6 py-3 rounded-xl bg-white text-black font-semibold"
+>
+Share on X
+</button>
+
 </div>
 
 </div>
@@ -455,6 +542,57 @@ ${myValue.toFixed(2)}
     </div>
 
   </div>
+
+)}
+
+{/* TEMPLATE PICKER POPUP */}
+
+{templatePicker && (
+
+<div className="fixed inset-0 bg-black/70 backdrop-blur flex items-center justify-center z-50">
+
+<div className="bg-[#0c1220] border border-neutral-800 rounded-2xl p-6 max-w-3xl w-full">
+
+<div className="flex justify-between items-center mb-4">
+
+<h3 className="text-lg">Choose Card Background</h3>
+
+<button
+onClick={()=>setTemplatePicker(false)}
+className="opacity-60 hover:opacity-100"
+>
+✕
+</button>
+
+</div>
+
+<div className="grid grid-cols-5 gap-3">
+
+{templates.map((t)=>(
+<button
+key={t}
+onClick={()=>{
+setSelectedTemplate(t)
+setTemplatePicker(false)
+}}
+className="rounded-lg overflow-hidden border border-neutral-800 hover:border-cyan-400 transition"
+>
+
+<Image
+src={`/templates/${t}.png`}
+alt={t}
+width={200}
+height={200}
+/>
+
+</button>
+))}
+
+</div>
+
+</div>
+
+</div>
 
 )}
 

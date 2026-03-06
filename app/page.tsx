@@ -82,7 +82,7 @@ export default function Home() {
   return (
     <main className="text-white relative overflow-x-hidden z-10">
 
-      {/* Animated Background */}
+      {/* Background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
 
         <div className="absolute inset-0 bg-gradient-to-br from-[#070b14] via-[#0f1630] to-[#050814]" />
@@ -98,46 +98,39 @@ export default function Home() {
       </div>
 
       {/* Hero */}
-<div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
+      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 text-center">
 
-  {/* Made by */}
-  <div className="flex justify-center items-center gap-3 mb-6 text-sm opacity-80">
+        {/* Made by */}
+        <div className="flex justify-center items-center gap-3 mb-6 text-sm opacity-80">
 
-    <span className="opacity-50">Made by</span>
+          <span className="opacity-50">Made by</span>
 
-    {/* X */}
-    <a
-      href="https://x.com/capy_onchain"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
-      </svg>
-      Capy
-    </a>
+          <a
+            href="https://x.com/capy_onchain"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z"/>
+            </svg>
+            Capy
+          </a>
 
-    {/* Telegram */}
-    <a
-      href="https://t.me/olejk_2k"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
-    >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-        10-4.48 10-10S17.52 2 12 2zm4.93 6.36l-1.66 7.84
-        c-.12.56-.44.7-.9.44l-2.48-1.83-1.2 1.15
-        c-.13.13-.24.24-.5.24l.18-2.54 4.63-4.18
-        c.2-.18-.04-.28-.3-.1l-5.72 3.6-2.46-.77
-        c-.53-.17-.54-.53.11-.78l9.61-3.71
-        c.45-.17.84.11.69.78z"/>
-      </svg>
-      Capy
-    </a>
+          <a
+            href="https://t.me/olejk_2k"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl border border-neutral-700 hover:border-cyan-400/40 hover:shadow-[0_0_12px_rgba(34,211,238,0.5)] transition backdrop-blur bg-white/5"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+              10-4.48 10-10S17.52 2 12 2z"/>
+            </svg>
+            Capy
+          </a>
 
-  </div>
+        </div>
 
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold tracking-tight">
           CAPY <span className="text-red-500">PERP</span> HUB
@@ -148,44 +141,46 @@ export default function Home() {
         </p>
 
         {/* Tabs */}
-<div className="flex justify-center mt-8">
-  <div className="flex bg-[#0c1220]/70 border border-neutral-800 rounded-full p-1 backdrop-blur">
+        <div className="flex justify-center mt-8">
+          <div className="flex bg-[#0c1220]/70 border border-neutral-800 rounded-full p-1 backdrop-blur">
 
-    <button
-      onClick={() => setTab("list")}
-      className={`px-5 py-2 rounded-full text-sm transition ${
-        tab === "list"
-          ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400"
-          : "text-neutral-400"
-      }`}
-    >
-      Perp DEX List
-    </button>
+            <button
+              onClick={() => setTab("list")}
+              className={`px-5 py-2 rounded-full text-sm transition ${
+                tab === "list"
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400"
+                  : "text-neutral-400"
+              }`}
+            >
+              Perp DEX List
+            </button>
 
-    <button
-      onClick={() => setTab("calculator")}
-      className={`px-5 py-2 rounded-full text-sm transition ${
-        tab === "calculator"
-          ? "bg-purple-500/20 text-purple-300 border border-purple-400"
-          : "text-neutral-400"
-      }`}
-    >
-      Airdrop Calculator
-    </button>
+            <button
+              onClick={() => setTab("calculator")}
+              className={`px-5 py-2 rounded-full text-sm transition ${
+                tab === "calculator"
+                  ? "bg-purple-500/20 text-purple-300 border border-purple-400"
+                  : "text-neutral-400"
+              }`}
+            >
+              Airdrop Calculator
+            </button>
 
-    <button
-      onClick={() => setTab("funding")}
-      className={`px-5 py-2 rounded-full text-sm transition ${
-        tab === "funding"
-          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400"
-          : "text-neutral-400"
-      }`}
-    >
-      Funding Rates
-    </button>
+            <button
+              onClick={() => setTab("funding")}
+              className={`px-5 py-2 rounded-full text-sm transition ${
+                tab === "funding"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400"
+                  : "text-neutral-400"
+              }`}
+            >
+              Funding Rates
+            </button>
 
-  </div>
-</div>
+          </div>
+        </div>
+
+      </div>
 
       {/* PERP LIST */}
       {tab === "list" && (
@@ -213,21 +208,18 @@ export default function Home() {
               </div>
 
               <div className="flex items-center gap-4">
-
                 <Image
                   src={perp.logo}
                   alt={perp.name}
                   width={40}
                   height={40}
-                  className="md:w-[48px] md:h-[48px] rounded-lg shadow-[0_0_12px_rgba(255,255,255,0.08)]"
+                  className="md:w-[48px] md:h-[48px] rounded-lg"
                 />
-
                 <div className="text-lg font-medium">{perp.name}</div>
-
               </div>
 
               <div className="flex md:justify-center">
-                <div className="text-xs sm:text-sm text-center px-3 py-1 font-medium rounded-full border border-emerald-400 text-emerald-300 bg-emerald-400/5 shadow-[0_0_10px_rgba(16,185,129,0.25)] max-w-[220px] md:max-w-full break-words">
+                <div className="text-xs sm:text-sm text-center px-3 py-1 font-medium rounded-full border border-emerald-400 text-emerald-300 bg-emerald-400/5">
                   {perp.boost}
                 </div>
               </div>
@@ -236,7 +228,7 @@ export default function Home() {
                 href={perp.ref}
                 target="_blank"
                 rel="noopener"
-                className="w-full md:w-auto mt-2 md:mt-0 md:ml-4 px-6 py-2 text-center rounded-xl border border-cyan-400 text-cyan-300 bg-cyan-400/5 hover:bg-cyan-400/10 hover:shadow-[0_0_18px_rgba(34,211,238,0.7)] transition font-semibold tracking-wide"
+                className="w-full md:w-auto mt-2 md:mt-0 md:ml-4 px-6 py-2 text-center rounded-xl border border-cyan-400 text-cyan-300 bg-cyan-400/5 hover:bg-cyan-400/10 transition font-semibold"
               >
                 TRADE →
               </a>
@@ -251,23 +243,16 @@ export default function Home() {
 
       {/* CALCULATOR */}
       {tab === "calculator" && (
-
-  <div className="max-w-4xl mx-auto mt-20 text-center min-h-screen">
-
+        <div className="max-w-4xl mx-auto mt-20 text-center min-h-screen">
           <div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-10">
-
             <div className="text-xl opacity-60 mb-4">
               Airdrop Calculator
             </div>
-
             <div className="opacity-40">
               coming soon
             </div>
-
           </div>
-
         </div>
-
       )}
 
     </main>

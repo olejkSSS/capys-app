@@ -77,9 +77,22 @@ function getTierStyle(tier: string) {
 
 export default function Home() {
 
-  const [tab, setTab] = useState<"list" | "calculator" | "funding">("list")
+const [tab,setTab] = useState<"list" | "calculator" | "funding">("list")
 
-  return (
+const [calcPerp,setCalcPerp] = useState("Nado")
+
+const [myPoints,setMyPoints] = useState(0)
+const [fdv,setFdv] = useState(1.5)
+const [totalPoints,setTotalPoints] = useState(4300000)
+const [airdrop,setAirdrop] = useState(8)
+
+const pricePerPoint =
+((fdv*1000000000)*(airdrop/100))/totalPoints
+
+const result =
+(myPoints*pricePerPoint)
+
+return (
     <main className="text-white relative overflow-x-hidden z-10">
 
       {/* Background */}
@@ -241,21 +254,117 @@ Capy
       {/* CALCULATOR */}
 {tab === "calculator" && (
 
-  <div className="max-w-4xl mx-auto mt-20 text-center min-h-screen">
+<section className="max-w-5xl mx-auto mt-16 px-4 space-y-6">
 
-    <div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-10">
+{/* PERP SELECT */}
+<div className="flex flex-wrap gap-2 justify-center">
 
-      <div className="text-xl opacity-60 mb-4">
-        Airdrop Calculator
-      </div>
+{[
+"Nado",
+"Variational",
+"Extended",
+"Pacifica",
+"Ethereal",
+"EdgeX",
+"StandX",
+"Hibachi"
+].map((p) => (
 
-      <div className="opacity-40">
-        coming soon
-      </div>
+<button
+key={p}
+onClick={() => setCalcPerp(p)}
+className={`px-4 py-2 rounded-full border text-sm transition ${
+calcPerp === p
+? "border-cyan-400 text-cyan-300 bg-cyan-400/10"
+: "border-neutral-700 text-neutral-400"
+}`}
+>
+{p}
+</button>
 
-    </div>
+))}
 
-  </div>
+</div>
+
+
+{/* INPUTS */}
+
+<div className="grid md:grid-cols-2 gap-4">
+
+<input
+type="number"
+placeholder="My points"
+value={myPoints}
+onChange={(e)=>setMyPoints(Number(e.target.value))}
+className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+/>
+
+<input
+type="number"
+placeholder="FDV (billions $)"
+value={fdv}
+onChange={(e)=>setFdv(Number(e.target.value))}
+className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+/>
+
+<input
+type="number"
+placeholder="Total points"
+value={totalPoints}
+onChange={(e)=>setTotalPoints(Number(e.target.value))}
+className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+/>
+
+<input
+type="number"
+placeholder="Airdrop % supply"
+value={airdrop}
+onChange={(e)=>setAirdrop(Number(e.target.value))}
+className="bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
+/>
+
+</div>
+
+
+{/* RESULT */}
+
+<div className="bg-[#0c1220]/70 border border-neutral-800 rounded-2xl p-8">
+
+<div className="text-xl text-cyan-300 mb-2">
+{calcPerp}
+</div>
+
+<div className="text-5xl font-bold mb-6">
+${result.toFixed(2)}
+</div>
+
+<div className="grid grid-cols-4 gap-3 text-sm">
+
+<div className="bg-black/40 rounded-xl p-3">
+<div className="opacity-50">Total Airdrop Pool</div>
+${(fdv*1000*(airdrop/100)).toFixed(2)}M
+</div>
+
+<div className="bg-black/40 rounded-xl p-3">
+<div className="opacity-50">My Points</div>
+{myPoints}
+</div>
+
+<div className="bg-black/40 rounded-xl p-3">
+<div className="opacity-50">Price per point</div>
+${pricePerPoint.toFixed(4)}
+</div>
+
+<div className="bg-black/40 rounded-xl p-3">
+<div className="opacity-50">Airdrop %</div>
+{airdrop}%
+</div>
+
+</div>
+
+</div>
+
+</section>
 
 )}
 
@@ -271,7 +380,7 @@ Capy
       </div>
 
       <div className="opacity-40">
-        funding screener coming soon
+         coming soon
       </div>
 
     </div>

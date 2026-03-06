@@ -76,6 +76,10 @@ const TEMPLATES = [
   "rich",
   "scarcover",
   "skeletons",
+  "whale",
+  "inc",
+  "wojak",
+  "locedin",
 ] as const
 
 const PERPS_CALC = {

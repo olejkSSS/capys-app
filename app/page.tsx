@@ -161,6 +161,17 @@ function formatMoney(value: number, digits = 2) {
   }).format(value)
 }
 
+function formatCompactMoney(value: number) {
+  if (!Number.isFinite(value)) return "$0"
+
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value)
+}
+
 function formatNumber(value: number) {
   if (!Number.isFinite(value)) return "0"
   return new Intl.NumberFormat("en-US").format(value)
@@ -176,7 +187,7 @@ export default function Home() {
   const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("nado")
   const [myPoints, setMyPoints] = useState(0)
   const [templatePicker, setTemplatePicker] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<string>(TEMPLATES[0])
   const [isDownloading, setIsDownloading] = useState(false)
 
   const cardRef = useRef<HTMLDivElement>(null)
@@ -184,8 +195,8 @@ export default function Home() {
   const current = PERPS_CALC[calcPerp]
 
   const [fdv, setFdv] = useState<number>(current.fdv)
-const [totalPoints, setTotalPoints] = useState<number>(current.totalPoints)
-const [airdrop, setAirdrop] = useState<number>(current.airdrop)
+  const [totalPoints, setTotalPoints] = useState<number>(current.totalPoints)
+  const [airdrop, setAirdrop] = useState<number>(current.airdrop)
 
   useEffect(() => {
     setFdv(current.fdv)
@@ -194,7 +205,7 @@ const [airdrop, setAirdrop] = useState<number>(current.airdrop)
   }, [current])
 
   const safeTotalPoints = Math.max(totalPoints, 1)
-  const safeAirdrop = Math.max(airdrop, 0)
+  const safeAirdrop = Math.min(Math.max(airdrop, 0), 100)
   const safeFdv = Math.max(fdv, 0)
   const safeMyPoints = Math.max(myPoints, 0)
 
@@ -211,39 +222,40 @@ const [airdrop, setAirdrop] = useState<number>(current.airdrop)
   }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
 
   const downloadCard = async () => {
-  if (!cardRef.current || isDownloading) return
+    if (!cardRef.current || isDownloading) return
 
-  try {
-    setIsDownloading(true)
+    try {
+      setIsDownloading(true)
 
-    await document.fonts.ready
-    await new Promise((resolve) => setTimeout(resolve, 200))
+      await document.fonts.ready
+      await new Promise((resolve) => setTimeout(resolve, 250))
 
-    const dataUrl = await toPng(cardRef.current, {
-      cacheBust: true,
-      pixelRatio: 2,
-      backgroundColor: "#0a0f1d",
-    })
+      const dataUrl = await toPng(cardRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#060b16",
+      })
 
-    const link = document.createElement("a")
-    link.download = `${current.name.toLowerCase()}-airdrop-card.png`
-    link.href = dataUrl
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  } catch (error) {
-    console.error("Card download failed:", error)
-    alert("Failed to download card.")
-  } finally {
-    setIsDownloading(false)
+      const link = document.createElement("a")
+      link.download = `${current.name.toLowerCase()}-airdrop-card.png`
+      link.href = dataUrl
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error("Card download failed:", error)
+      alert("Failed to download card.")
+    } finally {
+      setIsDownloading(false)
+    }
   }
-}
 
   const shareOnX = () => {
-    const text = `My potential ${current.name} airdrop is ${formatMoney(myValue)}.
+    const text = `My potential ${current.name} airdrop is ${formatMoney(myValue, 0)}.
 
-Points: ${formatNumber(safeMyPoints)}
-Price per point: ${formatMoney(pricePerPoint, 4)}
+My points: ${formatNumber(safeMyPoints)}
+Est. FDV: ${formatCompactMoney(safeFdv * 1_000_000_000)}
+Airdrop: ${safeAirdrop}%
 
 Calculate yours on capys.app`
 
@@ -389,7 +401,7 @@ Calculate yours on capys.app`
       )}
 
       {tab === "calculator" && (
-        <section className="mx-auto mt-20 max-w-4xl space-y-8 px-4">
+        <section className="mx-auto mt-20 max-w-5xl space-y-8 px-4">
           <p className="text-center opacity-50">
             Calculate your potential airdrop based on your perp DEX points balance.
           </p>
@@ -464,72 +476,113 @@ Calculate yours on capys.app`
           </div>
 
           <div
+            ref={cardRef}
+            className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[28px] border border-cyan-400/20 bg-[#060b16] shadow-[0_0_40px_rgba(0,255,255,0.08)]"
+          >
+            <img
+              src={`/templates/${selectedTemplate}.png`}
+              alt="Card template"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
 
-  ref={cardRef}
-  className="relative mt-10 overflow-hidden rounded-2xl border border-neutral-800 bg-[#0a0f1d] p-8"
->
-  {selectedTemplate && (
-    <img
-      src={`/templates/${selectedTemplate}.png`}
-      alt="Card template"
-      className="absolute inset-0 h-full w-full object-cover"
-    />
-  )}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#050a14]/92 via-[#050a14]/45 to-transparent" />
+            <div className="absolute inset-0 bg-black/15" />
 
-  <div className="absolute inset-0 bg-black/35" />
+            <div className="relative z-10 flex h-full flex-col p-5 sm:p-7 md:p-10">
+              <div className="flex items-start justify-between gap-4">
+                <div className="max-w-[62%]">
+                  <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.35em] text-cyan-300/85 sm:text-xs">
+                    capys.app
+                  </div>
 
-  <div className="relative z-10">
-          
-              <h2 className="mb-4 text-xl text-cyan-300">{current.name}</h2>
+                  <div className="mb-3 inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-300 sm:text-base">
+                    {current.name}
+                  </div>
 
-              <div className="mb-6 text-4xl font-bold">{formatMoney(myValue)}</div>
+                  <div className="text-[10px] uppercase tracking-[0.35em] text-white/45 sm:text-xs">
+                    Potential Airdrop Value
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
-                <div className="rounded-lg bg-black/35 p-4 backdrop-blur-sm">
-                  <p className="opacity-50">Total Airdrop Pool</p>
-                  <p>{formatMoney(totalAirdropPool / 1_000_000)}M</p>
+                  <div className="mt-3 text-3xl font-bold leading-none text-white sm:text-4xl md:text-6xl">
+                    {formatMoney(myValue, 0)}
+                  </div>
+
+                  <div className="mt-3 text-sm text-white/65 sm:text-base">
+                    {formatNumber(safeMyPoints)} points • {formatMoney(pricePerPoint, 2)} per point
+                  </div>
                 </div>
 
-                <div className="rounded-lg bg-black/35 p-4 backdrop-blur-sm">
-                  <p className="opacity-50">My Points</p>
-                  <p>{formatNumber(safeMyPoints)}</p>
-                </div>
-
-                <div className="rounded-lg bg-black/35 p-4 backdrop-blur-sm">
-                  <p className="opacity-50">Price per point</p>
-                  <p>{formatMoney(pricePerPoint, 4)}</p>
-                </div>
-
-                <div className="rounded-lg bg-black/35 p-4 backdrop-blur-sm">
-                  <p className="opacity-50">Airdrop %</p>
-                  <p>{safeAirdrop}%</p>
+                <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:px-4 sm:text-xs">
+                  estimate only
                 </div>
               </div>
 
-              <div className="mt-6 flex flex-wrap justify-center gap-4">
-                <button
-                  onClick={() => setTemplatePicker(true)}
-                  className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-cyan-400"
-                >
-                  Pick a Template
-                </button>
+              <div className="mt-auto grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur-md sm:p-4">
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
+                    My Points
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
+                    {formatNumber(safeMyPoints)}
+                  </div>
+                </div>
 
-                <button
-                  onClick={downloadCard}
-                  disabled={isDownloading}
-                  className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isDownloading ? "Downloading..." : "Download Card"}
-                </button>
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur-md sm:p-4">
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
+                    Total Supply
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
+                    {formatNumber(safeTotalPoints)}
+                  </div>
+                </div>
 
-                <button
-                  onClick={shareOnX}
-                  className="rounded-xl bg-white px-6 py-3 font-semibold text-black"
-                >
-                  Share on X
-                </button>
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur-md sm:p-4">
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
+                    Est. FDV
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
+                    {formatCompactMoney(safeFdv * 1_000_000_000)}
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur-md sm:p-4">
+                  <div className="text-[10px] uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
+                    Airdrop %
+                  </div>
+                  <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
+                    {safeAirdrop}%
+                  </div>
+                </div>
+              </div>
+
+              <div className="pointer-events-none absolute bottom-3 right-4 text-[10px] uppercase tracking-[0.28em] text-white/30 sm:bottom-4 sm:right-6 sm:text-xs">
+                @capy_onchain
               </div>
             </div>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => setTemplatePicker(true)}
+              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-cyan-400"
+            >
+              Pick a Template
+            </button>
+
+            <button
+              onClick={downloadCard}
+              disabled={isDownloading}
+              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isDownloading ? "Downloading..." : "Download Card"}
+            </button>
+
+            <button
+              onClick={shareOnX}
+              className="rounded-xl bg-white px-6 py-3 font-semibold text-black"
+            >
+              Share on X
+            </button>
           </div>
         </section>
       )}
@@ -545,7 +598,7 @@ Calculate yours on capys.app`
 
       {templatePicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur">
-          <div className="max-h-[85vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0c1220] p-6">
+          <div className="max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0c1220] p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-lg">Choose Card Background</h3>
 
@@ -557,7 +610,7 @@ Calculate yours on capys.app`
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {TEMPLATES.map((template) => (
                 <button
                   key={template}
@@ -565,19 +618,20 @@ Calculate yours on capys.app`
                     setSelectedTemplate(template)
                     setTemplatePicker(false)
                   }}
-                  className={`overflow-hidden rounded-lg border transition ${
+                  className={`overflow-hidden rounded-xl border transition ${
                     selectedTemplate === template
                       ? "border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.25)]"
                       : "border-neutral-800 hover:border-cyan-400"
                   }`}
                 >
-                  <Image
-                    src={`/templates/${template}.png`}
-                    alt={template}
-                    width={200}
-                    height={200}
-                    className="h-auto w-full object-cover"
-                  />
+                  <div className="relative aspect-video w-full bg-[#060b16]">
+                    <Image
+                      src={`/templates/${template}.png`}
+                      alt={template}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                 </button>
               ))}
             </div>

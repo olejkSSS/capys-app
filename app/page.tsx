@@ -77,7 +77,7 @@ function getTierStyle(tier: string) {
 
 export default function Home() {
 
-  const [tab, setTab] = useState<"list" | "calculator">("list")
+  const [tab, setTab] = useState<"list" | "calculator" | "funding">("list")
 
   return (
     <main className="text-white relative overflow-x-hidden z-10">
@@ -148,35 +148,44 @@ export default function Home() {
         </p>
 
         {/* Tabs */}
-        <div className="flex justify-center mt-8">
-          <div className="flex bg-[#0c1220]/70 border border-neutral-800 rounded-full p-1 backdrop-blur">
+<div className="flex justify-center mt-8">
+  <div className="flex bg-[#0c1220]/70 border border-neutral-800 rounded-full p-1 backdrop-blur">
 
-            <button
-              onClick={() => setTab("list")}
-              className={`px-5 py-2 rounded-full text-sm transition ${
-                tab === "list"
-                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400"
-                  : "text-neutral-400"
-              }`}
-            >
-              Perp DEX List
-            </button>
+    <button
+      onClick={() => setTab("list")}
+      className={`px-5 py-2 rounded-full text-sm transition ${
+        tab === "list"
+          ? "bg-cyan-500/20 text-cyan-300 border border-cyan-400"
+          : "text-neutral-400"
+      }`}
+    >
+      Perp DEX List
+    </button>
 
-            <button
-              onClick={() => setTab("calculator")}
-              className={`px-5 py-2 rounded-full text-sm transition ${
-                tab === "calculator"
-                  ? "bg-purple-500/20 text-purple-300 border border-purple-400"
-                  : "text-neutral-400"
-              }`}
-            >
-              Airdrop Calculator
-            </button>
+    <button
+      onClick={() => setTab("calculator")}
+      className={`px-5 py-2 rounded-full text-sm transition ${
+        tab === "calculator"
+          ? "bg-purple-500/20 text-purple-300 border border-purple-400"
+          : "text-neutral-400"
+      }`}
+    >
+      Airdrop Calculator
+    </button>
 
-          </div>
-        </div>
+    <button
+      onClick={() => setTab("funding")}
+      className={`px-5 py-2 rounded-full text-sm transition ${
+        tab === "funding"
+          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-400"
+          : "text-neutral-400"
+      }`}
+    >
+      Funding Rates
+    </button>
 
-      </div>
+  </div>
+</div>
 
       {/* PERP LIST */}
       {tab === "list" && (

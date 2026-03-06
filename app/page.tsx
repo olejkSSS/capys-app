@@ -141,8 +141,8 @@ setTotalPoints(current.totalPoints)
 setAirdrop(current.airdrop)
 }, [calcPerp])
 
-const totalAirdropPool = current.fdv * 1000000000 * (current.airdrop / 100)
-const pricePerPoint = totalAirdropPool / current.totalPoints
+const totalAirdropPool = fdv * 1000000000 * (airdrop / 100)
+const pricePerPoint = totalAirdropPool / totalPoints
 const myValue = myPoints * pricePerPoint
 
 return (

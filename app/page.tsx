@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 const perps = [
   {
@@ -130,8 +130,16 @@ const perpsCalc = {
 }
 const [calcPerp, setCalcPerp] = useState<keyof typeof perpsCalc>("nado")
 const [myPoints, setMyPoints] = useState(0)
+const [fdv, setFdv] = useState(perpsCalc.nado.fdv)
+const [totalPoints, setTotalPoints] = useState(perpsCalc.nado.totalPoints)
+const [airdrop, setAirdrop] = useState(perpsCalc.nado.airdrop)
 
 const current = perpsCalc[calcPerp]
+useEffect(() => {
+setFdv(current.fdv)
+setTotalPoints(current.totalPoints)
+setAirdrop(current.airdrop)
+}, [calcPerp])
 
 const totalAirdropPool = current.fdv * 1000000000 * (current.airdrop / 100)
 const pricePerPoint = totalAirdropPool / current.totalPoints
@@ -350,8 +358,8 @@ className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 
 <input
 type="number"
-value={current.fdv}
-readOnly
+value={fdv}
+onChange={(e)=>setFdv(Number(e.target.value))}
 className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 />
 
@@ -362,8 +370,8 @@ className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 
 <input
 type="number"
-value={current.totalPoints}
-readOnly
+value={totalPoints}
+onChange={(e)=>setTotalPoints(Number(e.target.value))}
 className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 />
 
@@ -374,8 +382,8 @@ className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 
 <input
 type="number"
-value={current.airdrop}
-readOnly
+value={airdrop}
+onChange={(e)=>setAirdrop(Number(e.target.value))}
 className="w-full bg-[#0c1220] border border-neutral-800 rounded-xl p-4"
 />
 

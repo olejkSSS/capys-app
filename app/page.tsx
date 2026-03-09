@@ -80,12 +80,6 @@ const TEMPLATES = [
 ] as const
 
 const PERPS_CALC = {
-  nado: {
-    name: "Nado",
-    fdv: 1.5,
-    totalPoints: 4300000,
-    airdrop: 8,
-  },
   variational: {
     name: "Variational",
     fdv: 0.6,
@@ -100,33 +94,75 @@ const PERPS_CALC = {
   },
   pacifica: {
     name: "Pacifica",
-    fdv: 0.6,
+    fdv: 0.3,
     totalPoints: 60000000,
     airdrop: 20,
   },
+  nado: {
+    name: "Nado",
+    fdv: 0.3,
+    totalPoints: 4300000,
+    airdrop: 8,
+  },
+  o1: {
+    name: "01Exchange",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 20,
+  },
+  treadfi: {
+    name: "Tread Fi",
+    fdv: 0.3,
+    totalPoints: 2000000,
+    airdrop: 20,
+  },
+  dreamcash: {
+    name: "Dreamcash",
+    fdv: 0.1,
+    totalPoints: 6000000,
+    airdrop: 12,
+  },
+  hibachi: {
+    name: "Hibachi",
+    fdv: 0.4,
+    totalPoints: 60000000,
+    airdrop: 15,
+  },
   ethereal: {
     name: "Ethereal",
-    fdv: 0.5,
+    fdv: 0.3,
     totalPoints: 10000000,
+    airdrop: 15,
+  },
+  ostium: {
+    name: "Ostium",
+    fdv: 0.3,
+    totalPoints: 56000000,
+    airdrop: 15,
+  },
+  grvt: {
+    name: "Grvt",
+    fdv: 0.15,
+    totalPoints: 3000000,
+    airdrop: 15,
+  },
+  bullpen: {
+    name: "Bullpen",
+    fdv: 0.15,
+    totalPoints: 69900000,
     airdrop: 15,
   },
   edgex: {
     name: "EdgeX",
-    fdv: 2,
+    fdv: 1,
     totalPoints: 10000000,
     airdrop: 30,
   },
   standx: {
     name: "StandX",
-    fdv: 0.5,
+    fdv: 0.2,
     totalPoints: 50000000,
     airdrop: 20,
-  },
-  hibachi: {
-    name: "Hibachi",
-    fdv: 0.15,
-    totalPoints: 60000000,
-    airdrop: 15,
   },
 } as const
 
@@ -183,7 +219,7 @@ function sanitizeNumber(value: string) {
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list")
-  const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("nado")
+  const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
   const [myPoints, setMyPoints] = useState(0)
   const [templatePicker, setTemplatePicker] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<string>(TEMPLATES[0])

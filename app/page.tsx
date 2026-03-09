@@ -10,7 +10,7 @@ const PERPS = [
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
-    boost: "OMNICAPY: +13% points boost",
+    boost: "OMNICAPY: +16% points boost",
     farm: "Holding positions + volume on mid-OI tokens",
   },
   {
@@ -174,7 +174,139 @@ const PERPS_CALC = {
   },
 } as const
 
-type Tab = "list" | "calculator" | "funding"
+const POLYMARKET_LAUNCH_ODDS = [
+  {
+    name: "Variational",
+    deadline: "Dec 31, 2026",
+    probability: 88,
+    link: "https://polymarket.com/event/will-variational-launch-a-token-in-2025?via=capy",
+    note: "Market is pricing one of the strongest launch setups among tracked perps.",
+  },
+  {
+    name: "Extended",
+    deadline: "Dec 31, 2026",
+    probability: 92,
+    link: "https://polymarket.com/event/will-extended-launch-a-token-by?via=capy",
+    note: "Very strong odds. One of the cleanest launch probabilities on the board.",
+  },
+  {
+    name: "edgeX",
+    deadline: "Sep 30, 2026",
+    probability: 98,
+    link: "https://polymarket.com/event/will-edgex-launch-a-token-by?via=capy",
+    note: "Extremely strong market confidence. Odds already imply near-certain launch this year.",
+  },
+  {
+    name: "GRVT",
+    deadline: "Sep 30, 2026",
+    probability: 84,
+    link: "https://polymarket.com/event/will-grvt-launch-a-token-by?via=capy",
+    note: "Very strong odds. Market is leaning heavily toward a 2026 launch.",
+  },
+  {
+    name: "Ostium",
+    deadline: "Dec 31, 2026",
+    probability: 80,
+    link: "https://polymarket.com/event/will-ostium-launch-a-token-in-2025?via=capy",
+    note: "Strong odds, though the market URL/title is older and the live frontrunner on page is Dec 31, 2026.",
+  },
+  {
+    name: "Tread Fi",
+    deadline: "Dec 31, 2026",
+    probability: 74,
+    link: "https://polymarket.com/event/will-tread-launch-a-token-by?via=capy",
+    note: "Good odds overall, but still not in the top tier of certainty.",
+  },
+  {
+    name: "Hibachi",
+    deadline: "Sep 30, 2026",
+    probability: 61,
+    link: "https://polymarket.com/event/will-hibachi-launch-a-token-by?via=capy",
+    note: "More binary setup. If market conditions improve, sentiment can rerate quickly.",
+  },
+  {
+    name: "Pacifica",
+    deadline: "Dec 31, 2026",
+    probability: 60,
+    link: "https://polymarket.com/event/will-pacifica-launch-a-token-by?via=capy",
+    note: "Moderate odds. Market is not fully convinced yet despite the protocol being watched.",
+  },
+  {
+    name: "Dreamcash",
+    deadline: "Dec 31, 2026",
+    probability: 62,
+    link: "https://polymarket.com/event/will-dreamcash-launch-a-token-by?via=capy",
+    note: "Still speculative, but market assigns a real shot at launch by year-end.",
+  },
+  {
+    name: "StandX",
+    deadline: "Mar 31, 2026",
+    probability: 2,
+    link: "https://polymarket.com/event/will-standx-launch-a-token-in-2025?via=capy",
+    note: "Very weak odds right now. Market is heavily skeptical on near-term launch timing.",
+  },
+] as const
+
+const POLYMARKET_FDV_ODDS = [
+  {
+    name: "edgeX",
+    threshold: "$700M",
+    probability: 53,
+    link: "https://polymarket.com/event/edgex-fdv-above-one-day-after-launch?via=capy",
+    note: "Market leader is already in the upper mid-range, with $1B still close behind.",
+  },
+  {
+    name: "Extended",
+    threshold: "$150M",
+    probability: 68,
+    link: "https://polymarket.com/event/extended-fdv-above-one-day-after-launch?via=capy",
+    note: "Market is leaning toward a relatively modest opening FDV versus top-tier perp names.",
+  },
+  {
+    name: "Variational",
+    threshold: "$300M",
+    probability: 41,
+    link: "https://polymarket.com/event/variational-fdv-above-one-day-after-launch?via=capy",
+    note: "Current leader is $300M, but the board still leaves room for rerating if sentiment improves.",
+  },
+  {
+    name: "Ostium",
+    threshold: "$300M",
+    probability: 37,
+    link: "https://polymarket.com/event/ostium-fdv-above-one-day-after-launch?via=capy",
+    note: "Market center of gravity is around the mid-range rather than a premium launch multiple.",
+  },
+  {
+    name: "Pacifica",
+    threshold: "$300M",
+    probability: 20,
+    link: "https://polymarket.com/event/pacifica-fdv-above-one-day-after-launch?via=capy",
+    note: "Market is still very split here, which makes Pacifica one of the noisier FDV boards.",
+  },
+  {
+    name: "Dreamcash",
+    threshold: "$20M",
+    probability: 82,
+    link: "https://polymarket.com/event/dreamcash-fdv-above-one-day-after-launch?via=capy",
+    note: "Board is anchored low for now, with most optimism concentrated at the lower thresholds.",
+  },
+  {
+    name: "GRVT",
+    threshold: "$50M",
+    probability: 86,
+    link: "https://polymarket.com/event/grvt-fdv-above-one-day-after-launch?via=capy",
+    note: "Market is heavily centered on a low opening FDV relative to the hype around the project.",
+  },
+  {
+    name: "StandX",
+    threshold: "$200M",
+    probability: 40,
+    link: "https://polymarket.com/event/standx-fdv-above-one-day-after-launch?via=capy",
+    note: "Very mixed board. No single valuation bucket has dominant control.",
+  },
+] as const
+
+type Tab = "list" | "calculator" | "odds" | "funding"
 type CalcPerpKey = keyof typeof PERPS_CALC
 
 function getTierStyle(tier: string) {
@@ -223,6 +355,30 @@ function formatNumber(value: number) {
 function sanitizeNumber(value: string) {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : 0
+}
+
+function getProbabilityStyle(probability: number) {
+  if (probability >= 75) {
+    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+  }
+
+  if (probability >= 50) {
+    return "border-yellow-400/30 bg-yellow-400/10 text-yellow-300"
+  }
+
+  return "border-red-400/30 bg-red-400/10 text-red-300"
+}
+
+function getFdvStyle(probability: number) {
+  if (probability >= 60) {
+    return "border-cyan-400/30 bg-cyan-400/10 text-cyan-300"
+  }
+
+  if (probability >= 35) {
+    return "border-fuchsia-400/30 bg-fuchsia-400/10 text-fuchsia-300"
+  }
+
+  return "border-neutral-500/30 bg-neutral-500/10 text-neutral-300"
 }
 
 export default function Home() {
@@ -352,42 +508,54 @@ Calculate yours on capys.app`
         <p className="mt-4 opacity-60">Crypto-native Perp Tier List</p>
 
         <div className="mt-8 flex justify-center">
-          <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
-            <button
-              onClick={() => setTab("list")}
-              className={`rounded-full px-5 py-2 text-sm transition ${
-                tab === "list"
-                  ? "border border-cyan-400 bg-cyan-500/20 text-cyan-300"
-                  : "text-neutral-400"
-              }`}
-            >
-              Perp DEX List
-            </button>
+  <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
+    <button
+      onClick={() => setTab("list")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "list"
+          ? "border border-cyan-400 bg-cyan-500/20 text-cyan-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Perp DEX List
+    </button>
 
-            <button
-              onClick={() => setTab("calculator")}
-              className={`rounded-full px-5 py-2 text-sm transition ${
-                tab === "calculator"
-                  ? "border border-purple-400 bg-purple-500/20 text-purple-300"
-                  : "text-neutral-400"
-              }`}
-            >
-              Perp DEX Airdrop Calculator
-            </button>
+    <button
+      onClick={() => setTab("calculator")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "calculator"
+          ? "border border-purple-400 bg-purple-500/20 text-purple-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Perp DEX Airdrop Calculator
+    </button>
 
-            <button
-              onClick={() => setTab("funding")}
-              className={`rounded-full px-5 py-2 text-sm transition ${
-                tab === "funding"
-                  ? "border border-emerald-400 bg-emerald-500/20 text-emerald-300"
-                  : "text-neutral-400"
-              }`}
-            >
-              Funding Rates
-            </button>
-          </div>
-        </div>
-      </div>
+    <button
+      onClick={() => setTab("odds")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "odds"
+          ? "border border-fuchsia-400 bg-fuchsia-500/20 text-fuchsia-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Polymarket Odds
+    </button>
+
+    <button
+      onClick={() => setTab("funding")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "funding"
+          ? "border border-emerald-400 bg-emerald-500/20 text-emerald-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Funding Rates
+    </button>
+  </div>
+</div>
+
+</div>
 
       {tab === "list" && (
         <section className="mx-auto mt-16 max-w-5xl space-y-6 px-4 sm:mt-20 sm:px-6">
@@ -635,6 +803,119 @@ Calculate yours on capys.app`
           </div>
         </section>
       )}
+
+      {tab === "odds" && (
+  <section className="mx-auto mt-20 max-w-6xl space-y-8 px-4 sm:px-6">
+    <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+      <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
+      <p className="mt-2 text-sm text-white/50">
+        Market-implied launch timing and FDV expectations based on current Polymarket pricing.
+      </p>
+    </div>
+
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-lg font-semibold text-white">Launch Timing Odds</h3>
+        <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+          token launch deadlines
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {POLYMARKET_LAUNCH_ODDS.map((item) => (
+          <div
+            key={item.name}
+            className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-fuchsia-400/30"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="text-xl font-semibold text-white">{item.name}</div>
+
+                  <div
+                    className={`rounded-full border px-3 py-1 text-xs font-medium ${getProbabilityStyle(
+                      item.probability
+                    )}`}
+                  >
+                    {item.probability}% probability
+                  </div>
+                </div>
+
+                <div className="text-sm text-white/45">
+                  Deadline: {item.deadline}
+                </div>
+
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex rounded-lg border border-cyan-400/25 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-400/15"
+                >
+                  Open launch market
+                </a>
+              </div>
+
+              <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
+                {item.note}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="text-lg font-semibold text-white">FDV Odds</h3>
+        <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+          one day after launch
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {POLYMARKET_FDV_ODDS.map((item) => (
+          <div
+            key={item.name}
+            className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-cyan-400/30"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="text-xl font-semibold text-white">{item.name}</div>
+
+                  <div
+                    className={`rounded-full border px-3 py-1 text-xs font-medium ${getFdvStyle(
+                      item.probability
+                    )}`}
+                  >
+                    {item.threshold} • {item.probability}%
+                  </div>
+                </div>
+
+                <div className="text-sm text-cyan-300/75">
+                  Current market leader
+                </div>
+
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex rounded-lg border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-medium text-fuchsia-300 transition hover:border-fuchsia-400/50 hover:bg-fuchsia-400/15"
+                >
+                  Open FDV market
+                </a>
+              </div>
+
+              <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
+                {item.note}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
 
       {tab === "funding" && (
         <div className="mx-auto mt-20 min-h-screen max-w-4xl px-4 text-center">

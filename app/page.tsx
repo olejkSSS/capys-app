@@ -11,7 +11,7 @@ const PERPS = [
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
     boost: "OMNICAPY: +13% points boost",
-    farm: "Holding + low OI tokens",
+    farm: "Holding positions + volume on mid-OI tokens",
   },
   {
     tier: "S+",
@@ -19,7 +19,7 @@ const PERPS = [
     ref: "https://app.extended.exchange/join/CAPY",
     logo: "/extended.png",
     boost: "-10% fees + 5% points boost + 30% refback",
-    farm: "Volume + holding",
+    farm: "Volume + holding positions",
   },
   {
     tier: "S",
@@ -27,7 +27,7 @@ const PERPS = [
     ref: "http://hibachi.xyz/r/capy",
     logo: "/hibachi.png",
     boost: "-15% fees + 15% points boost",
-    farm: "Volume farming",
+    farm: "Volume + holding positions",
   },
   {
     tier: "S",
@@ -35,7 +35,7 @@ const PERPS = [
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     logo: "/ethereal.png",
     boost: "+15% points boost",
-    farm: "Boost farming + activity",
+    farm: "Boost farming + low OI tokens",
   },
   {
     tier: "S",
@@ -51,7 +51,7 @@ const PERPS = [
     ref: "https://app.pacifica.fi/?referral=Capy",
     logo: "/pacifica.png",
     boost: "+15% points boost",
-    farm: "Active trading",
+    farm: "High volume + active trading",
   },
   {
     tier: "A",
@@ -59,7 +59,7 @@ const PERPS = [
     ref: "https://pro.edgex.exchange/referral/OLEJK",
     logo: "/edgex.png",
     boost: "-10% fees + 10% points boost + VIP1",
-    farm: "High volume + competition",
+    farm: "High volume + hold positions",
   },
   {
     tier: "A",
@@ -67,7 +67,7 @@ const PERPS = [
     ref: "https://dreamcash.xyz/share?code=CAPYCR",
     logo: "/dreamcash.png",
     boost: "boost from 10K to 1M points",
-    farm: "Early farming + positioning",
+    farm: "Low OI tokens + active trading",
   },
 ] as const
 

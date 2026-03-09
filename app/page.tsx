@@ -24,7 +24,7 @@ const PERPS = [
   {
     tier: "S",
     name: "Hibachi",
-    ref: "https://hibachi.xyz/r/capy",
+    ref: "http://hibachi.xyz/r/capy",
     logo: "/hibachi.png",
     boost: "-15% fees + 15% points boost",
     farm: "Volume + holding positions",
@@ -35,7 +35,7 @@ const PERPS = [
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     logo: "/ethereal.png",
     boost: "+15% points boost",
-    farm: "Boost farming + low-OI tokens",
+    farm: "Boost farming + low OI tokens",
   },
   {
     tier: "S",
@@ -59,15 +59,15 @@ const PERPS = [
     ref: "https://pro.edgex.exchange/referral/OLEJK",
     logo: "/edgex.png",
     boost: "-10% fees + 10% points boost + VIP1",
-    farm: "High volume + holding positions",
+    farm: "High volume + hold positions",
   },
   {
     tier: "A",
     name: "Dreamcash",
     ref: "https://dreamcash.xyz/share?code=CAPYCR",
     logo: "/dreamcash.png",
-    boost: "Boost from 10K to 1M points",
-    farm: "Low-OI tokens + active trading",
+    boost: "boost from 10K to 1M points",
+    farm: "Low OI tokens + active trading",
   },
 ] as const
 
@@ -149,7 +149,7 @@ const PERPS_CALC = {
     airdrop: 15,
   },
   grvt: {
-    name: "GRVT",
+    name: "Grvt",
     fdv: 0.15,
     totalPoints: 3000000,
     airdrop: 15,
@@ -176,20 +176,6 @@ const PERPS_CALC = {
 
 const POLYMARKET_LAUNCH_ODDS = [
   {
-    name: "EdgeX",
-    deadline: "Sep 30, 2026",
-    probability: 98,
-    link: "https://polymarket.com/event/will-edgex-launch-a-token-by?via=capy",
-    note: "Extremely strong market confidence. Odds already imply a near-certain launch this year.",
-  },
-  {
-    name: "Extended",
-    deadline: "Dec 31, 2026",
-    probability: 92,
-    link: "https://polymarket.com/event/will-extended-launch-a-token-by?via=capy",
-    note: "Very strong odds. One of the cleanest launch probability boards right now.",
-  },
-  {
     name: "Variational",
     deadline: "Dec 31, 2026",
     probability: 88,
@@ -197,18 +183,32 @@ const POLYMARKET_LAUNCH_ODDS = [
     note: "Market is pricing one of the strongest launch setups among tracked perps.",
   },
   {
+    name: "Extended",
+    deadline: "Dec 31, 2026",
+    probability: 92,
+    link: "https://polymarket.com/event/will-extended-launch-a-token-by?via=capy",
+    note: "Very strong odds. One of the cleanest launch probabilities on the board.",
+  },
+  {
+    name: "edgeX",
+    deadline: "Sep 30, 2026",
+    probability: 98,
+    link: "https://polymarket.com/event/will-edgex-launch-a-token-by?via=capy",
+    note: "Extremely strong market confidence. Odds already imply near-certain launch this year.",
+  },
+  {
     name: "GRVT",
     deadline: "Sep 30, 2026",
     probability: 84,
     link: "https://polymarket.com/event/will-grvt-launch-a-token-by?via=capy",
-    note: "Very strong odds. The market is leaning heavily toward a 2026 launch.",
+    note: "Very strong odds. Market is leaning heavily toward a 2026 launch.",
   },
   {
     name: "Ostium",
     deadline: "Dec 31, 2026",
     probability: 80,
     link: "https://polymarket.com/event/will-ostium-launch-a-token-in-2025?via=capy",
-    note: "Strong odds, though the market URL is older while the live board now points to Dec 31, 2026.",
+    note: "Strong odds, though the market URL/title is older and the live frontrunner on page is Dec 31, 2026.",
   },
   {
     name: "Tread Fi",
@@ -216,13 +216,6 @@ const POLYMARKET_LAUNCH_ODDS = [
     probability: 74,
     link: "https://polymarket.com/event/will-tread-launch-a-token-by?via=capy",
     note: "Good odds overall, but still not in the top tier of certainty.",
-  },
-  {
-    name: "Dreamcash",
-    deadline: "Dec 31, 2026",
-    probability: 62,
-    link: "https://polymarket.com/event/will-dreamcash-launch-a-token-by?via=capy",
-    note: "Still speculative, but the market assigns a real shot at launch by year-end.",
   },
   {
     name: "Hibachi",
@@ -236,73 +229,80 @@ const POLYMARKET_LAUNCH_ODDS = [
     deadline: "Dec 31, 2026",
     probability: 60,
     link: "https://polymarket.com/event/will-pacifica-launch-a-token-by?via=capy",
-    note: "Moderate odds. The market is not fully convinced yet despite strong interest around the protocol.",
+    note: "Moderate odds. Market is not fully convinced yet despite the protocol being watched.",
+  },
+  {
+    name: "Dreamcash",
+    deadline: "Dec 31, 2026",
+    probability: 62,
+    link: "https://polymarket.com/event/will-dreamcash-launch-a-token-by?via=capy",
+    note: "Still speculative, but market assigns a real shot at launch by year-end.",
   },
   {
     name: "StandX",
     deadline: "Mar 31, 2026",
     probability: 2,
     link: "https://polymarket.com/event/will-standx-launch-a-token-in-2025?via=capy",
-    note: "Very weak odds right now. The market is heavily skeptical on near-term launch timing.",
+    note: "Very weak odds right now. Market is heavily skeptical on near-term launch timing.",
   },
 ] as const
 
 const POLYMARKET_FDV_ODDS = [
   {
-    name: "GRVT",
-    threshold: "$50M",
-    probability: 86,
-    link: "https://polymarket.com/event/grvt-fdv-above-one-day-after-launch?via=capy",
-    note: "The board is heavily centered on a low opening FDV relative to the project hype.",
-  },
-  {
-    name: "Dreamcash",
-    threshold: "$20M",
-    probability: 82,
-    link: "https://polymarket.com/event/dreamcash-fdv-above-one-day-after-launch?via=capy",
-    note: "The board is anchored low for now, with most optimism concentrated at lower thresholds.",
+    name: "edgeX",
+    threshold: "$700M",
+    probability: 53,
+    link: "https://polymarket.com/event/edgex-fdv-above-one-day-after-launch?via=capy",
+    note: "Market leader is already in the upper mid-range, with $1B still close behind.",
   },
   {
     name: "Extended",
     threshold: "$150M",
     probability: 68,
     link: "https://polymarket.com/event/extended-fdv-above-one-day-after-launch?via=capy",
-    note: "The market is leaning toward a relatively modest opening FDV versus top-tier perp names.",
-  },
-  {
-    name: "EdgeX",
-    threshold: "$700M",
-    probability: 53,
-    link: "https://polymarket.com/event/edgex-fdv-above-one-day-after-launch?via=capy",
-    note: "The market leader is already in the upper mid-range, with $1B still close behind.",
+    note: "Market is leaning toward a relatively modest opening FDV versus top-tier perp names.",
   },
   {
     name: "Variational",
     threshold: "$300M",
     probability: 41,
     link: "https://polymarket.com/event/variational-fdv-above-one-day-after-launch?via=capy",
-    note: "The current leader is $300M, but the board still leaves room for rerating if sentiment improves.",
-  },
-  {
-    name: "StandX",
-    threshold: "$200M",
-    probability: 40,
-    link: "https://polymarket.com/event/standx-fdv-above-one-day-after-launch?via=capy",
-    note: "A very mixed board. No single valuation bucket has dominant control.",
+    note: "Current leader is $300M, but the board still leaves room for rerating if sentiment improves.",
   },
   {
     name: "Ostium",
     threshold: "$300M",
     probability: 37,
     link: "https://polymarket.com/event/ostium-fdv-above-one-day-after-launch?via=capy",
-    note: "The market center of gravity is around the mid-range rather than a premium launch multiple.",
+    note: "Market center of gravity is around the mid-range rather than a premium launch multiple.",
   },
   {
     name: "Pacifica",
     threshold: "$300M",
     probability: 20,
     link: "https://polymarket.com/event/pacifica-fdv-above-one-day-after-launch?via=capy",
-    note: "The board is still very split, which makes Pacifica one of the noisier FDV markets.",
+    note: "Market is still very split here, which makes Pacifica one of the noisier FDV boards.",
+  },
+  {
+    name: "Dreamcash",
+    threshold: "$20M",
+    probability: 82,
+    link: "https://polymarket.com/event/dreamcash-fdv-above-one-day-after-launch?via=capy",
+    note: "Board is anchored low for now, with most optimism concentrated at the lower thresholds.",
+  },
+  {
+    name: "GRVT",
+    threshold: "$50M",
+    probability: 86,
+    link: "https://polymarket.com/event/grvt-fdv-above-one-day-after-launch?via=capy",
+    note: "Market is heavily centered on a low opening FDV relative to the hype around the project.",
+  },
+  {
+    name: "StandX",
+    threshold: "$200M",
+    probability: 40,
+    link: "https://polymarket.com/event/standx-fdv-above-one-day-after-launch?via=capy",
+    note: "Very mixed board. No single valuation bucket has dominant control.",
   },
 ] as const
 
@@ -311,18 +311,18 @@ type CalcPerpKey = keyof typeof PERPS_CALC
 
 function getTierStyle(tier: string) {
   if (tier === "S+") {
-    return "bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_28px_rgba(168,85,247,0.55)]"
+    return "bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_35px_rgba(168,85,247,0.9)]"
   }
 
   if (tier === "S") {
-    return "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_22px_rgba(250,204,21,0.35)]"
+    return "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_22px_rgba(250,204,21,0.7)]"
   }
 
   if (tier === "A") {
-    return "bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_22px_rgba(34,211,238,0.35)]"
+    return "bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_22px_rgba(34,211,238,0.7)]"
   }
 
-  return "bg-neutral-500/20 border-neutral-400 text-neutral-300"
+  return ""
 }
 
 function formatMoney(value: number, digits = 2) {
@@ -381,13 +381,6 @@ function getFdvStyle(probability: number) {
   return "border-neutral-500/30 bg-neutral-500/10 text-neutral-300"
 }
 
-const tabBaseClass =
-  "rounded-full px-4 sm:px-5 py-2 text-xs sm:text-sm transition border"
-const inputClass =
-  "w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-400/70 focus:bg-[#0d1425]"
-const cardClass =
-  "rounded-2xl border border-neutral-800 bg-[#0c1220]/70 backdrop-blur-xl"
-
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list")
   const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
@@ -396,9 +389,10 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState<string>(TEMPLATES[0])
   const [isDownloading, setIsDownloading] = useState(false)
   const [launchSort, setLaunchSort] = useState<"desc" | "asc">("desc")
-  const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
+const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
 
   const cardRef = useRef<HTMLDivElement>(null)
+
   const current = PERPS_CALC[calcPerp]
 
   const [fdv, setFdv] = useState<number>(current.fdv)
@@ -429,12 +423,12 @@ export default function Home() {
   }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
 
   const sortedLaunchOdds = [...POLYMARKET_LAUNCH_ODDS].sort((a, b) =>
-    launchSort === "desc" ? b.probability - a.probability : a.probability - b.probability
-  )
+  launchSort === "desc" ? b.probability - a.probability : a.probability - b.probability
+)
 
-  const sortedFdvOdds = [...POLYMARKET_FDV_ODDS].sort((a, b) =>
-    fdvSort === "desc" ? b.probability - a.probability : a.probability - b.probability
-  )
+const sortedFdvOdds = [...POLYMARKET_FDV_ODDS].sort((a, b) =>
+  fdvSort === "desc" ? b.probability - a.probability : a.probability - b.probability
+)
 
   const downloadCard = async () => {
     if (!cardRef.current || isDownloading) return
@@ -485,18 +479,18 @@ Calculate yours on capys.app`
         <div className="absolute left-[-250px] top-[-250px] h-[700px] w-[700px] animate-blob rounded-full bg-purple-500/40 blur-[200px]" />
         <div className="animation-delay-2000 absolute bottom-[-250px] right-[-250px] h-[700px] w-[700px] animate-blob rounded-full bg-cyan-500/30 blur-[200px]" />
         <div className="animation-delay-4000 absolute left-[50%] top-[40%] h-[600px] w-[600px] animate-blob rounded-full bg-emerald-500/25 blur-[200px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:56px_56px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:60px_60px]" />
       </div>
 
-      <div className="relative z-20 mx-auto max-w-6xl px-4 pt-14 text-center sm:px-6 sm:pt-20">
-        <div className="mb-6 flex flex-wrap items-center justify-center gap-3 text-sm">
+      <div className="relative z-20 mx-auto max-w-6xl px-4 pt-16 text-center sm:px-6 sm:pt-24">
+        <div className="mb-6 flex items-center justify-center gap-4 text-sm">
           <span className="opacity-40">Made by</span>
 
           <a
             href="https://x.com/capy_onchain"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40 hover:bg-[#0f1729]"
+            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z" />
@@ -508,7 +502,7 @@ Calculate yours on capys.app`
             href="https://t.me/olejk_2k"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40 hover:bg-[#0f1729]"
+            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M21.5 2.5L2.7 9.6c-1 .4-1 1.1-.2 1.3l4.8 1.5 1.8 5.7c.2.6.1.8.7.8.5 0 .7-.2 1-.5l2.4-2.3 5 3.7c.9.5 1.5.2 1.8-.8L23 3.7c.4-1.3-.5-1.9-1.5-1.2z" />
@@ -517,64 +511,65 @@ Calculate yours on capys.app`
           </a>
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-6xl">
           CAPY <span className="text-red-500">PERP</span> HUB
         </h1>
 
-        <p className="mt-4 text-sm text-white/55 sm:text-base">Crypto-native perp research, tools, and launch market signals.</p>
+        <p className="mt-4 opacity-60">Crypto-native Perp Tier List</p>
 
         <div className="mt-8 flex justify-center">
-          <div className="flex flex-wrap justify-center gap-2 rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
-            <button
-              onClick={() => setTab("list")}
-              className={`${tabBaseClass} ${
-                tab === "list"
-                  ? "border-cyan-400 bg-cyan-500/20 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.18)]"
-                  : "border-transparent text-neutral-400 hover:border-neutral-700 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              Perp DEX List
-            </button>
+  <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
+    <button
+      onClick={() => setTab("list")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "list"
+          ? "border border-cyan-400 bg-cyan-500/20 text-cyan-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Perp DEX List
+    </button>
 
-            <button
-              onClick={() => setTab("calculator")}
-              className={`${tabBaseClass} ${
-                tab === "calculator"
-                  ? "border-purple-400 bg-purple-500/20 text-purple-300 shadow-[0_0_18px_rgba(168,85,247,0.18)]"
-                  : "border-transparent text-neutral-400 hover:border-neutral-700 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              Airdrop Calculator
-            </button>
+    <button
+      onClick={() => setTab("calculator")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "calculator"
+          ? "border border-purple-400 bg-purple-500/20 text-purple-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Perp DEX Airdrop Calculator
+    </button>
 
-            <button
-              onClick={() => setTab("odds")}
-              className={`${tabBaseClass} ${
-                tab === "odds"
-                  ? "border-fuchsia-400 bg-fuchsia-500/20 text-fuchsia-300 shadow-[0_0_18px_rgba(217,70,239,0.16)]"
-                  : "border-transparent text-neutral-400 hover:border-neutral-700 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              Polymarket Odds
-            </button>
+    <button
+      onClick={() => setTab("odds")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "odds"
+          ? "border border-fuchsia-400 bg-fuchsia-500/20 text-fuchsia-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Polymarket Odds
+    </button>
 
-            <button
-              onClick={() => setTab("funding")}
-              className={`${tabBaseClass} ${
-                tab === "funding"
-                  ? "border-emerald-400 bg-emerald-500/20 text-emerald-300 shadow-[0_0_18px_rgba(52,211,153,0.16)]"
-                  : "border-transparent text-neutral-400 hover:border-neutral-700 hover:bg-white/5 hover:text-white"
-              }`}
-            >
-              Funding Rates
-            </button>
-          </div>
-        </div>
-      </div>
+    <button
+      onClick={() => setTab("funding")}
+      className={`rounded-full px-5 py-2 text-sm transition ${
+        tab === "funding"
+          ? "border border-emerald-400 bg-emerald-500/20 text-emerald-300"
+          : "text-neutral-400"
+      }`}
+    >
+      Funding Rates
+    </button>
+  </div>
+</div>
+
+</div>
 
       {tab === "list" && (
-        <section className="mx-auto mt-16 max-w-5xl space-y-5 px-4 sm:mt-20 sm:px-6">
-          <div className="hidden grid-cols-[88px_1fr_240px_auto] border-b border-neutral-800 pb-4 text-[11px] uppercase tracking-[0.22em] text-white/35 md:grid">
+        <section className="mx-auto mt-16 max-w-5xl space-y-6 px-4 sm:mt-20 sm:px-6">
+          <div className="hidden grid-cols-[100px_1fr_220px_auto] border-b border-neutral-800 pb-4 text-xs uppercase tracking-widest opacity-50 md:grid">
             <div className="pl-2">Tier</div>
             <div>Protocol</div>
             <div className="pr-6 text-right">Boost</div>
@@ -584,11 +579,11 @@ Calculate yours on capys.app`
           {PERPS.map((perp) => (
             <div
               key={perp.name}
-              className={`${cardClass} group flex flex-col gap-4 p-4 transition hover:border-cyan-400/30 hover:bg-[#0d1425]/90 hover:shadow-[0_0_30px_rgba(34,211,238,0.08)] md:grid md:grid-cols-[88px_1fr_240px_auto] md:items-center md:gap-5 md:p-5`}
+              className="group flex flex-col items-start gap-4 rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-4 backdrop-blur-xl transition hover:scale-[1.01] hover:border-cyan-400/40 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] md:grid md:grid-cols-[100px_1fr_220px_auto] md:items-center md:p-5"
             >
               <div className="flex md:justify-center">
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl border text-sm font-bold ${getTierStyle(
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl border font-bold ${getTierStyle(
                     perp.tier
                   )}`}
                 >
@@ -597,22 +592,24 @@ Calculate yours on capys.app`
               </div>
 
               <div className="flex items-center gap-4">
-                <Image
-                  src={perp.logo}
-                  alt={perp.name}
-                  width={48}
-                  height={48}
-                  className="rounded-lg"
-                />
+  <Image
+    src={perp.logo}
+    alt={perp.name}
+    width={48}
+    height={48}
+    className="rounded-lg"
+  />
 
-                <div className="min-w-0">
-                  <div className="text-base font-semibold text-white sm:text-lg">{perp.name}</div>
-                  <div className="mt-1 text-xs text-cyan-300/70 sm:text-[13px]">{perp.farm}</div>
-                </div>
-              </div>
+  <div>
+    <div className="text-lg font-medium">{perp.name}</div>
+    <div className="text-xs text-white/45">
+      Farm tip: {perp.farm}
+    </div>
+  </div>
+</div>
 
               <div className="flex md:justify-center">
-                <div className="rounded-full border border-emerald-400/35 bg-emerald-400/8 px-3 py-1 text-center text-xs font-medium text-emerald-300">
+                <div className="rounded-full border border-emerald-400 bg-emerald-400/5 px-3 py-1 text-center text-xs font-medium text-emerald-300 sm:text-sm">
                   {perp.boost}
                 </div>
               </div>
@@ -621,9 +618,9 @@ Calculate yours on capys.app`
                 href={perp.ref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full rounded-xl border border-cyan-400 bg-cyan-400/5 px-6 py-2.5 text-center text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400/10 hover:shadow-[0_0_18px_rgba(34,211,238,0.08)] md:w-auto"
+                className="mt-2 w-full rounded-xl border border-cyan-400 bg-cyan-400/5 px-6 py-2 text-center font-semibold text-cyan-300 transition hover:bg-cyan-400/10 md:ml-4 md:mt-0 md:w-auto"
               >
-                Trade →
+                TRADE →
               </a>
             </div>
           ))}
@@ -631,13 +628,10 @@ Calculate yours on capys.app`
       )}
 
       {tab === "calculator" && (
-        <section className="mx-auto mt-16 max-w-5xl space-y-8 px-4 sm:mt-20 sm:px-6">
-          <div className={`${cardClass} p-5 sm:p-6`}>
-            <h2 className="text-xl font-semibold text-white">Perp DEX Airdrop Calculator</h2>
-            <p className="mt-2 text-sm text-white/50">
-              Estimate a potential airdrop value using your own assumptions.
-            </p>
-          </div>
+        <section className="mx-auto mt-20 max-w-5xl space-y-8 px-4">
+          <p className="text-center opacity-50">
+            Calculate your potential airdrop based on your perp DEX points balance.
+          </p>
 
           <div className="flex flex-wrap justify-center gap-3">
             {Object.keys(PERPS_CALC).map((key) => {
@@ -650,7 +644,7 @@ Calculate yours on capys.app`
                   onClick={() => setCalcPerp(perpKey)}
                   className={`rounded-full border px-4 py-2 text-sm transition ${
                     isActive
-                      ? "border-cyan-400 bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.14)]"
+                      ? "border-cyan-400 bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.2)]"
                       : "border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white"
                   }`}
                 >
@@ -662,49 +656,48 @@ Calculate yours on capys.app`
 
           <div className="grid gap-6 md:grid-cols-2">
             <div>
-              <p className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">My points</p>
+              <p className="mb-2 text-xs opacity-50">MY POINTS</p>
               <input
                 type="number"
                 min="0"
                 value={myPoints}
                 onChange={(e) => setMyPoints(sanitizeNumber(e.target.value))}
-                className={inputClass}
-                placeholder="0"
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
 
             <div>
-              <p className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">FDV (billions $)</p>
+              <p className="mb-2 text-xs opacity-50">FDV (billions $)</p>
               <input
                 type="number"
                 min="0"
                 step="0.1"
                 value={fdv}
                 onChange={(e) => setFdv(sanitizeNumber(e.target.value))}
-                className={inputClass}
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
 
             <div>
-              <p className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">Total points</p>
+              <p className="mb-2 text-xs opacity-50">TOTAL POINTS</p>
               <input
                 type="number"
                 min="1"
                 value={totalPoints}
                 onChange={(e) => setTotalPoints(sanitizeNumber(e.target.value))}
-                className={inputClass}
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
 
             <div>
-              <p className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">Airdrop % of supply</p>
+              <p className="mb-2 text-xs opacity-50">AIRDROP % SUPPLY</p>
               <input
                 type="number"
                 min="0"
                 max="100"
                 value={airdrop}
                 onChange={(e) => setAirdrop(sanitizeNumber(e.target.value))}
-                className={inputClass}
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
           </div>
@@ -722,14 +715,14 @@ Calculate yours on capys.app`
             <div className="absolute inset-0 bg-gradient-to-r from-[#050a14]/92 via-[#050a14]/45 to-transparent" />
             <div className="absolute inset-0 bg-black/15" />
 
-            <div className="relative z-10 flex h-full flex-col p-4 sm:p-6 md:p-10">
+            <div className="relative z-10 flex h-full flex-col p-5 sm:p-7 md:p-10">
               <div className="flex items-start justify-between gap-4">
-                <div className="max-w-[68%] sm:max-w-[62%]">
+                <div className="max-w-[62%]">
                   <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.35em] text-cyan-300/85 sm:text-xs">
                     capys.app
                   </div>
 
-                  <div className="mb-3 inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-300 sm:text-base">
+                  <div className="mb-3 inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-300 sm:text-base">
                     {current.name}
                   </div>
 
@@ -741,7 +734,7 @@ Calculate yours on capys.app`
                     {formatMoney(myValue, 0)}
                   </div>
 
-                  <div className="mt-3 text-xs text-white/65 sm:text-base">
+                  <div className="mt-3 text-sm text-white/65 sm:text-base">
                     {formatNumber(safeMyPoints)} points • {formatMoney(pricePerPoint, 2)} per point
                   </div>
                 </div>
@@ -798,7 +791,7 @@ Calculate yours on capys.app`
           <div className="flex flex-wrap justify-center gap-4">
             <button
               onClick={() => setTemplatePicker(true)}
-              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-cyan-400 hover:bg-white/5"
+              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-cyan-400"
             >
               Pick a Template
             </button>
@@ -806,14 +799,14 @@ Calculate yours on capys.app`
             <button
               onClick={downloadCard}
               disabled={isDownloading}
-              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-purple-400 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isDownloading ? "Downloading..." : "Download Card"}
             </button>
 
             <button
               onClick={shareOnX}
-              className="rounded-xl bg-white px-6 py-3 font-semibold text-black transition hover:bg-neutral-200"
+              className="rounded-xl bg-white px-6 py-3 font-semibold text-black"
             >
               Share on X
             </button>
@@ -822,185 +815,193 @@ Calculate yours on capys.app`
       )}
 
       {tab === "odds" && (
-        <section className="mx-auto mt-16 max-w-6xl space-y-8 px-4 sm:mt-20 sm:px-6">
-          <div className={`${cardClass} p-6`}>
-            <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
+  <section className="mx-auto mt-20 max-w-6xl space-y-8 px-4 sm:px-6">
+    <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+  <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
 
-            <p className="mt-2 text-sm text-white/50">
-              Market-implied launch timing and FDV expectations based on current Polymarket pricing.
-            </p>
+  <p className="mt-2 text-sm text-white/50">
+    Market-implied launch timing and FDV expectations based on current Polymarket pricing.
+  </p>
 
-            <div className="mt-3 inline-flex rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-fuchsia-300/80">
-              Last updated: Mar 9, 12:00 UTC
-            </div>
+  <div className="mt-3 inline-flex rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-fuchsia-300/80">
+    Last updated: Mar 9, 12:00 UTC
+  </div>
+</div>
+
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <h3 className="text-lg font-semibold text-white">Launch Timing Odds</h3>
+          <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+            token launch deadlines
           </div>
+        </div>
 
-          <div className="space-y-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-4">
-                <h3 className="text-lg font-semibold text-white">Launch Timing Odds</h3>
-                <div className="text-xs uppercase tracking-[0.25em] text-white/35">
-                  token launch deadlines
-                </div>
-              </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setLaunchSort("desc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              launchSort === "desc"
+                ? "border border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            High → Low
+          </button>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setLaunchSort("desc")}
-                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                    launchSort === "desc"
-                      ? "border border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-                      : "border border-neutral-700 text-neutral-400 hover:border-neutral-500"
-                  }`}
-                >
-                  High → Low
-                </button>
+          <button
+            onClick={() => setLaunchSort("asc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              launchSort === "asc"
+                ? "border border-red-400/40 bg-red-400/10 text-red-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            Low → High
+          </button>
+        </div>
+      </div>
 
-                <button
-                  onClick={() => setLaunchSort("asc")}
-                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                    launchSort === "asc"
-                      ? "border border-red-400/40 bg-red-400/10 text-red-300"
-                      : "border border-neutral-700 text-neutral-400 hover:border-neutral-500"
-                  }`}
-                >
-                  Low → High
-                </button>
-              </div>
-            </div>
+      <div className="grid gap-4">
+        {sortedLaunchOdds.map((item) => (
+          <div
+            key={item.name}
+            className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-fuchsia-400/30"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="text-xl font-semibold text-white">{item.name}</div>
 
-            <div className="grid gap-4">
-              {sortedLaunchOdds.map((item) => (
-                <div
-                  key={item.name}
-                  className={`${cardClass} p-5 transition hover:border-fuchsia-400/30 hover:bg-[#0d1425]/90`}
-                >
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className="text-xl font-semibold text-white">{item.name}</div>
-
-                        <div
-                          className={`rounded-full border px-3 py-1 text-xs font-medium ${getProbabilityStyle(
-                            item.probability
-                          )}`}
-                        >
-                          {item.probability}% probability
-                        </div>
-                      </div>
-
-                      <div className="text-sm text-white/45">Deadline: {item.deadline}</div>
-
-                      <a
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex rounded-lg border border-cyan-400/25 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-400/15"
-                      >
-                        Open launch market
-                      </a>
-                    </div>
-
-                    <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">{item.note}</div>
+                  <div
+                    className={`rounded-full border px-3 py-1 text-xs font-medium ${getProbabilityStyle(
+                      item.probability
+                    )}`}
+                  >
+                    {item.probability}% probability
                   </div>
                 </div>
-              ))}
+
+                <div className="text-sm text-white/45">
+                  Deadline: {item.deadline}
+                </div>
+
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex rounded-lg border border-cyan-400/25 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-400/15"
+                >
+                  Open launch market
+                </a>
+              </div>
+
+              <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
+                {item.note}
+              </div>
             </div>
           </div>
+        ))}
+      </div>
+    </div>
 
-          <div className="space-y-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-4">
-                <h3 className="text-lg font-semibold text-white">FDV Odds</h3>
-                <div className="text-xs uppercase tracking-[0.25em] text-white/35">
-                  one day after launch
-                </div>
-              </div>
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <h3 className="text-lg font-semibold text-white">FDV Odds</h3>
+          <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+            one day after launch
+          </div>
+        </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setFdvSort("desc")}
-                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                    fdvSort === "desc"
-                      ? "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
-                      : "border border-neutral-700 text-neutral-400 hover:border-neutral-500"
-                  }`}
-                >
-                  High → Low
-                </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFdvSort("desc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              fdvSort === "desc"
+                ? "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            High → Low
+          </button>
 
-                <button
-                  onClick={() => setFdvSort("asc")}
-                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                    fdvSort === "asc"
-                      ? "border border-fuchsia-400/40 bg-fuchsia-400/10 text-fuchsia-300"
-                      : "border border-neutral-700 text-neutral-400 hover:border-neutral-500"
-                  }`}
-                >
-                  Low → High
-                </button>
-              </div>
-            </div>
+          <button
+            onClick={() => setFdvSort("asc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              fdvSort === "asc"
+                ? "border border-fuchsia-400/40 bg-fuchsia-400/10 text-fuchsia-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            Low → High
+          </button>
+        </div>
+      </div>
 
-            <div className="grid gap-4">
-              {sortedFdvOdds.map((item) => (
-                <div
-                  key={item.name}
-                  className={`${cardClass} p-5 transition hover:border-cyan-400/30 hover:bg-[#0d1425]/90`}
-                >
-                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className="text-xl font-semibold text-white">{item.name}</div>
+      <div className="grid gap-4">
+        {sortedFdvOdds.map((item) => (
+          <div
+            key={item.name}
+            className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-cyan-400/30"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="text-xl font-semibold text-white">{item.name}</div>
 
-                        <div
-                          className={`rounded-full border px-3 py-1 text-xs font-medium ${getFdvStyle(
-                            item.probability
-                          )}`}
-                        >
-                          {item.threshold} • {item.probability}%
-                        </div>
-                      </div>
-
-                      <div className="text-sm text-cyan-300/75">Current market leader</div>
-
-                      <a
-                        href={item.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex rounded-lg border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-medium text-fuchsia-300 transition hover:border-fuchsia-400/50 hover:bg-fuchsia-400/15"
-                      >
-                        Open FDV market
-                      </a>
-                    </div>
-
-                    <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">{item.note}</div>
+                  <div
+                    className={`rounded-full border px-3 py-1 text-xs font-medium ${getFdvStyle(
+                      item.probability
+                    )}`}
+                  >
+                    {item.threshold} • {item.probability}%
                   </div>
                 </div>
-              ))}
+
+                <div className="text-sm text-cyan-300/75">
+                  Current market leader
+                </div>
+
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex rounded-lg border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-medium text-fuchsia-300 transition hover:border-fuchsia-400/50 hover:bg-fuchsia-400/15"
+                >
+                  Open FDV market
+                </a>
+              </div>
+
+              <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
+                {item.note}
+              </div>
             </div>
           </div>
-        </section>
-      )}
+        ))}
+      </div>
+    </div>
+  </section>
+)}
 
       {tab === "funding" && (
-        <section className="mx-auto mt-16 max-w-4xl px-4 text-center sm:mt-20">
-          <div className={`${cardClass} p-10`}>
-            <div className="mb-4 text-xl font-semibold text-white/70">Funding Rates</div>
-            <div className="text-sm text-white/40">Coming soon</div>
+        <div className="mx-auto mt-20 min-h-screen max-w-4xl px-4 text-center">
+          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-10">
+            <div className="mb-4 text-xl opacity-60">Funding Rates</div>
+            <div className="opacity-40">coming soon</div>
           </div>
-        </section>
+        </div>
       )}
 
       {templatePicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur">
           <div className="max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0c1220] p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">Choose Card Background</h3>
+              <h3 className="text-lg">Choose Card Background</h3>
 
               <button
                 onClick={() => setTemplatePicker(false)}
-                className="rounded-lg px-2 py-1 text-white/60 transition hover:bg-white/5 hover:text-white"
+                className="opacity-60 transition hover:opacity-100"
               >
                 ✕
               </button>
@@ -1016,7 +1017,7 @@ Calculate yours on capys.app`
                   }}
                   className={`overflow-hidden rounded-xl border transition ${
                     selectedTemplate === template
-                      ? "border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.2)]"
+                      ? "border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.25)]"
                       : "border-neutral-800 hover:border-cyan-400"
                   }`}
                 >

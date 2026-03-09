@@ -89,13 +89,13 @@ const PERPS_CALC = {
   extended: {
     name: "Extended",
     fdv: 0.5,
-    totalPoints: 7700000,
+    totalPoints: 50000000,
     airdrop: 30,
   },
   pacifica: {
     name: "Pacifica",
     fdv: 0.3,
-    totalPoints: 60000000,
+    totalPoints: 240000000,
     airdrop: 20,
   },
   nado: {
@@ -113,7 +113,7 @@ const PERPS_CALC = {
   treadfi: {
     name: "Tread Fi",
     fdv: 0.3,
-    totalPoints: 2000000,
+    totalPoints: 2800000,
     airdrop: 20,
   },
   dreamcash: {
@@ -131,7 +131,7 @@ const PERPS_CALC = {
   ethereal: {
     name: "Ethereal",
     fdv: 0.3,
-    totalPoints: 10000000,
+    totalPoints: 8000000000,
     airdrop: 15,
   },
   ostium: {

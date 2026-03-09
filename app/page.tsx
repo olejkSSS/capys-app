@@ -817,11 +817,16 @@ Calculate yours on capys.app`
       {tab === "odds" && (
   <section className="mx-auto mt-20 max-w-6xl space-y-8 px-4 sm:px-6">
     <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
-      <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
-      <p className="mt-2 text-sm text-white/50">
-        Market-implied launch timing and FDV expectations based on current Polymarket pricing.
-      </p>
-    </div>
+  <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
+
+  <p className="mt-2 text-sm text-white/50">
+    Market-implied launch timing and FDV expectations based on current Polymarket pricing.
+  </p>
+
+  <div className="mt-3 inline-flex rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-fuchsia-300/80">
+    Last updated: Mar 9, 12:00 UTC
+  </div>
+</div>
 
     <div className="space-y-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">

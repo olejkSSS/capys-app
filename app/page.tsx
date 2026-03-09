@@ -388,6 +388,8 @@ export default function Home() {
   const [templatePicker, setTemplatePicker] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<string>(TEMPLATES[0])
   const [isDownloading, setIsDownloading] = useState(false)
+  const [launchSort, setLaunchSort] = useState<"desc" | "asc">("desc")
+const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
 
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -419,6 +421,14 @@ export default function Home() {
       myValue: value,
     }
   }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
+
+  const sortedLaunchOdds = [...POLYMARKET_LAUNCH_ODDS].sort((a, b) =>
+  launchSort === "desc" ? b.probability - a.probability : a.probability - b.probability
+)
+
+const sortedFdvOdds = [...POLYMARKET_FDV_ODDS].sort((a, b) =>
+  fdvSort === "desc" ? b.probability - a.probability : a.probability - b.probability
+)
 
   const downloadCard = async () => {
     if (!cardRef.current || isDownloading) return
@@ -814,15 +824,41 @@ Calculate yours on capys.app`
     </div>
 
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold text-white">Launch Timing Odds</h3>
-        <div className="text-xs uppercase tracking-[0.25em] text-white/35">
-          token launch deadlines
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <h3 className="text-lg font-semibold text-white">Launch Timing Odds</h3>
+          <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+            token launch deadlines
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setLaunchSort("desc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              launchSort === "desc"
+                ? "border border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            High → Low
+          </button>
+
+          <button
+            onClick={() => setLaunchSort("asc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              launchSort === "asc"
+                ? "border border-red-400/40 bg-red-400/10 text-red-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            Low → High
+          </button>
         </div>
       </div>
 
       <div className="grid gap-4">
-        {POLYMARKET_LAUNCH_ODDS.map((item) => (
+        {sortedLaunchOdds.map((item) => (
           <div
             key={item.name}
             className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-fuchsia-400/30"
@@ -865,15 +901,41 @@ Calculate yours on capys.app`
     </div>
 
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold text-white">FDV Odds</h3>
-        <div className="text-xs uppercase tracking-[0.25em] text-white/35">
-          one day after launch
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="flex items-center gap-4">
+          <h3 className="text-lg font-semibold text-white">FDV Odds</h3>
+          <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+            one day after launch
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setFdvSort("desc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              fdvSort === "desc"
+                ? "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            High → Low
+          </button>
+
+          <button
+            onClick={() => setFdvSort("asc")}
+            className={`rounded-lg px-3 py-1.5 text-xs transition ${
+              fdvSort === "asc"
+                ? "border border-fuchsia-400/40 bg-fuchsia-400/10 text-fuchsia-300"
+                : "border border-neutral-700 text-neutral-400"
+            }`}
+          >
+            Low → High
+          </button>
         </div>
       </div>
 
       <div className="grid gap-4">
-        {POLYMARKET_FDV_ODDS.map((item) => (
+        {sortedFdvOdds.map((item) => (
           <div
             key={item.name}
             className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-cyan-400/30"

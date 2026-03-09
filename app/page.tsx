@@ -10,7 +10,8 @@ const PERPS = [
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     logo: "/variational.png",
-    boost: "OMNICAPY: +16% points boost",
+    boost: "OMNICAPY: +13% points boost",
+    farm: "Holding + low OI tokens",
   },
   {
     tier: "S+",
@@ -18,6 +19,7 @@ const PERPS = [
     ref: "https://app.extended.exchange/join/CAPY",
     logo: "/extended.png",
     boost: "-10% fees + 5% points boost + 30% refback",
+    farm: "Volume + holding",
   },
   {
     tier: "S",
@@ -25,6 +27,7 @@ const PERPS = [
     ref: "http://hibachi.xyz/r/capy",
     logo: "/hibachi.png",
     boost: "-15% fees + 15% points boost",
+    farm: "Volume farming",
   },
   {
     tier: "S",
@@ -32,6 +35,7 @@ const PERPS = [
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     logo: "/ethereal.png",
     boost: "+15% points boost",
+    farm: "Boost farming + activity",
   },
   {
     tier: "S",
@@ -39,6 +43,7 @@ const PERPS = [
     ref: "https://app.hyena.trade/ref/CAPY",
     logo: "/hyena.png",
     boost: "+10% points boost",
+    farm: "Activity + steady volume",
   },
   {
     tier: "A",
@@ -46,6 +51,7 @@ const PERPS = [
     ref: "https://app.pacifica.fi/?referral=Capy",
     logo: "/pacifica.png",
     boost: "+15% points boost",
+    farm: "Active trading",
   },
   {
     tier: "A",
@@ -53,6 +59,7 @@ const PERPS = [
     ref: "https://pro.edgex.exchange/referral/OLEJK",
     logo: "/edgex.png",
     boost: "-10% fees + 10% points boost + VIP1",
+    farm: "High volume + competition",
   },
   {
     tier: "A",
@@ -60,6 +67,7 @@ const PERPS = [
     ref: "https://dreamcash.xyz/share?code=CAPYCR",
     logo: "/dreamcash.png",
     boost: "boost from 10K to 1M points",
+    farm: "Early farming + positioning",
   },
 ] as const
 
@@ -406,15 +414,21 @@ Calculate yours on capys.app`
               </div>
 
               <div className="flex items-center gap-4">
-                <Image
-                  src={perp.logo}
-                  alt={perp.name}
-                  width={48}
-                  height={48}
-                  className="rounded-lg"
-                />
-                <div className="text-lg font-medium">{perp.name}</div>
-              </div>
+  <Image
+    src={perp.logo}
+    alt={perp.name}
+    width={48}
+    height={48}
+    className="rounded-lg"
+  />
+
+  <div>
+    <div className="text-lg font-medium">{perp.name}</div>
+    <div className="text-xs text-white/45">
+      Farm tip: {perp.farm}
+    </div>
+  </div>
+</div>
 
               <div className="flex md:justify-center">
                 <div className="rounded-full border border-emerald-400 bg-emerald-400/5 px-3 py-1 text-center text-xs font-medium text-emerald-300 sm:text-sm">

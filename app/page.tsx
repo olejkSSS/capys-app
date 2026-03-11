@@ -72,9 +72,9 @@ const PERPS = [
 ] as const
 
 const TEMPLATES = [
+  "cinema",
   "aurafarming",
   "capypistol",
-  "cinema",
   "fck",
   "heaven",
   "offer",
@@ -171,6 +171,24 @@ const PERPS_CALC = {
     fdv: 0.2,
     totalPoints: 50000000,
     airdrop: 20,
+    },
+  hyena: {
+    name: "Hyena",
+    fdv: 0,
+    totalPoints: 0,
+    airdrop: 15,
+  },
+  liquid: {
+    name: "Liquid",
+    fdv: 0,
+    totalPoints: 0,
+    airdrop: 15,
+  },
+  decibel: {
+    name: "Decibel",
+    fdv: 0,
+    totalPoints: 0,
+    airdrop: 15,
   },
 } as const
 

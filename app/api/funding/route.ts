@@ -72,7 +72,7 @@ export async function GET() {
         const exchangeFunding = fundingRates[exchange.name] ?? {}
 
         return Object.entries(exchangeFunding).map(([symbol, rawFunding]) => {
-          const funding = Number(rawFunding) / 10000
+          const funding = Number(rawFunding) / 100
 
           let bias: FundingRow["bias"] = "neutral"
           if (funding > 0) bias = "longs_pay_shorts"

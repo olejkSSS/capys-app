@@ -334,20 +334,6 @@ const POLYMARKET_FDV_ODDS = [
 
 const FUNDING_EXCHANGE_ORDER = [
   {
-    key: "variational",
-    label: "Variational",
-    intervalHours: 8,
-    tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
-    hasPersonalRef: true,
-  },
-  {
-    key: "extended",
-    label: "Extended",
-    intervalHours: 1,
-    tradeUrl: "https://app.extended.exchange/join/CAPY",
-    hasPersonalRef: true,
-  },
-  {
     key: "edgex",
     label: "EdgeX",
     intervalHours: 8,
@@ -359,6 +345,13 @@ const FUNDING_EXCHANGE_ORDER = [
     label: "Ethereal",
     intervalHours: 8,
     tradeUrl: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
+    hasPersonalRef: true,
+  },
+  {
+    key: "extended",
+    label: "Extended",
+    intervalHours: 1,
+    tradeUrl: "https://app.extended.exchange/join/CAPY",
     hasPersonalRef: true,
   },
   {
@@ -376,6 +369,13 @@ const FUNDING_EXCHANGE_ORDER = [
     hasPersonalRef: true,
   },
   {
+    key: "hyperliquid",
+    label: "Hyperliquid",
+    intervalHours: 1,
+    tradeUrl: "https://app.hyperliquid.xyz/",
+    hasPersonalRef: false,
+  },
+  {
     key: "pacifica",
     label: "Pacifica",
     intervalHours: 8,
@@ -383,11 +383,11 @@ const FUNDING_EXCHANGE_ORDER = [
     hasPersonalRef: true,
   },
   {
-    key: "hyperliquid",
-    label: "Hyperliquid",
-    intervalHours: 1,
-    tradeUrl: "https://app.hyperliquid.xyz/",
-    hasPersonalRef: false,
+    key: "variational",
+    label: "Variational",
+    intervalHours: 8,
+    tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
+    hasPersonalRef: true,
   },
 ] as const
 
@@ -1694,22 +1694,22 @@ Calculate yours on capys.app`
                   </button>
 
                   {FUNDING_EXCHANGE_ORDER.map((exchange) => {
-                    const enabled = enabledFundingExchanges.includes(exchange.key)
+  const enabled = enabledFundingExchanges.includes(exchange.key)
 
-                    return (
-                      <button
-                        key={exchange.key}
-                        onClick={() => toggleFundingExchange(exchange.key)}
-                        className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
-                          enabled
-                            ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
-                            : "border-neutral-700 text-white/50"
-                        }`}
-                      >
-                        {exchange.label} · {intervalLabel(exchange.intervalHours)}
-                      </button>
-                    )
-                  })}
+  return (
+    <button
+      key={exchange.key}
+      onClick={() => toggleFundingExchange(exchange.key)}
+      className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
+        enabled
+          ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
+          : "border-neutral-700 text-white/50"
+      }`}
+    >
+      {exchange.label}
+    </button>
+  )
+})}
                 </div>
               </div>
 
@@ -1736,53 +1736,47 @@ Calculate yours on capys.app`
 
             {!fundingLoading && !fundingError && (
               <div className="overflow-x-auto rounded-2xl border border-neutral-800">
-                <table className="min-w-[1820px] border-separate border-spacing-0">
+  <table className="w-full table-fixed border-separate border-spacing-0">
                   <thead>
                     <tr className="text-left">
-                      <th className="sticky left-0 top-0 z-40 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
-                        Symbol
-                      </th>
+                      <th className="sticky left-0 top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+  Symbol
+</th>
 
-                      <th className="sticky left-[120px] top-0 z-40 w-[95px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
-                        OI Rank
-                      </th>
+<th className="sticky left-[96px] top-0 z-40 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+  OI Rank
+</th>
 
-                      <th className="sticky left-[215px] top-0 z-40 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
-                        Max Arb
-                      </th>
+<th className="sticky left-[172px] top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+  Max Arb
+</th>
 
-                      <th className="sticky left-[335px] top-0 z-40 w-[260px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
-                        Action
-                      </th>
+<th className="sticky left-[268px] top-0 z-40 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+  Action
+</th>
 
                       {activeFundingExchanges.map((exchange) => (
-                        <th
-                          key={exchange.key}
-                          className="sticky top-0 z-30 min-w-[155px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-center last:border-r-0"
-                        >
-                          <div className="flex flex-col items-center gap-1">
-                            <a
-                              href={exchange.tradeUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70 transition hover:text-cyan-300"
-                            >
-                              {exchange.label}
-                            </a>
-
-                            <div className="text-[10px] uppercase tracking-[0.2em] text-white/30">
-                              {intervalLabel(exchange.intervalHours)}
-                            </div>
-                          </div>
-                        </th>
-                      ))}
+  <th
+    key={exchange.key}
+    className="sticky top-0 z-30 border-b border-r border-neutral-800 bg-[#0b111d] px-2 py-3 text-center last:border-r-0"
+  >
+    <a
+      href={exchange.tradeUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition hover:text-cyan-300"
+    >
+      {exchange.label}
+    </a>
+  </th>
+))}
                     </tr>
                   </thead>
 
                   <tbody>
                     {fundingMatrixRows.map((row) => (
                       <tr key={row.symbol} className="hover:bg-white/[0.02]">
-                        <td className="sticky left-0 z-20 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm font-semibold text-white">
+                        <td className="sticky left-0 z-20 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm font-semibold text-white">
                           <button
                             onClick={() => void copyTickerValue(row.symbol)}
                             className="transition hover:text-cyan-300"
@@ -1792,17 +1786,17 @@ Calculate yours on capys.app`
                           </button>
                         </td>
 
-                        <td className="sticky left-[120px] z-20 w-[95px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm text-white/80">
+                        <td className="sticky left-[96px] z-20 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm text-white/80">
                           {row.oiRank}
                         </td>
 
-                        <td className="sticky left-[215px] z-20 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm">
+                        <td className="sticky left-[172px] z-20 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm">
                           <span className="inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
                             {formatSpreadValue(row.maxArb)}
                           </span>
                         </td>
 
-                        <td className="sticky left-[335px] z-20 w-[260px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4">
+                        <td className="sticky left-[268px] z-20 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4">
                           {row.buyExchange && row.sellExchange ? (
                             <div className="flex flex-wrap gap-2">
                               <a
@@ -1834,9 +1828,9 @@ Calculate yours on capys.app`
                           return (
                             <td
                               key={`${row.symbol}-${exchange.key}`}
-                              className={`border-b border-r border-neutral-800 px-4 py-4 text-center text-sm font-semibold last:border-r-0 ${getFundingCellClass(
-                                value
-                              )}`}
+                              className={`border-b border-r border-neutral-800 px-2 py-4 text-center text-xs font-semibold sm:text-sm last:border-r-0 ${getFundingCellClass(
+  value
+)}`}
                             >
                               <a
                                 href={exchange.tradeUrl}

@@ -1713,11 +1713,9 @@ Calculate yours on capys.app`
                 </div>
               </div>
 
-              <div className="text-xs text-white/35">
-                {fundingMetricMode === "interval"
-                  ? "1h venues are shown in their actual 1h funding form. Loris normalizes some 1h venues to 8h-comparable values, so they are de-normalized here for display."
-                  : "Annualized view uses the currently shown per-interval funding and extrapolates it across a full year."}
-              </div>
+              <div className="text-xs text-white/30">
+  Live funding data with interval and annualized views.
+</div>
             </div>
           </div>
 

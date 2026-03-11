@@ -334,6 +334,20 @@ const POLYMARKET_FDV_ODDS = [
 
 const FUNDING_EXCHANGE_ORDER = [
   {
+    key: "variational",
+    label: "Variational",
+    intervalHours: 8,
+    tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
+    hasPersonalRef: true,
+  },
+  {
+    key: "extended",
+    label: "Extended",
+    intervalHours: 1,
+    tradeUrl: "https://app.extended.exchange/join/CAPY",
+    hasPersonalRef: true,
+  },
+  {
     key: "edgex",
     label: "EdgeX",
     intervalHours: 8,
@@ -345,13 +359,6 @@ const FUNDING_EXCHANGE_ORDER = [
     label: "Ethereal",
     intervalHours: 8,
     tradeUrl: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
-    hasPersonalRef: true,
-  },
-  {
-    key: "extended",
-    label: "Extended",
-    intervalHours: 1,
-    tradeUrl: "https://app.extended.exchange/join/CAPY",
     hasPersonalRef: true,
   },
   {
@@ -369,13 +376,6 @@ const FUNDING_EXCHANGE_ORDER = [
     hasPersonalRef: true,
   },
   {
-    key: "hyperliquid",
-    label: "Hyperliquid",
-    intervalHours: 1,
-    tradeUrl: "https://app.hyperliquid.xyz/",
-    hasPersonalRef: false,
-  },
-  {
     key: "pacifica",
     label: "Pacifica",
     intervalHours: 8,
@@ -383,11 +383,11 @@ const FUNDING_EXCHANGE_ORDER = [
     hasPersonalRef: true,
   },
   {
-    key: "variational",
-    label: "Variational",
-    intervalHours: 8,
-    tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
-    hasPersonalRef: true,
+    key: "hyperliquid",
+    label: "Hyperliquid",
+    intervalHours: 1,
+    tradeUrl: "https://app.hyperliquid.xyz/",
+    hasPersonalRef: false,
   },
 ] as const
 

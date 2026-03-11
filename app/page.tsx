@@ -1867,19 +1867,27 @@ Calculate yours on capys.app`
             )}
 
             <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-white/35">
-              <span>
-                Rows: <span className="text-white/60">{fundingMatrixRows.length}</span>
-              </span>
+  <span>
+    Rows: <span className="text-white/60">{fundingMatrixRows.length}</span>
+  </span>
 
-              <span>
-                Active exchanges:{" "}
-                <span className="text-white/60">{activeFundingExchanges.length}</span>
-              </span>
+  <span>
+    Active exchanges:{" "}
+    <span className="text-white/60">{activeFundingExchanges.length}</span>
+  </span>
 
-              <span>
-                Hyperliquid currently uses a generic link here until you swap in your personal ref.
-              </span>
-            </div>
+  <span>
+    Funding rate data provided by{" "}
+    <a
+      href="https://loris.tools"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-cyan-300 transition hover:text-cyan-200"
+    >
+      Loris Tools
+    </a>
+  </span>
+</div>
           </div>
         </section>
       )}

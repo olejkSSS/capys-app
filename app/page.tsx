@@ -171,7 +171,7 @@ const PERPS_CALC = {
     fdv: 0.2,
     totalPoints: 50000000,
     airdrop: 20,
-    },
+  },
   hyena: {
     name: "Hyena",
     fdv: 0,
@@ -324,8 +324,29 @@ const POLYMARKET_FDV_ODDS = [
   },
 ] as const
 
+const FUNDING_EXCHANGE_ORDER = [
+  { key: "edgex", label: "EdgeX" },
+  { key: "ethereal", label: "Ethereal" },
+  { key: "extended", label: "Extended" },
+  { key: "hibachi", label: "Hibachi" },
+  { key: "hyena", label: "Hyena" },
+  { key: "hyperliquid", label: "Hyperliquid" },
+  { key: "pacifica", label: "Pacifica" },
+  { key: "variational", label: "Variational" },
+] as const
+
 type Tab = "list" | "calculator" | "odds" | "funding"
 type CalcPerpKey = keyof typeof PERPS_CALC
+type FundingBias = "longs_pay_shorts" | "shorts_pay_longs" | "neutral"
+
+type FundingApiRow = {
+  exchange: string
+  display: string
+  symbol: string
+  funding: number
+  oiRank: string
+  bias: FundingBias
+}
 
 function getTierStyle(tier: string) {
   if (tier === "S+") {
@@ -399,15 +420,67 @@ function getFdvStyle(probability: number) {
   return "border-neutral-500/30 bg-neutral-500/10 text-neutral-300"
 }
 
+function formatFundingPercent(value: number) {
+  const sign = value > 0 ? "+" : ""
+  return `${sign}${value.toFixed(4)}%`
+}
+
+function formatFundingSpread(value: number) {
+  return `${value.toFixed(4)}%`
+}
+
+function getFundingChipStyle(value: number) {
+  if (value > 0) {
+    return "border-red-400/25 bg-red-500/10 text-red-300"
+  }
+
+  if (value < 0) {
+    return "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
+  }
+
+  return "border-neutral-600/30 bg-neutral-700/20 text-neutral-300"
+}
+
+function getFundingCellStyle(value: number | null) {
+  if (value === null) {
+    return "bg-transparent text-white/20"
+  }
+
+  if (value > 0) {
+    return "bg-red-500/12 text-red-300"
+  }
+
+  if (value < 0) {
+    return "bg-emerald-500/12 text-emerald-300"
+  }
+
+  return "bg-neutral-700/20 text-neutral-300"
+}
+
+function parseOiRank(value: string) {
+  if (!value) return 999999
+  if (value.includes("+")) {
+    const numeric = Number(value.replace("+", ""))
+    return Number.isFinite(numeric) ? numeric : 999999
+  }
+  const numeric = Number(value)
+  return Number.isFinite(numeric) ? numeric : 999999
+}
+
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list")
   const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
   const [myPoints, setMyPoints] = useState(0)
   const [templatePicker, setTemplatePicker] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<string>(TEMPLATES[0])
+  const [selectedTemplate, setSelectedTemplate] = useState<string>("cinema")
   const [isDownloading, setIsDownloading] = useState(false)
   const [launchSort, setLaunchSort] = useState<"desc" | "asc">("desc")
-const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
+  const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
+  const [fundingSort, setFundingSort] = useState<"desc" | "asc">("desc")
+  const [fundingRows, setFundingRows] = useState<FundingApiRow[]>([])
+  const [fundingUpdatedAt, setFundingUpdatedAt] = useState<string | null>(null)
+  const [fundingLoading, setFundingLoading] = useState(false)
+  const [fundingError, setFundingError] = useState<string | null>(null)
 
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -423,30 +496,160 @@ const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
     setAirdrop(current.airdrop)
   }, [current])
 
+  useEffect(() => {
+    if (tab !== "funding") return
+
+    let cancelled = false
+
+    const loadFunding = async () => {
+      try {
+        setFundingLoading(true)
+        setFundingError(null)
+
+        const res = await fetch("/api/funding", { cache: "no-store" })
+        const data = await res.json()
+
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to load funding data")
+        }
+
+        if (!cancelled) {
+          setFundingRows(Array.isArray(data?.rows) ? data.rows : [])
+          setFundingUpdatedAt(data?.updatedAt ?? null)
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setFundingError(
+            error instanceof Error ? error.message : "Failed to load funding data"
+          )
+        }
+      } finally {
+        if (!cancelled) {
+          setFundingLoading(false)
+        }
+      }
+    }
+
+    loadFunding()
+    const interval = setInterval(loadFunding, 60000)
+
+    return () => {
+      cancelled = true
+      clearInterval(interval)
+    }
+  }, [tab])
+
   const safeTotalPoints = Math.max(totalPoints, 1)
   const safeAirdrop = Math.min(Math.max(airdrop, 0), 100)
   const safeFdv = Math.max(fdv, 0)
   const safeMyPoints = Math.max(myPoints, 0)
 
-  const { totalAirdropPool, pricePerPoint, myValue } = useMemo(() => {
+  const { pricePerPoint, myValue } = useMemo(() => {
     const pool = safeFdv * 1_000_000_000 * (safeAirdrop / 100)
     const price = pool / safeTotalPoints
     const value = safeMyPoints * price
 
     return {
-      totalAirdropPool: pool,
       pricePerPoint: price,
       myValue: value,
     }
   }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
 
   const sortedLaunchOdds = [...POLYMARKET_LAUNCH_ODDS].sort((a, b) =>
-  launchSort === "desc" ? b.probability - a.probability : a.probability - b.probability
-)
+    launchSort === "desc"
+      ? b.probability - a.probability
+      : a.probability - b.probability
+  )
 
-const sortedFdvOdds = [...POLYMARKET_FDV_ODDS].sort((a, b) =>
-  fdvSort === "desc" ? b.probability - a.probability : a.probability - b.probability
-)
+  const sortedFdvOdds = [...POLYMARKET_FDV_ODDS].sort((a, b) =>
+    fdvSort === "desc"
+      ? b.probability - a.probability
+      : a.probability - b.probability
+  )
+
+  const fundingMatrixRows = useMemo(() => {
+    const grouped = new Map<
+      string,
+      {
+        symbol: string
+        oiRank: string
+        byExchange: Record<string, FundingApiRow | undefined>
+      }
+    >()
+
+    for (const row of fundingRows) {
+      if (!grouped.has(row.symbol)) {
+        grouped.set(row.symbol, {
+          symbol: row.symbol,
+          oiRank: row.oiRank,
+          byExchange: {},
+        })
+      }
+
+      const currentGroup = grouped.get(row.symbol)!
+      currentGroup.byExchange[row.exchange] = row
+
+      if (parseOiRank(row.oiRank) < parseOiRank(currentGroup.oiRank)) {
+        currentGroup.oiRank = row.oiRank
+      }
+    }
+
+    const matrixRows = Array.from(grouped.values()).map((group) => {
+      const available = FUNDING_EXCHANGE_ORDER.map(
+        (exchange) => group.byExchange[exchange.key]?.funding ?? null
+      ).filter((value): value is number => value !== null)
+
+      const maxFunding = available.length ? Math.max(...available) : 0
+      const minFunding = available.length ? Math.min(...available) : 0
+      const maxArb = maxFunding - minFunding
+
+      const highestExchange = FUNDING_EXCHANGE_ORDER.map((exchange) => ({
+  label: exchange.label,
+  value: group.byExchange[exchange.key]?.funding,
+}))
+  .filter((item) => item.value !== undefined && item.value !== null)
+  .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))[0] ?? null
+
+      const lowestExchange = FUNDING_EXCHANGE_ORDER.map((exchange) => ({
+  label: exchange.label,
+  value: group.byExchange[exchange.key]?.funding,
+}))
+  .filter((item) => item.value !== undefined && item.value !== null)
+  .sort((a, b) => (a.value ?? 0) - (b.value ?? 0))[0] ?? null
+
+      let action = "No edge"
+
+      if (highestExchange && lowestExchange && highestExchange.label !== lowestExchange.label) {
+        action = `BUY ${lowestExchange.label} / SELL ${highestExchange.label}`
+      }
+
+      return {
+        symbol: group.symbol,
+        oiRank: group.oiRank,
+        maxArb,
+        action,
+        byExchange: group.byExchange,
+      }
+    })
+
+    return matrixRows.sort((a, b) =>
+      fundingSort === "desc" ? b.maxArb - a.maxArb : a.maxArb - b.maxArb
+    )
+  }, [fundingRows, fundingSort])
+
+  const topFundingPositive = useMemo(() => {
+    const positive = fundingRows.filter((row) => row.funding > 0)
+    if (!positive.length) return null
+    return [...positive].sort((a, b) => b.funding - a.funding)[0]
+  }, [fundingRows])
+
+  const topFundingNegative = useMemo(() => {
+    const negative = fundingRows.filter((row) => row.funding < 0)
+    if (!negative.length) return null
+    return [...negative].sort((a, b) => a.funding - b.funding)[0]
+  }, [fundingRows])
+
+  const topFundingSpread = fundingMatrixRows[0] ?? null
 
   const downloadCard = async () => {
     if (!cardRef.current || isDownloading) return
@@ -536,54 +739,53 @@ Calculate yours on capys.app`
         <p className="mt-4 opacity-60">Crypto-native Perp Tier List</p>
 
         <div className="mt-8 flex justify-center">
-  <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
-    <button
-      onClick={() => setTab("list")}
-      className={`rounded-full px-5 py-2 text-sm transition ${
-        tab === "list"
-          ? "border border-cyan-400 bg-cyan-500/20 text-cyan-300"
-          : "text-neutral-400"
-      }`}
-    >
-      Perp DEX List
-    </button>
+          <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
+            <button
+              onClick={() => setTab("list")}
+              className={`rounded-full px-5 py-2 text-sm transition ${
+                tab === "list"
+                  ? "border border-cyan-400 bg-cyan-500/20 text-cyan-300"
+                  : "text-neutral-400"
+              }`}
+            >
+              Perp DEX List
+            </button>
 
-    <button
-      onClick={() => setTab("calculator")}
-      className={`rounded-full px-5 py-2 text-sm transition ${
-        tab === "calculator"
-          ? "border border-purple-400 bg-purple-500/20 text-purple-300"
-          : "text-neutral-400"
-      }`}
-    >
-      Perp DEX Airdrop Calculator
-    </button>
+            <button
+              onClick={() => setTab("calculator")}
+              className={`rounded-full px-5 py-2 text-sm transition ${
+                tab === "calculator"
+                  ? "border border-purple-400 bg-purple-500/20 text-purple-300"
+                  : "text-neutral-400"
+              }`}
+            >
+              Perp DEX Airdrop Calculator
+            </button>
 
-    <button
-      onClick={() => setTab("odds")}
-      className={`rounded-full px-5 py-2 text-sm transition ${
-        tab === "odds"
-          ? "border border-fuchsia-400 bg-fuchsia-500/20 text-fuchsia-300"
-          : "text-neutral-400"
-      }`}
-    >
-      Polymarket Odds
-    </button>
+            <button
+              onClick={() => setTab("odds")}
+              className={`rounded-full px-5 py-2 text-sm transition ${
+                tab === "odds"
+                  ? "border border-fuchsia-400 bg-fuchsia-500/20 text-fuchsia-300"
+                  : "text-neutral-400"
+              }`}
+            >
+              Polymarket Odds
+            </button>
 
-    <button
-      onClick={() => setTab("funding")}
-      className={`rounded-full px-5 py-2 text-sm transition ${
-        tab === "funding"
-          ? "border border-emerald-400 bg-emerald-500/20 text-emerald-300"
-          : "text-neutral-400"
-      }`}
-    >
-      Funding Rates
-    </button>
-  </div>
-</div>
-
-</div>
+            <button
+              onClick={() => setTab("funding")}
+              className={`rounded-full px-5 py-2 text-sm transition ${
+                tab === "funding"
+                  ? "border border-emerald-400 bg-emerald-500/20 text-emerald-300"
+                  : "text-neutral-400"
+              }`}
+            >
+              Funding Rates
+            </button>
+          </div>
+        </div>
+      </div>
 
       {tab === "list" && (
         <section className="mx-auto mt-16 max-w-5xl space-y-6 px-4 sm:mt-20 sm:px-6">
@@ -610,21 +812,21 @@ Calculate yours on capys.app`
               </div>
 
               <div className="flex items-center gap-4">
-  <Image
-    src={perp.logo}
-    alt={perp.name}
-    width={48}
-    height={48}
-    className="rounded-lg"
-  />
+                <Image
+                  src={perp.logo}
+                  alt={perp.name}
+                  width={48}
+                  height={48}
+                  className="rounded-lg"
+                />
 
-  <div>
-    <div className="text-lg font-medium">{perp.name}</div>
-    <div className="text-xs text-white/45">
-      Farm tip: {perp.farm}
-    </div>
-  </div>
-</div>
+                <div>
+                  <div className="text-lg font-medium">{perp.name}</div>
+                  <div className="text-xs text-white/45">
+                    Farm tip: {perp.farm}
+                  </div>
+                </div>
+              </div>
 
               <div className="flex md:justify-center">
                 <div className="rounded-full border border-emerald-400 bg-emerald-400/5 px-3 py-1 text-center text-xs font-medium text-emerald-300 sm:text-sm">
@@ -833,182 +1035,383 @@ Calculate yours on capys.app`
       )}
 
       {tab === "odds" && (
-  <section className="mx-auto mt-20 max-w-6xl space-y-8 px-4 sm:px-6">
-    <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
-  <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
+        <section className="mx-auto mt-20 max-w-6xl space-y-8 px-4 sm:px-6">
+          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+            <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
 
-  <p className="mt-2 text-sm text-white/50">
-    Market-implied launch timing and FDV expectations based on current Polymarket pricing.
-  </p>
+            <p className="mt-2 text-sm text-white/50">
+              Market-implied launch timing and FDV expectations based on current Polymarket pricing.
+            </p>
 
-  <div className="mt-3 inline-flex rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-fuchsia-300/80">
-    Last updated: Mar 11, 9:00 UTC
-  </div>
-</div>
-
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4">
-          <h3 className="text-lg font-semibold text-white">Launch Timing Odds</h3>
-          <div className="text-xs uppercase tracking-[0.25em] text-white/35">
-            token launch deadlines
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setLaunchSort("desc")}
-            className={`rounded-lg px-3 py-1.5 text-xs transition ${
-              launchSort === "desc"
-                ? "border border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-                : "border border-neutral-700 text-neutral-400"
-            }`}
-          >
-            High → Low
-          </button>
-
-          <button
-            onClick={() => setLaunchSort("asc")}
-            className={`rounded-lg px-3 py-1.5 text-xs transition ${
-              launchSort === "asc"
-                ? "border border-red-400/40 bg-red-400/10 text-red-300"
-                : "border border-neutral-700 text-neutral-400"
-            }`}
-          >
-            Low → High
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-4">
-        {sortedLaunchOdds.map((item) => (
-          <div
-            key={item.name}
-            className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-fuchsia-400/30"
-          >
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="text-xl font-semibold text-white">{item.name}</div>
-
-                  <div
-                    className={`rounded-full border px-3 py-1 text-xs font-medium ${getProbabilityStyle(
-                      item.probability
-                    )}`}
-                  >
-                    {item.probability}% probability
-                  </div>
-                </div>
-
-                <div className="text-sm text-white/45">
-                  Deadline: {item.deadline}
-                </div>
-
-                <a
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex rounded-lg border border-cyan-400/25 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-400/15"
-                >
-                  Open launch market
-                </a>
-              </div>
-
-              <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
-                {item.note}
-              </div>
+            <div className="mt-3 inline-flex rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-fuchsia-300/80">
+              Last updated: Mar 11, 7:00 UTC
             </div>
           </div>
-        ))}
-      </div>
-    </div>
 
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4">
-          <h3 className="text-lg font-semibold text-white">FDV Odds</h3>
-          <div className="text-xs uppercase tracking-[0.25em] text-white/35">
-            one day after launch
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setFdvSort("desc")}
-            className={`rounded-lg px-3 py-1.5 text-xs transition ${
-              fdvSort === "desc"
-                ? "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
-                : "border border-neutral-700 text-neutral-400"
-            }`}
-          >
-            High → Low
-          </button>
-
-          <button
-            onClick={() => setFdvSort("asc")}
-            className={`rounded-lg px-3 py-1.5 text-xs transition ${
-              fdvSort === "asc"
-                ? "border border-fuchsia-400/40 bg-fuchsia-400/10 text-fuchsia-300"
-                : "border border-neutral-700 text-neutral-400"
-            }`}
-          >
-            Low → High
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-4">
-        {sortedFdvOdds.map((item) => (
-          <div
-            key={item.name}
-            className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-cyan-400/30"
-          >
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="text-xl font-semibold text-white">{item.name}</div>
-
-                  <div
-                    className={`rounded-full border px-3 py-1 text-xs font-medium ${getFdvStyle(
-                      item.probability
-                    )}`}
-                  >
-                    {item.threshold} • {item.probability}%
-                  </div>
+          <div className="space-y-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-semibold text-white">Launch Timing Odds</h3>
+                <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+                  token launch deadlines
                 </div>
-
-                <div className="text-sm text-cyan-300/75">
-                  Current market leader
-                </div>
-
-                <a
-                  href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex rounded-lg border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-medium text-fuchsia-300 transition hover:border-fuchsia-400/50 hover:bg-fuchsia-400/15"
-                >
-                  Open FDV market
-                </a>
               </div>
 
-              <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
-                {item.note}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setLaunchSort("desc")}
+                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
+                    launchSort === "desc"
+                      ? "border border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
+                      : "border border-neutral-700 text-neutral-400"
+                  }`}
+                >
+                  High → Low
+                </button>
+
+                <button
+                  onClick={() => setLaunchSort("asc")}
+                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
+                    launchSort === "asc"
+                      ? "border border-red-400/40 bg-red-400/10 text-red-300"
+                      : "border border-neutral-700 text-neutral-400"
+                  }`}
+                >
+                  Low → High
+                </button>
               </div>
             </div>
+
+            <div className="grid gap-4">
+              {sortedLaunchOdds.map((item) => (
+                <div
+                  key={item.name}
+                  className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-fuchsia-400/30"
+                >
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="text-xl font-semibold text-white">{item.name}</div>
+
+                        <div
+                          className={`rounded-full border px-3 py-1 text-xs font-medium ${getProbabilityStyle(
+                            item.probability
+                          )}`}
+                        >
+                          {item.probability}% probability
+                        </div>
+                      </div>
+
+                      <div className="text-sm text-white/45">
+                        Deadline: {item.deadline}
+                      </div>
+
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex rounded-lg border border-cyan-400/25 bg-cyan-400/10 px-3 py-1.5 text-xs font-medium text-cyan-300 transition hover:border-cyan-400/50 hover:bg-cyan-400/15"
+                      >
+                        Open launch market
+                      </a>
+                    </div>
+
+                    <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
+                      {item.note}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </section>
-)}
+
+          <div className="space-y-4">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-semibold text-white">FDV Odds</h3>
+                <div className="text-xs uppercase tracking-[0.25em] text-white/35">
+                  one day after launch
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setFdvSort("desc")}
+                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
+                    fdvSort === "desc"
+                      ? "border border-cyan-400/40 bg-cyan-400/10 text-cyan-300"
+                      : "border border-neutral-700 text-neutral-400"
+                  }`}
+                >
+                  High → Low
+                </button>
+
+                <button
+                  onClick={() => setFdvSort("asc")}
+                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
+                    fdvSort === "asc"
+                      ? "border border-fuchsia-400/40 bg-fuchsia-400/10 text-fuchsia-300"
+                      : "border border-neutral-700 text-neutral-400"
+                  }`}
+                >
+                  Low → High
+                </button>
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              {sortedFdvOdds.map((item) => (
+                <div
+                  key={item.name}
+                  className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl transition hover:border-cyan-400/30"
+                >
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <div className="text-xl font-semibold text-white">{item.name}</div>
+
+                        <div
+                          className={`rounded-full border px-3 py-1 text-xs font-medium ${getFdvStyle(
+                            item.probability
+                          )}`}
+                        >
+                          {item.threshold} • {item.probability}%
+                        </div>
+                      </div>
+
+                      <div className="text-sm text-cyan-300/75">
+                        Current market leader
+                      </div>
+
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex rounded-lg border border-fuchsia-400/25 bg-fuchsia-400/10 px-3 py-1.5 text-xs font-medium text-fuchsia-300 transition hover:border-fuchsia-400/50 hover:bg-fuchsia-400/15"
+                      >
+                        Open FDV market
+                      </a>
+                    </div>
+
+                    <div className="max-w-2xl text-sm leading-6 text-white/70 lg:text-right">
+                      {item.note}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {tab === "funding" && (
-        <div className="mx-auto mt-20 min-h-screen max-w-4xl px-4 text-center">
-          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-10">
-            <div className="mb-4 text-xl opacity-60">Funding Rates</div>
-            <div className="opacity-40">coming soon</div>
+        <section className="mx-auto mt-20 max-w-[1700px] space-y-8 px-4 sm:px-6">
+          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+            <h2 className="text-2xl font-semibold text-white">Funding Rate Screener</h2>
+
+            <p className="mt-2 text-sm text-white/50">
+              Live funding matrix for EdgeX, Ethereal, Extended, Hibachi, Hyena, Hyperliquid, Pacifica and Variational.
+            </p>
+
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-emerald-300/80">
+                Auto-refresh: 60s
+              </div>
+
+              {fundingUpdatedAt && (
+                <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-cyan-300/80">
+                  Updated: {fundingUpdatedAt}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl">
+              <div className="text-xs uppercase tracking-[0.22em] text-white/40">
+                Most Positive Funding
+              </div>
+
+              <div className="mt-3 text-xl font-semibold text-white">
+                {topFundingPositive ? topFundingPositive.symbol : "N/A"}
+              </div>
+
+              <div className="mt-1 text-sm text-white/50">
+                {topFundingPositive ? topFundingPositive.display : "—"}
+              </div>
+
+              <div className="mt-4 inline-flex rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-sm font-medium text-red-300">
+                {topFundingPositive ? formatFundingPercent(topFundingPositive.funding) : "N/A"}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl">
+              <div className="text-xs uppercase tracking-[0.22em] text-white/40">
+                Most Negative Funding
+              </div>
+
+              <div className="mt-3 text-xl font-semibold text-white">
+                {topFundingNegative ? topFundingNegative.symbol : "N/A"}
+              </div>
+
+              <div className="mt-1 text-sm text-white/50">
+                {topFundingNegative ? topFundingNegative.display : "—"}
+              </div>
+
+              <div className="mt-4 inline-flex rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-300">
+                {topFundingNegative ? formatFundingPercent(topFundingNegative.funding) : "N/A"}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl">
+              <div className="text-xs uppercase tracking-[0.22em] text-white/40">
+                Highest Spread
+              </div>
+
+              <div className="mt-3 text-xl font-semibold text-white">
+                {topFundingSpread ? topFundingSpread.symbol : "N/A"}
+              </div>
+
+              <div className="mt-1 text-sm text-white/50">
+                {topFundingSpread ? `OI Rank ${topFundingSpread.oiRank}` : "—"}
+              </div>
+
+              <div className="mt-4 inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-sm font-medium text-cyan-300">
+                {topFundingSpread ? formatFundingSpread(topFundingSpread.maxArb) : "N/A"}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+            <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-white">Funding Matrix</h3>
+                <div className="mt-1 text-xs uppercase tracking-[0.22em] text-white/35">
+                  Loris-style screener in Capy theme
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setFundingSort("desc")}
+                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
+                    fundingSort === "desc"
+                      ? "border border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
+                      : "border border-neutral-700 text-neutral-400"
+                  }`}
+                >
+                  Max Arb High → Low
+                </button>
+
+                <button
+                  onClick={() => setFundingSort("asc")}
+                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
+                    fundingSort === "asc"
+                      ? "border border-red-400/40 bg-red-400/10 text-red-300"
+                      : "border border-neutral-700 text-neutral-400"
+                  }`}
+                >
+                  Max Arb Low → High
+                </button>
+              </div>
+            </div>
+
+            {fundingLoading && (
+              <div className="rounded-2xl border border-neutral-800 bg-black/20 p-6 text-white/60">
+                Loading funding data...
+              </div>
+            )}
+
+            {fundingError && (
+              <div className="rounded-2xl border border-red-400/20 bg-red-400/10 p-6 text-red-300">
+                {fundingError}
+              </div>
+            )}
+
+            {!fundingLoading && !fundingError && (
+              <div className="overflow-x-auto rounded-2xl border border-neutral-800">
+                <table className="min-w-[1500px] border-separate border-spacing-0">
+                  <thead>
+                    <tr className="text-left">
+                      <th className="sticky left-0 z-20 border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+                        Symbol
+                      </th>
+                      <th className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+                        OI Rank
+                      </th>
+                      <th className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+                        Max Arb
+                      </th>
+                      <th className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+                        Action
+                      </th>
+
+                      {FUNDING_EXCHANGE_ORDER.map((exchange) => (
+                        <th
+                          key={exchange.key}
+                          className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-center text-xs uppercase tracking-[0.22em] text-white/40 last:border-r-0"
+                        >
+                          {exchange.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {fundingMatrixRows.map((row) => (
+                      <tr key={row.symbol} className="hover:bg-white/[0.02]">
+                        <td className="sticky left-0 z-10 border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm font-semibold text-white">
+                          {row.symbol}
+                        </td>
+
+                        <td className="border-b border-r border-neutral-800 px-4 py-4 text-sm text-white/80">
+                          {row.oiRank}
+                        </td>
+
+                        <td className="border-b border-r border-neutral-800 px-4 py-4 text-sm">
+                          <span className="inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
+                            {formatFundingSpread(row.maxArb)}
+                          </span>
+                        </td>
+
+                        <td className="border-b border-r border-neutral-800 px-4 py-4 text-xs font-medium text-white/75">
+                          {row.action}
+                        </td>
+
+                        {FUNDING_EXCHANGE_ORDER.map((exchange) => {
+                          const fundingValue = row.byExchange[exchange.key]?.funding ?? null
+
+                          return (
+                            <td
+                              key={`${row.symbol}-${exchange.key}`}
+                              className={`border-b border-r border-neutral-800 px-4 py-4 text-center text-sm font-semibold last:border-r-0 ${getFundingCellStyle(
+                                fundingValue
+                              )}`}
+                            >
+                              {fundingValue === null ? "—" : formatFundingPercent(fundingValue)}
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <div className="mt-6 text-xs text-white/35">
+              Funding rate data provided by{" "}
+              <a
+                href="https://loris.tools"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-cyan-300 hover:text-cyan-200"
+              >
+                Loris Tools
+              </a>
+            </div>
+          </div>
+        </section>
       )}
 
       {templatePicker && (

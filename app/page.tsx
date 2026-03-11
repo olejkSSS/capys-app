@@ -420,13 +420,21 @@ function getFdvStyle(probability: number) {
   return "border-neutral-500/30 bg-neutral-500/10 text-neutral-300"
 }
 
-function formatFundingPercent(value: number) {
-  const sign = value > 0 ? "+" : ""
-  return `${sign}${value.toFixed(4)}%`
+function formatFundingPercent(value: unknown) {
+  const numeric = Number(value)
+
+  if (!Number.isFinite(numeric)) return "—"
+
+  const sign = numeric > 0 ? "+" : ""
+  return `${sign}${numeric.toFixed(4)}%`
 }
 
-function formatFundingSpread(value: number) {
-  return `${value.toFixed(4)}%`
+function formatFundingSpread(value: unknown) {
+  const numeric = Number(value)
+
+  if (!Number.isFinite(numeric)) return "—"
+
+  return `${numeric.toFixed(4)}%`
 }
 
 function getFundingChipStyle(value: number) {
@@ -441,29 +449,37 @@ function getFundingChipStyle(value: number) {
   return "border-neutral-600/30 bg-neutral-700/20 text-neutral-300"
 }
 
-function getFundingCellStyle(value: number | null) {
-  if (value === null) {
+function getFundingCellStyle(value: unknown) {
+  const numeric = Number(value)
+
+  if (!Number.isFinite(numeric)) {
     return "bg-transparent text-white/20"
   }
 
-  if (value > 0) {
+  if (numeric > 0) {
     return "bg-red-500/12 text-red-300"
   }
 
-  if (value < 0) {
+  if (numeric < 0) {
     return "bg-emerald-500/12 text-emerald-300"
   }
 
   return "bg-neutral-700/20 text-neutral-300"
 }
 
-function parseOiRank(value: string) {
-  if (!value) return 999999
-  if (value.includes("+")) {
-    const numeric = Number(value.replace("+", ""))
+function parseOiRank(value: unknown) {
+  if (value === null || value === undefined) return 999999
+
+  const normalized = String(value)
+
+  if (!normalized) return 999999
+
+  if (normalized.includes("+")) {
+    const numeric = Number(normalized.replace("+", ""))
     return Number.isFinite(numeric) ? numeric : 999999
   }
-  const numeric = Number(value)
+
+  const numeric = Number(normalized)
   return Number.isFinite(numeric) ? numeric : 999999
 }
 
@@ -514,8 +530,14 @@ export default function Home() {
         }
 
         if (!cancelled) {
-          setFundingRows(Array.isArray(data?.rows) ? data.rows : [])
-          setFundingUpdatedAt(data?.updatedAt ?? null)
+          setFundingRows(
+  Array.isArray(data?.rows)
+    ? data.rows.filter(
+        (row: unknown) => row && typeof row === "object"
+      )
+    : []
+)
+setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
         }
       } catch (error) {
         if (!cancelled) {
@@ -568,6 +590,7 @@ export default function Home() {
   )
 
   const fundingMatrixRows = useMemo(() => {
+  try {
     const grouped = new Map<
       string,
       {
@@ -577,56 +600,86 @@ export default function Home() {
       }
     >()
 
-    for (const row of fundingRows) {
-      if (!grouped.has(row.symbol)) {
-        grouped.set(row.symbol, {
-          symbol: row.symbol,
-          oiRank: row.oiRank,
+    for (const rawRow of fundingRows) {
+      const symbol = String(rawRow?.symbol ?? "").trim()
+      if (!symbol) continue
+
+      const exchange = String(rawRow?.exchange ?? "").trim()
+      if (!exchange) continue
+
+      const display = String(rawRow?.display ?? exchange)
+      const funding = Number(rawRow?.funding)
+      const oiRank = String(rawRow?.oiRank ?? "500+")
+      const bias =
+        rawRow?.bias === "longs_pay_shorts" ||
+        rawRow?.bias === "shorts_pay_longs" ||
+        rawRow?.bias === "neutral"
+          ? rawRow.bias
+          : "neutral"
+
+      const safeRow: FundingApiRow = {
+        exchange,
+        display,
+        symbol,
+        funding: Number.isFinite(funding) ? funding : 0,
+        oiRank,
+        bias,
+      }
+
+      if (!grouped.has(symbol)) {
+        grouped.set(symbol, {
+          symbol,
+          oiRank,
           byExchange: {},
         })
       }
 
-      const currentGroup = grouped.get(row.symbol)!
-      currentGroup.byExchange[row.exchange] = row
+      const currentGroup = grouped.get(symbol)!
+      currentGroup.byExchange[exchange] = safeRow
 
-      if (parseOiRank(row.oiRank) < parseOiRank(currentGroup.oiRank)) {
-        currentGroup.oiRank = row.oiRank
+      if (parseOiRank(oiRank) < parseOiRank(currentGroup.oiRank)) {
+        currentGroup.oiRank = oiRank
       }
     }
 
     const matrixRows = Array.from(grouped.values()).map((group) => {
-      const available = FUNDING_EXCHANGE_ORDER.map(
-        (exchange) => group.byExchange[exchange.key]?.funding ?? null
-      ).filter((value): value is number => value !== null)
+      const available = FUNDING_EXCHANGE_ORDER.map((exchange) => {
+        const value = group.byExchange[exchange.key]?.funding
+        return Number.isFinite(value) ? Number(value) : null
+      }).filter((value): value is number => value !== null)
 
       const maxFunding = available.length ? Math.max(...available) : 0
       const minFunding = available.length ? Math.min(...available) : 0
       const maxArb = maxFunding - minFunding
 
-      const highestExchange = FUNDING_EXCHANGE_ORDER.map((exchange) => ({
-  label: exchange.label,
-  value: group.byExchange[exchange.key]?.funding,
-}))
-  .filter((item) => item.value !== undefined && item.value !== null)
-  .sort((a, b) => (b.value ?? 0) - (a.value ?? 0))[0] ?? null
+      const exchangeValues = FUNDING_EXCHANGE_ORDER.map((exchange) => {
+        const value = group.byExchange[exchange.key]?.funding
+        return {
+          label: exchange.label,
+          value: Number.isFinite(value) ? Number(value) : null,
+        }
+      }).filter((item) => item.value !== null)
 
-      const lowestExchange = FUNDING_EXCHANGE_ORDER.map((exchange) => ({
-  label: exchange.label,
-  value: group.byExchange[exchange.key]?.funding,
-}))
-  .filter((item) => item.value !== undefined && item.value !== null)
-  .sort((a, b) => (a.value ?? 0) - (b.value ?? 0))[0] ?? null
+      const highestExchange =
+        [...exchangeValues].sort((a, b) => Number(b.value) - Number(a.value))[0] ?? null
+
+      const lowestExchange =
+        [...exchangeValues].sort((a, b) => Number(a.value) - Number(b.value))[0] ?? null
 
       let action = "No edge"
 
-      if (highestExchange && lowestExchange && highestExchange.label !== lowestExchange.label) {
+      if (
+        highestExchange &&
+        lowestExchange &&
+        highestExchange.label !== lowestExchange.label
+      ) {
         action = `BUY ${lowestExchange.label} / SELL ${highestExchange.label}`
       }
 
       return {
         symbol: group.symbol,
         oiRank: group.oiRank,
-        maxArb,
+        maxArb: Number.isFinite(maxArb) ? maxArb : 0,
         action,
         byExchange: group.byExchange,
       }
@@ -635,19 +688,23 @@ export default function Home() {
     return matrixRows.sort((a, b) =>
       fundingSort === "desc" ? b.maxArb - a.maxArb : a.maxArb - b.maxArb
     )
-  }, [fundingRows, fundingSort])
+  } catch (error) {
+    console.error("Funding matrix build failed:", error)
+    return []
+  }
+}, [fundingRows, fundingSort])
 
   const topFundingPositive = useMemo(() => {
-    const positive = fundingRows.filter((row) => row.funding > 0)
-    if (!positive.length) return null
-    return [...positive].sort((a, b) => b.funding - a.funding)[0]
-  }, [fundingRows])
+  const positive = fundingRows.filter((row) => Number.isFinite(row.funding) && row.funding > 0)
+  if (!positive.length) return null
+  return [...positive].sort((a, b) => b.funding - a.funding)[0]
+}, [fundingRows])
 
-  const topFundingNegative = useMemo(() => {
-    const negative = fundingRows.filter((row) => row.funding < 0)
-    if (!negative.length) return null
-    return [...negative].sort((a, b) => a.funding - b.funding)[0]
-  }, [fundingRows])
+const topFundingNegative = useMemo(() => {
+  const negative = fundingRows.filter((row) => Number.isFinite(row.funding) && row.funding < 0)
+  if (!negative.length) return null
+  return [...negative].sort((a, b) => a.funding - b.funding)[0]
+}, [fundingRows])
 
   const topFundingSpread = fundingMatrixRows[0] ?? null
 

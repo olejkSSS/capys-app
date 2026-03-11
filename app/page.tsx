@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toPng } from "html-to-image"
 
 const PERPS = [
@@ -9,6 +9,7 @@ const PERPS = [
     tier: "S+",
     name: "Variational",
     ref: "https://omni.variational.io/?ref=OMNICAPY",
+    refCode: "OMNICAPY",
     logo: "/variational.png",
     boost: "OMNICAPY: +15% points boost",
     farm: "Holding positions + volume on mid-OI tokens",
@@ -17,6 +18,7 @@ const PERPS = [
     tier: "S+",
     name: "Extended",
     ref: "https://app.extended.exchange/join/CAPY",
+    refCode: "CAPY",
     logo: "/extended.png",
     boost: "-10% fees + 5% points boost + 30% refback",
     farm: "Volume + holding positions",
@@ -25,6 +27,7 @@ const PERPS = [
     tier: "S",
     name: "Hibachi",
     ref: "http://hibachi.xyz/r/capy",
+    refCode: "capy",
     logo: "/hibachi.png",
     boost: "-15% fees + 15% points boost",
     farm: "Volume + holding positions",
@@ -33,6 +36,7 @@ const PERPS = [
     tier: "S",
     name: "Ethereal",
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
+    refCode: "UM68P2M9JZ6D",
     logo: "/ethereal.png",
     boost: "+15% points boost",
     farm: "Boost farming + low OI tokens",
@@ -41,6 +45,7 @@ const PERPS = [
     tier: "S",
     name: "Hyena",
     ref: "https://app.hyena.trade/ref/CAPY",
+    refCode: "CAPY",
     logo: "/hyena.png",
     boost: "+10% points boost",
     farm: "Activity + steady volume",
@@ -49,6 +54,7 @@ const PERPS = [
     tier: "A",
     name: "Pacifica",
     ref: "https://app.pacifica.fi/?referral=Capy",
+    refCode: "Capy",
     logo: "/pacifica.png",
     boost: "+15% points boost",
     farm: "High volume + active trading",
@@ -57,6 +63,7 @@ const PERPS = [
     tier: "A",
     name: "EdgeX",
     ref: "https://pro.edgex.exchange/referral/OLEJK",
+    refCode: "OLEJK",
     logo: "/edgex.png",
     boost: "-10% fees + 10% points boost + VIP1",
     farm: "High volume + hold positions",
@@ -65,6 +72,7 @@ const PERPS = [
     tier: "A",
     name: "Dreamcash",
     ref: "https://dreamcash.xyz/share?code=CAPYCR",
+    refCode: "CAPYCR",
     logo: "/dreamcash.png",
     boost: "boost from 10K to 1M points",
     farm: "Low OI tokens + active trading",
@@ -175,19 +183,19 @@ const PERPS_CALC = {
   hyena: {
     name: "Hyena",
     fdv: 0,
-    totalPoints: 0,
+    totalPoints: 1,
     airdrop: 15,
   },
   liquid: {
     name: "Liquid",
     fdv: 0,
-    totalPoints: 0,
+    totalPoints: 1,
     airdrop: 15,
   },
   decibel: {
     name: "Decibel",
     fdv: 0,
-    totalPoints: 0,
+    totalPoints: 1,
     airdrop: 15,
   },
 } as const
@@ -325,19 +333,69 @@ const POLYMARKET_FDV_ODDS = [
 ] as const
 
 const FUNDING_EXCHANGE_ORDER = [
-  { key: "edgex", label: "EdgeX" },
-  { key: "ethereal", label: "Ethereal" },
-  { key: "extended", label: "Extended" },
-  { key: "hibachi", label: "Hibachi" },
-  { key: "hyena", label: "Hyena" },
-  { key: "hyperliquid", label: "Hyperliquid" },
-  { key: "pacifica", label: "Pacifica" },
-  { key: "variational", label: "Variational" },
+  {
+    key: "edgex",
+    label: "EdgeX",
+    intervalHours: 8,
+    tradeUrl: "https://pro.edgex.exchange/referral/OLEJK",
+    hasPersonalRef: true,
+  },
+  {
+    key: "ethereal",
+    label: "Ethereal",
+    intervalHours: 8,
+    tradeUrl: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
+    hasPersonalRef: true,
+  },
+  {
+    key: "extended",
+    label: "Extended",
+    intervalHours: 1,
+    tradeUrl: "https://app.extended.exchange/join/CAPY",
+    hasPersonalRef: true,
+  },
+  {
+    key: "hibachi",
+    label: "Hibachi",
+    intervalHours: 8,
+    tradeUrl: "http://hibachi.xyz/r/capy",
+    hasPersonalRef: true,
+  },
+  {
+    key: "hyena",
+    label: "Hyena",
+    intervalHours: 8,
+    tradeUrl: "https://app.hyena.trade/ref/CAPY",
+    hasPersonalRef: true,
+  },
+  {
+    key: "hyperliquid",
+    label: "Hyperliquid",
+    intervalHours: 1,
+    tradeUrl: "https://app.hyperliquid.xyz/",
+    hasPersonalRef: false,
+  },
+  {
+    key: "pacifica",
+    label: "Pacifica",
+    intervalHours: 8,
+    tradeUrl: "https://app.pacifica.fi/?referral=Capy",
+    hasPersonalRef: true,
+  },
+  {
+    key: "variational",
+    label: "Variational",
+    intervalHours: 8,
+    tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
+    hasPersonalRef: true,
+  },
 ] as const
 
 type Tab = "list" | "calculator" | "odds" | "funding"
 type CalcPerpKey = keyof typeof PERPS_CALC
+type FundingMetricMode = "interval" | "annualized"
 type FundingBias = "longs_pay_shorts" | "shorts_pay_longs" | "neutral"
+type FundingExchangeKey = (typeof FUNDING_EXCHANGE_ORDER)[number]["key"]
 
 type FundingApiRow = {
   exchange: string
@@ -347,6 +405,20 @@ type FundingApiRow = {
   oiRank: string
   bias: FundingBias
 }
+
+type FundingMatrixRow = {
+  symbol: string
+  oiRank: string
+  maxArb: number
+  activeCount: number
+  buyExchange: { key: FundingExchangeKey; label: string } | null
+  sellExchange: { key: FundingExchangeKey; label: string } | null
+  byExchange: Record<FundingExchangeKey, number | null>
+}
+
+const ALL_FUNDING_KEYS = FUNDING_EXCHANGE_ORDER.map(
+  (exchange) => exchange.key
+) as FundingExchangeKey[]
 
 function getTierStyle(tier: string) {
   if (tier === "S+") {
@@ -420,47 +492,45 @@ function getFdvStyle(probability: number) {
   return "border-neutral-500/30 bg-neutral-500/10 text-neutral-300"
 }
 
-function formatFundingPercent(value: unknown) {
+function formatFundingValue(value: unknown) {
   const numeric = Number(value)
-
   if (!Number.isFinite(numeric)) return "—"
+
+  const abs = Math.abs(numeric)
+  let digits = 4
+
+  if (abs >= 100) digits = 1
+  else if (abs >= 10) digits = 2
+  else if (abs >= 1) digits = 3
 
   const sign = numeric > 0 ? "+" : ""
-  return `${sign}${numeric.toFixed(4)}%`
+  return `${sign}${numeric.toFixed(digits)}%`
 }
 
-function formatFundingSpread(value: unknown) {
+function formatSpreadValue(value: unknown) {
   const numeric = Number(value)
-
   if (!Number.isFinite(numeric)) return "—"
 
-  return `${numeric.toFixed(4)}%`
+  const abs = Math.abs(numeric)
+  let digits = 4
+
+  if (abs >= 100) digits = 1
+  else if (abs >= 10) digits = 2
+  else if (abs >= 1) digits = 3
+
+  return `${numeric.toFixed(digits)}%`
 }
 
-function getFundingChipStyle(value: number) {
-  if (value > 0) {
-    return "border-red-400/25 bg-red-500/10 text-red-300"
-  }
-
-  if (value < 0) {
-    return "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
-  }
-
-  return "border-neutral-600/30 bg-neutral-700/20 text-neutral-300"
-}
-
-function getFundingCellStyle(value: unknown) {
-  const numeric = Number(value)
-
-  if (!Number.isFinite(numeric)) {
+function getFundingCellClass(value: number | null) {
+  if (value === null || !Number.isFinite(value)) {
     return "bg-transparent text-white/20"
   }
 
-  if (numeric > 0) {
+  if (value > 0) {
     return "bg-red-500/12 text-red-300"
   }
 
-  if (numeric < 0) {
+  if (value < 0) {
     return "bg-emerald-500/12 text-emerald-300"
   }
 
@@ -471,7 +541,6 @@ function parseOiRank(value: unknown) {
   if (value === null || value === undefined) return 999999
 
   const normalized = String(value)
-
   if (!normalized) return 999999
 
   if (normalized.includes("+")) {
@@ -483,22 +552,65 @@ function parseOiRank(value: unknown) {
   return Number.isFinite(numeric) ? numeric : 999999
 }
 
+function getExchangeMeta(exchangeKey: FundingExchangeKey) {
+  return (
+    FUNDING_EXCHANGE_ORDER.find((exchange) => exchange.key === exchangeKey) ??
+    FUNDING_EXCHANGE_ORDER[0]
+  )
+}
+
+function toDisplayedFundingValue(
+  rawFunding: number,
+  exchangeKey: FundingExchangeKey,
+  metricMode: FundingMetricMode
+) {
+  const meta = getExchangeMeta(exchangeKey)
+
+  const actualIntervalFunding =
+    meta.intervalHours === 1 ? rawFunding / 8 : rawFunding
+
+  if (metricMode === "annualized") {
+    return actualIntervalFunding * (24 / meta.intervalHours) * 365
+  }
+
+  return actualIntervalFunding
+}
+
+function intervalLabel(hours: number) {
+  return `${hours}h`
+}
+
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list")
   const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
   const [myPoints, setMyPoints] = useState(0)
   const [templatePicker, setTemplatePicker] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("cinema")
+  const [selectedTemplate, setSelectedTemplate] =
+    useState<(typeof TEMPLATES)[number]>("cinema")
   const [isDownloading, setIsDownloading] = useState(false)
   const [launchSort, setLaunchSort] = useState<"desc" | "asc">("desc")
   const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
-  const [fundingSort, setFundingSort] = useState<"desc" | "asc">("desc")
+
+  const [copiedRefName, setCopiedRefName] = useState<string | null>(null)
+  const [copiedTicker, setCopiedTicker] = useState<string | null>(null)
+
   const [fundingRows, setFundingRows] = useState<FundingApiRow[]>([])
   const [fundingUpdatedAt, setFundingUpdatedAt] = useState<string | null>(null)
   const [fundingLoading, setFundingLoading] = useState(false)
   const [fundingError, setFundingError] = useState<string | null>(null)
+  const [fundingSort, setFundingSort] = useState<"desc" | "asc">("desc")
+  const [searchTicker, setSearchTicker] = useState("")
+  const [enabledFundingExchanges, setEnabledFundingExchanges] =
+    useState<FundingExchangeKey[]>(ALL_FUNDING_KEYS)
+  const [fundingMetricMode, setFundingMetricMode] =
+    useState<FundingMetricMode>("interval")
+  const [onlyActionable, setOnlyActionable] = useState(true)
+  const [refreshCountdown, setRefreshCountdown] = useState(60)
 
   const cardRef = useRef<HTMLDivElement>(null)
+  const fundingRequestInFlightRef = useRef(false)
+  const listCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const tickerCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const current = PERPS_CALC[calcPerp]
 
@@ -513,53 +625,86 @@ export default function Home() {
   }, [current])
 
   useEffect(() => {
-    if (tab !== "funding") return
+    return () => {
+      if (listCopyTimeoutRef.current) clearTimeout(listCopyTimeoutRef.current)
+      if (tickerCopyTimeoutRef.current) clearTimeout(tickerCopyTimeoutRef.current)
+    }
+  }, [])
 
-    let cancelled = false
+  const loadFunding = useCallback(
+    async (silent = false) => {
+      if (fundingRequestInFlightRef.current) return
 
-    const loadFunding = async () => {
       try {
-        setFundingLoading(true)
+        fundingRequestInFlightRef.current = true
+        if (!silent) setFundingLoading(true)
         setFundingError(null)
 
-        const res = await fetch("/api/funding", { cache: "no-store" })
+        const res = await fetch(`/api/funding?ts=${Date.now()}`, {
+          cache: "no-store",
+        })
+
         const data = await res.json()
 
         if (!res.ok) {
           throw new Error(data?.error || "Failed to load funding data")
         }
 
-        if (!cancelled) {
-          setFundingRows(
-  Array.isArray(data?.rows)
-    ? data.rows.filter(
-        (row: unknown) => row && typeof row === "object"
-      )
-    : []
-)
-setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
-        }
+        const safeRows = Array.isArray(data?.rows)
+          ? data.rows
+              .filter((row: unknown) => row && typeof row === "object")
+              .map((row: any) => ({
+                exchange: String(row.exchange ?? ""),
+                display: String(row.display ?? row.exchange ?? ""),
+                symbol: String(row.symbol ?? "").toUpperCase(),
+                funding: Number.isFinite(Number(row.funding))
+                  ? Number(row.funding)
+                  : 0,
+                oiRank: String(row.oiRank ?? "500+"),
+                bias:
+                  row.bias === "longs_pay_shorts" ||
+                  row.bias === "shorts_pay_longs" ||
+                  row.bias === "neutral"
+                    ? row.bias
+                    : "neutral",
+              }))
+          : []
+
+        setFundingRows(safeRows)
+        setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
+        setRefreshCountdown(60)
       } catch (error) {
-        if (!cancelled) {
-          setFundingError(
-            error instanceof Error ? error.message : "Failed to load funding data"
-          )
-        }
+        setFundingError(
+          error instanceof Error ? error.message : "Failed to load funding data"
+        )
       } finally {
-        if (!cancelled) {
-          setFundingLoading(false)
-        }
+        fundingRequestInFlightRef.current = false
+        if (!silent) setFundingLoading(false)
       }
-    }
+    },
+    []
+  )
 
-    loadFunding()
-    const interval = setInterval(loadFunding, 60000)
+  useEffect(() => {
+    if (tab !== "funding") return
+    void loadFunding(false)
+  }, [tab, loadFunding])
 
-    return () => {
-      cancelled = true
-      clearInterval(interval)
-    }
-  }, [tab])
+  useEffect(() => {
+    if (tab !== "funding") return
+
+    const interval = setInterval(() => {
+      setRefreshCountdown((prev) => {
+        if (prev <= 1) {
+          void loadFunding(true)
+          return 60
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [tab, loadFunding])
 
   const safeTotalPoints = Math.max(totalPoints, 1)
   const safeAirdrop = Math.min(Math.max(airdrop, 0), 100)
@@ -589,124 +734,197 @@ setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
       : a.probability - b.probability
   )
 
-  const fundingMatrixRows = useMemo(() => {
-  try {
-    const grouped = new Map<
-      string,
-      {
-        symbol: string
-        oiRank: string
-        byExchange: Record<string, FundingApiRow | undefined>
-      }
-    >()
+  const activeFundingExchanges = useMemo(
+    () =>
+      FUNDING_EXCHANGE_ORDER.filter((exchange) =>
+        enabledFundingExchanges.includes(exchange.key)
+      ),
+    [enabledFundingExchanges]
+  )
 
-    for (const rawRow of fundingRows) {
-      const symbol = String(rawRow?.symbol ?? "").trim()
-      if (!symbol) continue
+  const visibleFundingRows = useMemo(() => {
+    const search = searchTicker.trim().toUpperCase()
 
-      const exchange = String(rawRow?.exchange ?? "").trim()
-      if (!exchange) continue
-
-      const display = String(rawRow?.display ?? exchange)
-      const funding = Number(rawRow?.funding)
-      const oiRank = String(rawRow?.oiRank ?? "500+")
-      const bias =
-        rawRow?.bias === "longs_pay_shorts" ||
-        rawRow?.bias === "shorts_pay_longs" ||
-        rawRow?.bias === "neutral"
-          ? rawRow.bias
-          : "neutral"
-
-      const safeRow: FundingApiRow = {
-        exchange,
-        display,
-        symbol,
-        funding: Number.isFinite(funding) ? funding : 0,
-        oiRank,
-        bias,
-      }
-
-      if (!grouped.has(symbol)) {
-        grouped.set(symbol, {
-          symbol,
-          oiRank,
-          byExchange: {},
-        })
-      }
-
-      const currentGroup = grouped.get(symbol)!
-      currentGroup.byExchange[exchange] = safeRow
-
-      if (parseOiRank(oiRank) < parseOiRank(currentGroup.oiRank)) {
-        currentGroup.oiRank = oiRank
-      }
-    }
-
-    const matrixRows = Array.from(grouped.values()).map((group) => {
-      const available = FUNDING_EXCHANGE_ORDER.map((exchange) => {
-        const value = group.byExchange[exchange.key]?.funding
-        return Number.isFinite(value) ? Number(value) : null
-      }).filter((value): value is number => value !== null)
-
-      const maxFunding = available.length ? Math.max(...available) : 0
-      const minFunding = available.length ? Math.min(...available) : 0
-      const maxArb = maxFunding - minFunding
-
-      const exchangeValues = FUNDING_EXCHANGE_ORDER.map((exchange) => {
-        const value = group.byExchange[exchange.key]?.funding
+    return fundingRows
+      .filter((row) =>
+        enabledFundingExchanges.includes(row.exchange as FundingExchangeKey)
+      )
+      .filter((row) => !search || row.symbol.includes(search))
+      .map((row) => {
+        const exchangeKey = row.exchange as FundingExchangeKey
         return {
-          label: exchange.label,
-          value: Number.isFinite(value) ? Number(value) : null,
+          ...row,
+          displayFunding: toDisplayedFundingValue(
+            row.funding,
+            exchangeKey,
+            fundingMetricMode
+          ),
         }
-      }).filter((item) => item.value !== null)
+      })
+  }, [fundingRows, enabledFundingExchanges, searchTicker, fundingMetricMode])
 
-      const highestExchange =
-        [...exchangeValues].sort((a, b) => Number(b.value) - Number(a.value))[0] ?? null
+  const fundingMatrixRows = useMemo(() => {
+    try {
+      const grouped = new Map<
+        string,
+        {
+          symbol: string
+          oiRank: string
+          byExchange: Record<FundingExchangeKey, number | null>
+        }
+      >()
 
-      const lowestExchange =
-        [...exchangeValues].sort((a, b) => Number(a.value) - Number(b.value))[0] ?? null
+      for (const row of visibleFundingRows) {
+        const exchangeKey = row.exchange as FundingExchangeKey
+        const symbol = String(row.symbol ?? "").trim()
+        if (!symbol) continue
 
-      let action = "No edge"
+        if (!grouped.has(symbol)) {
+          grouped.set(symbol, {
+            symbol,
+            oiRank: String(row.oiRank ?? "500+"),
+            byExchange: {
+              edgex: null,
+              ethereal: null,
+              extended: null,
+              hibachi: null,
+              hyena: null,
+              hyperliquid: null,
+              pacifica: null,
+              variational: null,
+            },
+          })
+        }
 
-      if (
-        highestExchange &&
-        lowestExchange &&
-        highestExchange.label !== lowestExchange.label
-      ) {
-        action = `BUY ${lowestExchange.label} / SELL ${highestExchange.label}`
+        const currentGroup = grouped.get(symbol)!
+        currentGroup.byExchange[exchangeKey] = Number.isFinite(row.displayFunding)
+          ? row.displayFunding
+          : null
+
+        if (parseOiRank(row.oiRank) < parseOiRank(currentGroup.oiRank)) {
+          currentGroup.oiRank = String(row.oiRank ?? "500+")
+        }
       }
 
-      return {
-        symbol: group.symbol,
-        oiRank: group.oiRank,
-        maxArb: Number.isFinite(maxArb) ? maxArb : 0,
-        action,
-        byExchange: group.byExchange,
-      }
-    })
+      const matrix = Array.from(grouped.values()).map((group) => {
+        const values = activeFundingExchanges
+          .map((exchange) => group.byExchange[exchange.key])
+          .filter((value): value is number => value !== null && Number.isFinite(value))
 
-    return matrixRows.sort((a, b) =>
-      fundingSort === "desc" ? b.maxArb - a.maxArb : a.maxArb - b.maxArb
-    )
-  } catch (error) {
-    console.error("Funding matrix build failed:", error)
-    return []
-  }
-}, [fundingRows, fundingSort])
+        const maxFunding = values.length ? Math.max(...values) : 0
+        const minFunding = values.length ? Math.min(...values) : 0
+        const maxArb = maxFunding - minFunding
+
+        const highestEntry =
+  activeFundingExchanges
+    .map((exchange) => ({
+      key: exchange.key,
+      label: String(exchange.label),
+      value: group.byExchange[exchange.key] ?? null,
+    }))
+    .filter((item) => item.value !== null)
+    .sort((a, b) => Number(b.value ?? 0) - Number(a.value ?? 0))[0] ?? null
+
+        const lowestEntry =
+  activeFundingExchanges
+    .map((exchange) => ({
+      key: exchange.key,
+      label: String(exchange.label),
+      value: group.byExchange[exchange.key] ?? null,
+    }))
+    .filter((item) => item.value !== null)
+    .sort((a, b) => Number(a.value ?? 0) - Number(b.value ?? 0))[0] ?? null
+
+        return {
+          symbol: group.symbol,
+          oiRank: group.oiRank,
+          maxArb,
+          activeCount: values.length,
+          buyExchange:
+            lowestEntry && highestEntry && lowestEntry.key !== highestEntry.key
+              ? { key: lowestEntry.key, label: lowestEntry.label }
+              : null,
+          sellExchange:
+            lowestEntry && highestEntry && lowestEntry.key !== highestEntry.key
+              ? { key: highestEntry.key, label: highestEntry.label }
+              : null,
+          byExchange: group.byExchange,
+        } satisfies FundingMatrixRow
+      })
+
+      const filtered = onlyActionable
+        ? matrix.filter((row) => row.activeCount >= 2 && row.maxArb > 0)
+        : matrix
+
+      return filtered.sort((a, b) =>
+        fundingSort === "desc" ? b.maxArb - a.maxArb : a.maxArb - b.maxArb
+      )
+    } catch (error) {
+      console.error("Funding matrix build failed:", error)
+      return []
+    }
+  }, [visibleFundingRows, activeFundingExchanges, fundingSort, onlyActionable])
 
   const topFundingPositive = useMemo(() => {
-  const positive = fundingRows.filter((row) => Number.isFinite(row.funding) && row.funding > 0)
-  if (!positive.length) return null
-  return [...positive].sort((a, b) => b.funding - a.funding)[0]
-}, [fundingRows])
+    const positive = visibleFundingRows.filter((row) => row.displayFunding > 0)
+    if (!positive.length) return null
+    return [...positive].sort((a, b) => b.displayFunding - a.displayFunding)[0]
+  }, [visibleFundingRows])
 
-const topFundingNegative = useMemo(() => {
-  const negative = fundingRows.filter((row) => Number.isFinite(row.funding) && row.funding < 0)
-  if (!negative.length) return null
-  return [...negative].sort((a, b) => a.funding - b.funding)[0]
-}, [fundingRows])
+  const topFundingNegative = useMemo(() => {
+    const negative = visibleFundingRows.filter((row) => row.displayFunding < 0)
+    if (!negative.length) return null
+    return [...negative].sort((a, b) => a.displayFunding - b.displayFunding)[0]
+  }, [visibleFundingRows])
 
   const topFundingSpread = fundingMatrixRows[0] ?? null
+
+  const copyRefCode = async (perpName: string, refCode: string) => {
+    try {
+      await navigator.clipboard.writeText(refCode)
+      setCopiedRefName(perpName)
+
+      if (listCopyTimeoutRef.current) clearTimeout(listCopyTimeoutRef.current)
+      listCopyTimeoutRef.current = setTimeout(() => {
+        setCopiedRefName(null)
+      }, 1600)
+    } catch (error) {
+      console.error("Failed to copy ref code:", error)
+    }
+  }
+
+  const copyTickerValue = async (symbol: string) => {
+    try {
+      await navigator.clipboard.writeText(symbol)
+      setCopiedTicker(symbol)
+
+      if (tickerCopyTimeoutRef.current) clearTimeout(tickerCopyTimeoutRef.current)
+      tickerCopyTimeoutRef.current = setTimeout(() => {
+        setCopiedTicker(null)
+      }, 1400)
+    } catch (error) {
+      console.error("Failed to copy ticker:", error)
+    }
+  }
+
+  const toggleFundingExchange = (exchangeKey: FundingExchangeKey) => {
+    setEnabledFundingExchanges((prev) => {
+      if (prev.includes(exchangeKey)) {
+        if (prev.length === 1) return prev
+        return prev.filter((key) => key !== exchangeKey)
+      }
+
+      return [...prev, exchangeKey]
+    })
+  }
+
+  const resetFundingFilters = () => {
+    setEnabledFundingExchanges(ALL_FUNDING_KEYS)
+    setSearchTicker("")
+    setOnlyActionable(true)
+    setFundingMetricMode("interval")
+    setFundingSort("desc")
+  }
 
   const downloadCard = async () => {
     if (!cardRef.current || isDownloading) return
@@ -751,8 +969,8 @@ Calculate yours on capys.app`
   }
 
   return (
-    <main className="relative z-10 overflow-x-hidden text-white">
-      <div className="absolute inset-0 -z-10 overflow-hidden">
+    <main className="relative z-10 min-h-screen overflow-x-hidden bg-[#050814] pb-20 text-white">
+      <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#070b14] via-[#0f1630] to-[#050814]" />
         <div className="absolute left-[-250px] top-[-250px] h-[700px] w-[700px] animate-blob rounded-full bg-purple-500/40 blur-[200px]" />
         <div className="animation-delay-2000 absolute bottom-[-250px] right-[-250px] h-[700px] w-[700px] animate-blob rounded-full bg-cyan-500/30 blur-[200px]" />
@@ -886,9 +1104,17 @@ Calculate yours on capys.app`
               </div>
 
               <div className="flex md:justify-center">
-                <div className="rounded-full border border-emerald-400 bg-emerald-400/5 px-3 py-1 text-center text-xs font-medium text-emerald-300 sm:text-sm">
-                  {perp.boost}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => copyRefCode(perp.name, perp.refCode)}
+                  className="group/boost relative rounded-full border border-emerald-400 bg-emerald-400/5 px-3 py-1 text-center text-xs font-medium text-emerald-300 transition hover:bg-emerald-400/10 sm:text-sm"
+                >
+                  {copiedRefName === perp.name ? "Copied code" : perp.boost}
+
+                  <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max -translate-x-1/2 rounded-lg border border-neutral-700 bg-[#0b111d] px-3 py-2 text-[11px] text-white opacity-0 shadow-lg transition group-hover/boost:opacity-100">
+                    Code: <span className="text-cyan-300">{perp.refCode}</span> • click to copy
+                  </span>
+                </button>
               </div>
 
               <a
@@ -1262,34 +1488,58 @@ Calculate yours on capys.app`
       )}
 
       {tab === "funding" && (
-        <section className="mx-auto mt-20 max-w-[1700px] space-y-8 px-4 sm:px-6">
+        <section className="mx-auto mt-20 max-w-[1750px] space-y-8 px-4 sm:px-6">
           <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
-            <h2 className="text-2xl font-semibold text-white">Funding Rate Screener</h2>
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold text-white">Funding Rate Screener</h2>
 
-            <p className="mt-2 text-sm text-white/50">
-              Live funding matrix for EdgeX, Ethereal, Extended, Hibachi, Hyena, Hyperliquid, Pacifica and Variational.
-            </p>
+                <p className="mt-2 text-sm text-white/50">
+                  Live funding matrix for EdgeX, Ethereal, Extended, Hibachi, Hyena, Hyperliquid, Pacifica and Variational.
+                </p>
 
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <div className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-emerald-300/80">
-                Auto-refresh: 60s
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <div className="inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-emerald-300/80">
+                    Auto-refresh in: {refreshCountdown}s
+                  </div>
+
+                  {fundingUpdatedAt && (
+                    <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-cyan-300/80">
+                      Updated: {fundingUpdatedAt}
+                    </div>
+                  )}
+
+                  <div className="inline-flex rounded-full border border-neutral-700 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white/60">
+                    View: {fundingMetricMode === "interval" ? "Per interval" : "Annualized"}
+                  </div>
+                </div>
               </div>
 
-              {fundingUpdatedAt && (
-                <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-cyan-300/80">
-                  Updated: {fundingUpdatedAt}
-                </div>
-              )}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => void loadFunding(false)}
+                  className="rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400/15"
+                >
+                  Refresh now
+                </button>
+
+                <button
+                  onClick={resetFundingFilters}
+                  className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-white/70 transition hover:border-neutral-500 hover:text-white"
+                >
+                  Reset filters
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 xl:grid-cols-[1.2fr_1.2fr_1fr]">
             <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
                 Most Positive Funding
               </div>
 
-              <div className="mt-3 text-xl font-semibold text-white">
+              <div className="mt-3 text-2xl font-semibold text-white">
                 {topFundingPositive ? topFundingPositive.symbol : "N/A"}
               </div>
 
@@ -1298,7 +1548,9 @@ Calculate yours on capys.app`
               </div>
 
               <div className="mt-4 inline-flex rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-sm font-medium text-red-300">
-                {topFundingPositive ? formatFundingPercent(topFundingPositive.funding) : "N/A"}
+                {topFundingPositive
+                  ? formatFundingValue(topFundingPositive.displayFunding)
+                  : "N/A"}
               </div>
             </div>
 
@@ -1307,7 +1559,7 @@ Calculate yours on capys.app`
                 Most Negative Funding
               </div>
 
-              <div className="mt-3 text-xl font-semibold text-white">
+              <div className="mt-3 text-2xl font-semibold text-white">
                 {topFundingNegative ? topFundingNegative.symbol : "N/A"}
               </div>
 
@@ -1316,7 +1568,9 @@ Calculate yours on capys.app`
               </div>
 
               <div className="mt-4 inline-flex rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-300">
-                {topFundingNegative ? formatFundingPercent(topFundingNegative.funding) : "N/A"}
+                {topFundingNegative
+                  ? formatFundingValue(topFundingNegative.displayFunding)
+                  : "N/A"}
               </div>
             </div>
 
@@ -1325,7 +1579,7 @@ Calculate yours on capys.app`
                 Highest Spread
               </div>
 
-              <div className="mt-3 text-xl font-semibold text-white">
+              <div className="mt-3 text-2xl font-semibold text-white">
                 {topFundingSpread ? topFundingSpread.symbol : "N/A"}
               </div>
 
@@ -1334,45 +1588,140 @@ Calculate yours on capys.app`
               </div>
 
               <div className="mt-4 inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-sm font-medium text-cyan-300">
-                {topFundingSpread ? formatFundingSpread(topFundingSpread.maxArb) : "N/A"}
+                {topFundingSpread ? formatSpreadValue(topFundingSpread.maxArb) : "N/A"}
               </div>
             </div>
           </div>
 
           <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
-            <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-white">Funding Matrix</h3>
-                <div className="mt-1 text-xs uppercase tracking-[0.22em] text-white/35">
-                  Loris-style screener in Capy theme
+            <div className="flex flex-col gap-4">
+              <div className="grid gap-4 xl:grid-cols-[1.25fr_1fr_1fr_auto]">
+                <div>
+                  <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
+                    Search by ticker
+                  </label>
+                  <input
+                    value={searchTicker}
+                    onChange={(e) => setSearchTicker(e.target.value.toUpperCase())}
+                    placeholder="BTC, ETH, SOL, ICP..."
+                    className="w-full rounded-xl border border-neutral-800 bg-[#0b111d] px-4 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
+                    Funding view
+                  </label>
+                  <div className="flex rounded-xl border border-neutral-800 bg-[#0b111d] p-1">
+                    <button
+                      onClick={() => setFundingMetricMode("interval")}
+                      className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
+                        fundingMetricMode === "interval"
+                          ? "bg-cyan-500/15 text-cyan-300"
+                          : "text-white/60"
+                      }`}
+                    >
+                      Per interval
+                    </button>
+
+                    <button
+                      onClick={() => setFundingMetricMode("annualized")}
+                      className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
+                        fundingMetricMode === "annualized"
+                          ? "bg-fuchsia-500/15 text-fuchsia-300"
+                          : "text-white/60"
+                      }`}
+                    >
+                      Annualized
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
+                    Sort by spread
+                  </label>
+                  <div className="flex rounded-xl border border-neutral-800 bg-[#0b111d] p-1">
+                    <button
+                      onClick={() => setFundingSort("desc")}
+                      className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
+                        fundingSort === "desc"
+                          ? "bg-emerald-500/15 text-emerald-300"
+                          : "text-white/60"
+                      }`}
+                    >
+                      High → Low
+                    </button>
+
+                    <button
+                      onClick={() => setFundingSort("asc")}
+                      className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
+                        fundingSort === "asc"
+                          ? "bg-red-500/15 text-red-300"
+                          : "text-white/60"
+                      }`}
+                    >
+                      Low → High
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-end">
+                  <button
+                    onClick={() => setOnlyActionable((prev) => !prev)}
+                    className={`w-full rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                      onlyActionable
+                        ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300"
+                        : "border-neutral-700 text-white/60"
+                    }`}
+                  >
+                    {onlyActionable ? "Only opportunities" : "Show all symbols"}
+                  </button>
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  onClick={() => setFundingSort("desc")}
-                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                    fundingSort === "desc"
-                      ? "border border-emerald-400/40 bg-emerald-400/10 text-emerald-300"
-                      : "border border-neutral-700 text-neutral-400"
-                  }`}
-                >
-                  Max Arb High → Low
-                </button>
+              <div>
+                <div className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">
+                  Toggle exchanges
+                </div>
 
-                <button
-                  onClick={() => setFundingSort("asc")}
-                  className={`rounded-lg px-3 py-1.5 text-xs transition ${
-                    fundingSort === "asc"
-                      ? "border border-red-400/40 bg-red-400/10 text-red-300"
-                      : "border border-neutral-700 text-neutral-400"
-                  }`}
-                >
-                  Max Arb Low → High
-                </button>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setEnabledFundingExchanges(ALL_FUNDING_KEYS)}
+                    className="rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/15"
+                  >
+                    All
+                  </button>
+
+                  {FUNDING_EXCHANGE_ORDER.map((exchange) => {
+                    const enabled = enabledFundingExchanges.includes(exchange.key)
+
+                    return (
+                      <button
+                        key={exchange.key}
+                        onClick={() => toggleFundingExchange(exchange.key)}
+                        className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
+                          enabled
+                            ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
+                            : "border-neutral-700 text-white/50"
+                        }`}
+                      >
+                        {exchange.label} · {intervalLabel(exchange.intervalHours)}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="text-xs text-white/35">
+                {fundingMetricMode === "interval"
+                  ? "1h venues are shown in their actual 1h funding form. Loris normalizes some 1h venues to 8h-comparable values, so they are de-normalized here for display."
+                  : "Annualized view uses the currently shown per-interval funding and extrapolates it across a full year."}
               </div>
             </div>
+          </div>
 
+          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
             {fundingLoading && (
               <div className="rounded-2xl border border-neutral-800 bg-black/20 p-6 text-white/60">
                 Loading funding data...
@@ -1387,28 +1736,44 @@ Calculate yours on capys.app`
 
             {!fundingLoading && !fundingError && (
               <div className="overflow-x-auto rounded-2xl border border-neutral-800">
-                <table className="min-w-[1500px] border-separate border-spacing-0">
+                <table className="min-w-[1820px] border-separate border-spacing-0">
                   <thead>
                     <tr className="text-left">
-                      <th className="sticky left-0 z-20 border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+                      <th className="sticky left-0 top-0 z-40 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
                         Symbol
                       </th>
-                      <th className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+
+                      <th className="sticky left-[120px] top-0 z-40 w-[95px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
                         OI Rank
                       </th>
-                      <th className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+
+                      <th className="sticky left-[215px] top-0 z-40 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
                         Max Arb
                       </th>
-                      <th className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
+
+                      <th className="sticky left-[335px] top-0 z-40 w-[260px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-xs uppercase tracking-[0.22em] text-white/40">
                         Action
                       </th>
 
-                      {FUNDING_EXCHANGE_ORDER.map((exchange) => (
+                      {activeFundingExchanges.map((exchange) => (
                         <th
                           key={exchange.key}
-                          className="border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-center text-xs uppercase tracking-[0.22em] text-white/40 last:border-r-0"
+                          className="sticky top-0 z-30 min-w-[155px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-center last:border-r-0"
                         >
-                          {exchange.label}
+                          <div className="flex flex-col items-center gap-1">
+                            <a
+                              href={exchange.tradeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70 transition hover:text-cyan-300"
+                            >
+                              {exchange.label}
+                            </a>
+
+                            <div className="text-[10px] uppercase tracking-[0.2em] text-white/30">
+                              {intervalLabel(exchange.intervalHours)}
+                            </div>
+                          </div>
                         </th>
                       ))}
                     </tr>
@@ -1417,55 +1782,109 @@ Calculate yours on capys.app`
                   <tbody>
                     {fundingMatrixRows.map((row) => (
                       <tr key={row.symbol} className="hover:bg-white/[0.02]">
-                        <td className="sticky left-0 z-10 border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm font-semibold text-white">
-                          {row.symbol}
+                        <td className="sticky left-0 z-20 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm font-semibold text-white">
+                          <button
+                            onClick={() => void copyTickerValue(row.symbol)}
+                            className="transition hover:text-cyan-300"
+                            title="Click to copy ticker"
+                          >
+                            {copiedTicker === row.symbol ? "Copied" : row.symbol}
+                          </button>
                         </td>
 
-                        <td className="border-b border-r border-neutral-800 px-4 py-4 text-sm text-white/80">
+                        <td className="sticky left-[120px] z-20 w-[95px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm text-white/80">
                           {row.oiRank}
                         </td>
 
-                        <td className="border-b border-r border-neutral-800 px-4 py-4 text-sm">
+                        <td className="sticky left-[215px] z-20 w-[120px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4 text-sm">
                           <span className="inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
-                            {formatFundingSpread(row.maxArb)}
+                            {formatSpreadValue(row.maxArb)}
                           </span>
                         </td>
 
-                        <td className="border-b border-r border-neutral-800 px-4 py-4 text-xs font-medium text-white/75">
-                          {row.action}
+                        <td className="sticky left-[335px] z-20 w-[260px] border-b border-r border-neutral-800 bg-[#0b111d] px-4 py-4">
+                          {row.buyExchange && row.sellExchange ? (
+                            <div className="flex flex-wrap gap-2">
+                              <a
+                                href={getExchangeMeta(row.buyExchange.key).tradeUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/15"
+                              >
+                                BUY {row.buyExchange.label}
+                              </a>
+
+                              <a
+                                href={getExchangeMeta(row.sellExchange.key).tradeUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-500/15"
+                              >
+                                SELL {row.sellExchange.label}
+                              </a>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-white/35">No trade route</span>
+                          )}
                         </td>
 
-                        {FUNDING_EXCHANGE_ORDER.map((exchange) => {
-                          const fundingValue = row.byExchange[exchange.key]?.funding ?? null
+                        {activeFundingExchanges.map((exchange) => {
+                          const value = row.byExchange[exchange.key]
 
                           return (
                             <td
                               key={`${row.symbol}-${exchange.key}`}
-                              className={`border-b border-r border-neutral-800 px-4 py-4 text-center text-sm font-semibold last:border-r-0 ${getFundingCellStyle(
-                                fundingValue
+                              className={`border-b border-r border-neutral-800 px-4 py-4 text-center text-sm font-semibold last:border-r-0 ${getFundingCellClass(
+                                value
                               )}`}
                             >
-                              {fundingValue === null ? "—" : formatFundingPercent(fundingValue)}
+                              <a
+                                href={exchange.tradeUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block"
+                                title={
+                                  exchange.hasPersonalRef
+                                    ? `Open ${exchange.label} with your ref`
+                                    : `Open ${exchange.label} (generic link)`
+                                }
+                              >
+                                {value === null ? "—" : formatFundingValue(value)}
+                              </a>
                             </td>
                           )
                         })}
                       </tr>
                     ))}
+
+                    {!fundingMatrixRows.length && (
+                      <tr>
+                        <td
+                          colSpan={4 + activeFundingExchanges.length}
+                          className="px-6 py-12 text-center text-white/45"
+                        >
+                          No rows match your current filters.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
             )}
 
-            <div className="mt-6 text-xs text-white/35">
-              Funding rate data provided by{" "}
-              <a
-                href="https://loris.tools"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-cyan-300 hover:text-cyan-200"
-              >
-                Loris Tools
-              </a>
+            <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-white/35">
+              <span>
+                Rows: <span className="text-white/60">{fundingMatrixRows.length}</span>
+              </span>
+
+              <span>
+                Active exchanges:{" "}
+                <span className="text-white/60">{activeFundingExchanges.length}</span>
+              </span>
+
+              <span>
+                Hyperliquid currently uses a generic link here until you swap in your personal ref.
+              </span>
             </div>
           </div>
         </section>

@@ -1,67 +1,39 @@
 import { NextResponse } from "next/server"
 
-const EXCHANGE_META = {
-  edgex: {
-    label: "EdgeX",
-    intervalHours: 8,
-    apiFundingMode: "interval",
-  },
-  ethereal: {
-    label: "Ethereal",
-    intervalHours: 8,
-    apiFundingMode: "interval",
-  },
-  extended: {
-    label: "Extended",
-    intervalHours: 1,
-    apiFundingMode: "normalized8h",
-  },
-  hibachi: {
-    label: "Hibachi",
-    intervalHours: 8,
-    apiFundingMode: "interval",
-  },
-  hyena: {
-    label: "Hyena",
-    intervalHours: 8,
-    apiFundingMode: "interval",
-  },
-  hyperliquid: {
-    label: "Hyperliquid",
-    intervalHours: 1,
-    apiFundingMode: "normalized8h",
-  },
-  pacifica: {
-    label: "Pacifica",
-    intervalHours: 8,
-    apiFundingMode: "interval",
-  },
-  variational: {
-    label: "Variational",
-    intervalHours: 8,
-    apiFundingMode: "interval",
-  },
-} as const
+const TARGET_EXCHANGES = [
+  "edgex",
+  "ethereal",
+  "extended",
+  "hibachi",
+  "hyena",
+  "hyperliquid",
+  "pacifica",
+  "variational",
+] as const
 
-type ExchangeKey = keyof typeof EXCHANGE_META
-type ApiFundingMode = "interval" | "normalized8h"
+const EXCHANGE_LABELS: Record<string, string> = {
+  edgex: "EdgeX",
+  ethereal: "Ethereal",
+  extended: "Extended",
+  hibachi: "Hibachi",
+  hyena: "Hyena",
+  hyperliquid: "Hyperliquid",
+  pacifica: "Pacifica",
+  variational: "Variational",
+}
+
+type LorisExchangeName = {
+  name: string
+  display: string
+}
 
 type FundingRow = {
-  exchange: ExchangeKey
+  exchange: string
   display: string
   symbol: string
   funding: number
   oiRank: string
-  intervalHours: number
-  apiFundingMode: ApiFundingMode
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null
-}
-
-function isExchangeKey(value: string): value is ExchangeKey {
-  return value in EXCHANGE_META
+  bias: "longs_pay_shorts" | "shorts_pay_longs" | "neutral"
 }
 
 export async function GET() {
@@ -71,98 +43,65 @@ export async function GET() {
         Accept: "application/json",
       },
       next: { revalidate: 60 },
-      signal: AbortSignal.timeout(8000),
     })
 
     if (!res.ok) {
       return NextResponse.json(
-        { error: `Upstream funding API error: ${res.status}` },
-        { status: 502 }
+        { error: `Loris API error: ${res.status}` },
+        { status: 500 }
       )
     }
 
-    const contentType = res.headers.get("content-type") ?? ""
-    if (!contentType.includes("application/json")) {
-      return NextResponse.json(
-        { error: "Upstream returned non-JSON response" },
-        { status: 502 }
-      )
-    }
+    const data = await res.json()
 
-    const data: unknown = await res.json()
+    const exchangeNames: LorisExchangeName[] =
+      data?.exchanges?.exchange_names ?? []
 
-    if (!isRecord(data)) {
-      return NextResponse.json(
-        { error: "Invalid upstream payload" },
-        { status: 502 }
-      )
-    }
+    const fundingRates: Record<string, Record<string, number>> =
+      data?.funding_rates ?? {}
 
-    const exchangesRoot = isRecord(data.exchanges) ? data.exchanges : null
-    const exchangeNamesRaw = Array.isArray(exchangesRoot?.exchange_names)
-      ? exchangesRoot.exchange_names
-      : []
+    const oiRankings: Record<string, string> = data?.oi_rankings ?? {}
+    const defaultOiRank: string = data?.default_oi_rank ?? "500+"
+    const updatedAt: string | null = data?.timestamp ?? null
 
-    const fundingRatesRaw =
-      isRecord(data.funding_rates) ? data.funding_rates : {}
-    const oiRankingsRaw = isRecord(data.oi_rankings) ? data.oi_rankings : {}
+    const allowedExchangeSet = new Set<string>(TARGET_EXCHANGES)
 
-    const defaultOiRank =
-      typeof data.default_oi_rank === "string" ? data.default_oi_rank : "500+"
+    const rows: FundingRow[] = exchangeNames
+      .filter((exchange) => allowedExchangeSet.has(exchange.name))
+      .flatMap((exchange) => {
+        const exchangeFunding = fundingRates[exchange.name] ?? {}
 
-    const updatedAt =
-      typeof data.timestamp === "string" ? data.timestamp : null
+        return Object.entries(exchangeFunding).map(([symbol, rawFunding]) => {
+          const funding = Number(rawFunding) / 100
 
-    const rows: FundingRow[] = exchangeNamesRaw.flatMap((exchangeItem) => {
-      if (!isRecord(exchangeItem) || typeof exchangeItem.name !== "string") {
-        return []
-      }
+          let bias: FundingRow["bias"] = "neutral"
+          if (funding > 0) bias = "longs_pay_shorts"
+          if (funding < 0) bias = "shorts_pay_longs"
 
-      const exchangeName = exchangeItem.name.trim().toLowerCase()
-      if (!isExchangeKey(exchangeName)) return []
-
-      const meta = EXCHANGE_META[exchangeName]
-      const exchangeFundingRaw = fundingRatesRaw[exchangeName]
-
-      if (!isRecord(exchangeFundingRaw)) return []
-
-      return Object.entries(exchangeFundingRaw).flatMap(([symbol, rawFunding]) => {
-        const numericFunding = Number(rawFunding)
-        if (!Number.isFinite(numericFunding)) return []
-
-        return [
-          {
-            exchange: exchangeName,
-            display: meta.label,
-            symbol: String(symbol).trim().toUpperCase(),
-            funding: numericFunding / 100,
-            oiRank:
-              typeof oiRankingsRaw[symbol] === "string" ||
-              typeof oiRankingsRaw[symbol] === "number"
-                ? String(oiRankingsRaw[symbol])
-                : defaultOiRank,
-            intervalHours: meta.intervalHours,
-            apiFundingMode: meta.apiFundingMode,
-          },
-        ]
+          return {
+            exchange: exchange.name,
+            display:
+              EXCHANGE_LABELS[exchange.name] ?? exchange.display ?? exchange.name,
+            symbol,
+            funding,
+            oiRank: oiRankings[symbol] ?? defaultOiRank,
+            bias,
+          }
+        })
       })
-    })
-
-    rows.sort(
-      (a, b) =>
-        a.symbol.localeCompare(b.symbol) ||
-        a.display.localeCompare(b.display)
-    )
 
     return NextResponse.json({
       updatedAt,
+      exchanges: TARGET_EXCHANGES.map((key) => ({
+        key,
+        label: EXCHANGE_LABELS[key],
+      })),
       rows,
     })
   } catch (error) {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Unknown funding route error",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     )

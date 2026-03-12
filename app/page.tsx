@@ -2,157 +2,82 @@
 
 import Image from "next/image"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { toPng } from "html-to-image"
 
-type Tier = "S+" | "S" | "A"
-type Tab = "list" | "calculator" | "odds" | "funding"
-type FundingMetricMode = "interval" | "annualized"
-type FundingApiMode = "interval" | "normalized8h"
-type FundingExchangeKey =
-  | "edgex"
-  | "ethereal"
-  | "extended"
-  | "hibachi"
-  | "hyena"
-  | "hyperliquid"
-  | "pacifica"
-  | "variational"
-
-type FundingApiRow = {
-  exchange: FundingExchangeKey
-  display: string
-  symbol: string
-  funding: number
-  oiRank: string
-  intervalHours: number
-  apiFundingMode: FundingApiMode
-}
-
-type FundingMatrixRow = {
-  symbol: string
-  oiRank: string
-  maxArb: number
-  activeCount: number
-  lowFundingExchange: { key: FundingExchangeKey; label: string } | null
-  highFundingExchange: { key: FundingExchangeKey; label: string } | null
-  byExchange: Record<FundingExchangeKey, number | null>
-}
-
-const REFRESH_SECONDS = 60
-
-const PROTOCOLS = {
-  variational: {
+const PERPS = [
+  {
+    tier: "S+",
     name: "Variational",
-    tier: "S+" as Tier,
-    logo: "/variational.png",
-    tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
+    ref: "https://omni.variational.io/?ref=OMNICAPY",
     refCode: "OMNICAPY",
-    boost: "OMNICAPY · +15% points boost",
+    logo: "/variational.png",
+    boost: "OMNICAPY: +16% points boost",
     farm: "Holding positions + volume on mid-OI tokens",
   },
-  extended: {
+  {
+    tier: "S+",
     name: "Extended",
-    tier: "S+" as Tier,
-    logo: "/extended.png",
-    tradeUrl: "https://app.extended.exchange/join/CAPY",
+    ref: "https://app.extended.exchange/join/CAPY",
     refCode: "CAPY",
-    boost: "CAPY · -10% fees + 5% points boost + 30% refback",
+    logo: "/extended.png",
+    boost: "-10% fees + 5% points boost + 30% refback",
     farm: "Volume + holding positions",
   },
-  hibachi: {
+  {
+    tier: "S",
     name: "Hibachi",
-    tier: "S" as Tier,
-    logo: "/hibachi.png",
-    tradeUrl: "https://hibachi.xyz/r/capy",
+    ref: "http://hibachi.xyz/r/capy",
     refCode: "capy",
-    boost: "capy · -15% fees + 15% points boost",
+    logo: "/hibachi.png",
+    boost: "-15% fees + 15% points boost",
     farm: "Volume + holding positions",
   },
-  ethereal: {
+  {
+    tier: "S",
     name: "Ethereal",
-    tier: "S" as Tier,
-    logo: "/ethereal.png",
-    tradeUrl: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
+    ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     refCode: "UM68P2M9JZ6D",
-    boost: "UM68P2M9JZ6D · +15% points boost",
+    logo: "/ethereal.png",
+    boost: "+15% points boost",
     farm: "Boost farming + low OI tokens",
   },
-  hyena: {
+  {
+    tier: "S",
     name: "Hyena",
-    tier: "S" as Tier,
-    logo: "/hyena.png",
-    tradeUrl: "https://app.hyena.trade/ref/CAPY",
+    ref: "https://app.hyena.trade/ref/CAPY",
     refCode: "CAPY",
-    boost: "CAPY · +10% points boost",
+    logo: "/hyena.png",
+    boost: "+10% points boost",
     farm: "Activity + steady volume",
   },
-  pacifica: {
+  {
+    tier: "A",
     name: "Pacifica",
-    tier: "A" as Tier,
-    logo: "/pacifica.png",
-    tradeUrl: "https://app.pacifica.fi/?referral=Capy",
+    ref: "https://app.pacifica.fi/?referral=Capy",
     refCode: "Capy",
-    boost: "Capy · +15% points boost",
+    logo: "/pacifica.png",
+    boost: "+15% points boost",
     farm: "High volume + active trading",
   },
-  edgex: {
+  {
+    tier: "A",
     name: "EdgeX",
-    tier: "A" as Tier,
-    logo: "/edgex.png",
-    tradeUrl: "https://pro.edgex.exchange/referral/OLEJK",
+    ref: "https://pro.edgex.exchange/referral/OLEJK",
     refCode: "OLEJK",
-    boost: "OLEJK · -10% fees + 10% points boost + VIP1",
+    logo: "/edgex.png",
+    boost: "-10% fees + 10% points boost + VIP1",
     farm: "High volume + hold positions",
   },
-  dreamcash: {
+  {
+    tier: "A",
     name: "Dreamcash",
-    tier: "A" as Tier,
-    logo: "/dreamcash.png",
-    tradeUrl: "https://dreamcash.xyz/share?code=CAPYCR",
+    ref: "https://dreamcash.xyz/share?code=CAPYCR",
     refCode: "CAPYCR",
-    boost: "CAPYCR · boost from 10K to 1M points",
+    logo: "/dreamcash.png",
+    boost: "boost from 10K to 1M points",
     farm: "Low OI tokens + active trading",
   },
-  nado: {
-    name: "Nado",
-  },
-  o1: {
-    name: "01Exchange",
-  },
-  treadfi: {
-    name: "Tread Fi",
-  },
-  ostium: {
-    name: "Ostium",
-  },
-  grvt: {
-    name: "GRVT",
-  },
-  bullpen: {
-    name: "Bullpen",
-  },
-  standx: {
-    name: "StandX",
-  },
-  liquid: {
-    name: "Liquid",
-  },
-  decibel: {
-    name: "Decibel",
-  },
-} as const
-
-type ProtocolKey = keyof typeof PROTOCOLS
-
-const LIST_PROTOCOL_IDS = [
-  "variational",
-  "extended",
-  "hibachi",
-  "ethereal",
-  "hyena",
-  "pacifica",
-  "edgex",
-  "dreamcash",
-] as const satisfies readonly ProtocolKey[]
+] as const
 
 const TEMPLATES = [
   "cinema",
@@ -170,111 +95,110 @@ const TEMPLATES = [
   "locedin",
 ] as const
 
-type TemplateName = (typeof TEMPLATES)[number]
-
-const CALCULATOR_PRESETS = {
+const PERPS_CALC = {
   variational: {
-    available: true,
+    name: "Variational",
     fdv: 0.6,
-    totalPoints: 9_300_000,
+    totalPoints: 9300000,
     airdrop: 30,
   },
   extended: {
-    available: true,
+    name: "Extended",
     fdv: 0.5,
-    totalPoints: 50_000_000,
+    totalPoints: 50000000,
     airdrop: 30,
   },
   pacifica: {
-    available: true,
+    name: "Pacifica",
     fdv: 0.3,
-    totalPoints: 240_000_000,
+    totalPoints: 240000000,
     airdrop: 20,
   },
   nado: {
-    available: true,
+    name: "Nado",
     fdv: 0.3,
-    totalPoints: 4_300_000,
+    totalPoints: 4300000,
     airdrop: 8,
   },
   o1: {
-    available: true,
+    name: "01Exchange",
     fdv: 0.2,
-    totalPoints: 10_000_000,
+    totalPoints: 10000000,
     airdrop: 20,
   },
   treadfi: {
-    available: true,
+    name: "Tread Fi",
     fdv: 0.3,
-    totalPoints: 2_800_000,
+    totalPoints: 2800000,
     airdrop: 20,
   },
   dreamcash: {
-    available: true,
+    name: "Dreamcash",
     fdv: 0.1,
-    totalPoints: 6_000_000,
+    totalPoints: 6000000,
     airdrop: 12,
   },
   hibachi: {
-    available: true,
+    name: "Hibachi",
     fdv: 0.4,
-    totalPoints: 60_000_000,
+    totalPoints: 60000000,
     airdrop: 15,
   },
   ethereal: {
-    available: true,
+    name: "Ethereal",
     fdv: 0.3,
-    totalPoints: 8_000_000_000,
+    totalPoints: 8000000000,
     airdrop: 15,
   },
   ostium: {
-    available: true,
+    name: "Ostium",
     fdv: 0.3,
-    totalPoints: 56_000_000,
+    totalPoints: 56000000,
     airdrop: 15,
   },
   grvt: {
-    available: true,
+    name: "Grvt",
     fdv: 0.15,
-    totalPoints: 3_000_000,
+    totalPoints: 3000000,
     airdrop: 15,
   },
   bullpen: {
-    available: true,
+    name: "Bullpen",
     fdv: 0.15,
-    totalPoints: 69_900_000,
+    totalPoints: 69900000,
     airdrop: 15,
   },
   edgex: {
-    available: true,
+    name: "EdgeX",
     fdv: 1,
-    totalPoints: 10_000_000,
+    totalPoints: 10000000,
     airdrop: 30,
   },
   standx: {
-    available: true,
+    name: "StandX",
     fdv: 0.2,
-    totalPoints: 50_000_000,
+    totalPoints: 50000000,
     airdrop: 20,
   },
   hyena: {
-    available: false,
+    name: "Hyena",
+    fdv: 0,
+    totalPoints: 1,
+    airdrop: 15,
   },
   liquid: {
-    available: false,
+    name: "Liquid",
+    fdv: 0,
+    totalPoints: 1,
+    airdrop: 15,
   },
   decibel: {
-    available: false,
+    name: "Decibel",
+    fdv: 0,
+    totalPoints: 1,
+    airdrop: 15,
   },
 } as const
-
-type CalcProtocolKey = keyof typeof CALCULATOR_PRESETS
-
-const CALCULATOR_PROTOCOL_IDS = Object.keys(
-  CALCULATOR_PRESETS
-) as CalcProtocolKey[]
-
-const ODDS_UPDATED_LABEL = "Manually curated snapshot"
 
 const POLYMARKET_LAUNCH_ODDS = [
   {
@@ -292,7 +216,7 @@ const POLYMARKET_LAUNCH_ODDS = [
     note: "Very strong odds. One of the cleanest launch probabilities on the board.",
   },
   {
-    name: "EdgeX",
+    name: "edgeX",
     deadline: "Sep 30, 2026",
     probability: 98,
     link: "https://polymarket.com/event/will-edgex-launch-a-token-by?via=capy",
@@ -310,7 +234,7 @@ const POLYMARKET_LAUNCH_ODDS = [
     deadline: "Dec 31, 2026",
     probability: 80,
     link: "https://polymarket.com/event/will-ostium-launch-a-token-in-2025?via=capy",
-    note: "Strong odds overall, though market pricing can rerate quickly with sentiment changes.",
+    note: "Strong odds, though the market URL/title is older and the live frontrunner on page is Dec 31, 2026.",
   },
   {
     name: "Tread Fi",
@@ -351,7 +275,7 @@ const POLYMARKET_LAUNCH_ODDS = [
 
 const POLYMARKET_FDV_ODDS = [
   {
-    name: "EdgeX",
+    name: "edgeX",
     threshold: "$700M",
     probability: 53,
     link: "https://polymarket.com/event/edgex-fdv-above-one-day-after-launch?via=capy",
@@ -390,7 +314,7 @@ const POLYMARKET_FDV_ODDS = [
     threshold: "$20M",
     probability: 82,
     link: "https://polymarket.com/event/dreamcash-fdv-above-one-day-after-launch?via=capy",
-    note: "Board is anchored low for now, with most optimism concentrated at lower thresholds.",
+    note: "Board is anchored low for now, with most optimism concentrated at the lower thresholds.",
   },
   {
     name: "GRVT",
@@ -408,93 +332,108 @@ const POLYMARKET_FDV_ODDS = [
   },
 ] as const
 
-const FUNDING_EXCHANGES = {
-  edgex: {
+const FUNDING_EXCHANGE_ORDER = [
+  {
+    key: "edgex",
     label: "EdgeX",
     intervalHours: 8,
     tradeUrl: "https://pro.edgex.exchange/referral/OLEJK",
     hasPersonalRef: true,
-    apiFundingMode: "interval" as FundingApiMode,
   },
-  ethereal: {
+  {
+    key: "ethereal",
     label: "Ethereal",
     intervalHours: 8,
     tradeUrl: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     hasPersonalRef: true,
-    apiFundingMode: "interval" as FundingApiMode,
   },
-  extended: {
+  {
+    key: "extended",
     label: "Extended",
     intervalHours: 1,
     tradeUrl: "https://app.extended.exchange/join/CAPY",
     hasPersonalRef: true,
-    apiFundingMode: "normalized8h" as FundingApiMode,
   },
-  hibachi: {
+  {
+    key: "hibachi",
     label: "Hibachi",
     intervalHours: 8,
-    tradeUrl: "https://hibachi.xyz/r/capy",
+    tradeUrl: "http://hibachi.xyz/r/capy",
     hasPersonalRef: true,
-    apiFundingMode: "interval" as FundingApiMode,
   },
-  hyena: {
+  {
+    key: "hyena",
     label: "Hyena",
     intervalHours: 8,
     tradeUrl: "https://app.hyena.trade/ref/CAPY",
     hasPersonalRef: true,
-    apiFundingMode: "interval" as FundingApiMode,
   },
-  hyperliquid: {
+  {
+    key: "hyperliquid",
     label: "Hyperliquid",
     intervalHours: 1,
     tradeUrl: "https://app.hyperliquid.xyz/",
     hasPersonalRef: false,
-    apiFundingMode: "normalized8h" as FundingApiMode,
   },
-  pacifica: {
+  {
+    key: "pacifica",
     label: "Pacifica",
     intervalHours: 8,
     tradeUrl: "https://app.pacifica.fi/?referral=Capy",
     hasPersonalRef: true,
-    apiFundingMode: "interval" as FundingApiMode,
   },
-  variational: {
+  {
+    key: "variational",
     label: "Variational",
     intervalHours: 8,
     tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
     hasPersonalRef: true,
-    apiFundingMode: "interval" as FundingApiMode,
   },
-} as const
+] as const
 
-const ALL_FUNDING_KEYS = Object.keys(
-  FUNDING_EXCHANGES
+type Tab = "list" | "calculator" | "odds" | "funding"
+type CalcPerpKey = keyof typeof PERPS_CALC
+type FundingMetricMode = "interval" | "annualized"
+type FundingBias = "longs_pay_shorts" | "shorts_pay_longs" | "neutral"
+type FundingExchangeKey = (typeof FUNDING_EXCHANGE_ORDER)[number]["key"]
+
+type FundingApiRow = {
+  exchange: string
+  display: string
+  symbol: string
+  funding: number
+  oiRank: string
+  bias: FundingBias
+}
+
+type FundingMatrixRow = {
+  symbol: string
+  oiRank: string
+  maxArb: number
+  activeCount: number
+  buyExchange: { key: FundingExchangeKey; label: string } | null
+  sellExchange: { key: FundingExchangeKey; label: string } | null
+  byExchange: Record<FundingExchangeKey, number | null>
+}
+
+const ALL_FUNDING_KEYS = FUNDING_EXCHANGE_ORDER.map(
+  (exchange) => exchange.key
 ) as FundingExchangeKey[]
 
-const FUNDING_KEY_SET = new Set<FundingExchangeKey>(ALL_FUNDING_KEYS)
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max)
-}
-
-function normalizeNumberInput(
-  value: string,
-  { allowDecimal = false }: { allowDecimal?: boolean } = {}
-) {
-  const base = value.replace(/,/g, ".")
-
-  if (!allowDecimal) {
-    return base.replace(/[^\d]/g, "")
+function getTierStyle(tier: string) {
+  if (tier === "S+") {
+    return "bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_35px_rgba(168,85,247,0.9)]"
   }
 
-  const stripped = base.replace(/[^\d.]/g, "")
-  const [head, ...tail] = stripped.split(".")
-  return tail.length ? `${head}.${tail.join("")}` : stripped
-}
+  if (tier === "S") {
+    return "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_22px_rgba(250,204,21,0.7)]"
+  }
 
-function parsePositiveNumber(value: string) {
-  const parsed = Number.parseFloat(value)
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0
+  if (tier === "A") {
+    return "bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_22px_rgba(34,211,238,0.7)]"
+  }
+
+  return ""
 }
 
 function formatMoney(value: number, digits = 2) {
@@ -524,24 +463,9 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("en-US").format(value)
 }
 
-function formatPointPrice(value: number) {
-  if (!Number.isFinite(value) || value <= 0) return "$0.00"
-  if (value >= 1) return formatMoney(value, 2)
-  if (value >= 0.01) return formatMoney(value, 4)
-  if (value >= 0.0001) return formatMoney(value, 6)
-  return formatMoney(value, 8)
-}
-
-function getTierStyle(tier: Tier) {
-  if (tier === "S+") {
-    return "bg-purple-500/20 border-purple-400 text-purple-300 shadow-[0_0_35px_rgba(168,85,247,0.9)]"
-  }
-
-  if (tier === "S") {
-    return "bg-yellow-500/20 border-yellow-400 text-yellow-300 shadow-[0_0_22px_rgba(250,204,21,0.7)]"
-  }
-
-  return "bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-[0_0_22px_rgba(34,211,238,0.7)]"
+function sanitizeNumber(value: string) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
 }
 
 function getProbabilityStyle(probability: number) {
@@ -616,7 +540,7 @@ function getFundingCellClass(value: number | null) {
 function parseOiRank(value: unknown) {
   if (value === null || value === undefined) return 999999
 
-  const normalized = String(value).trim()
+  const normalized = String(value)
   if (!normalized) return 999999
 
   if (normalized.includes("+")) {
@@ -628,70 +552,44 @@ function parseOiRank(value: unknown) {
   return Number.isFinite(numeric) ? numeric : 999999
 }
 
-function normalizeExchangeKey(value: unknown): FundingExchangeKey | null {
-  const key = String(value ?? "")
-    .trim()
-    .toLowerCase() as FundingExchangeKey
-
-  return FUNDING_KEY_SET.has(key) ? key : null
-}
-
-function buildEmptyExchangeMap() {
-  return Object.fromEntries(
-    ALL_FUNDING_KEYS.map((key) => [key, null])
-  ) as Record<FundingExchangeKey, number | null>
-}
-
 function getExchangeMeta(exchangeKey: FundingExchangeKey) {
-  return FUNDING_EXCHANGES[exchangeKey]
+  return (
+    FUNDING_EXCHANGE_ORDER.find((exchange) => exchange.key === exchangeKey) ??
+    FUNDING_EXCHANGE_ORDER[0]
+  )
 }
 
 function toDisplayedFundingValue(
   rawFunding: number,
-  intervalHours: number,
-  apiFundingMode: FundingApiMode,
+  exchangeKey: FundingExchangeKey,
   metricMode: FundingMetricMode
 ) {
-  if (!Number.isFinite(rawFunding) || !Number.isFinite(intervalHours) || intervalHours <= 0) {
-    return 0
-  }
+  const meta = getExchangeMeta(exchangeKey)
 
   const actualIntervalFunding =
-    apiFundingMode === "normalized8h"
-      ? rawFunding / (8 / intervalHours)
-      : rawFunding
+    meta.intervalHours === 1 ? rawFunding / 8 : rawFunding
 
   if (metricMode === "annualized") {
-    return actualIntervalFunding * (24 / intervalHours) * 365
+    return actualIntervalFunding * (24 / meta.intervalHours) * 365
   }
 
   return actualIntervalFunding
 }
 
-function getFocusableElements(container: HTMLElement | null) {
-  if (!container) return []
-
-  return Array.from(
-    container.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-  ).filter((element) => !element.hasAttribute("aria-hidden"))
+function intervalLabel(hours: number) {
+  return `${hours}h`
 }
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list")
-  const [calcPerp, setCalcPerp] = useState<CalcProtocolKey>("variational")
+  const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
+  const [myPoints, setMyPoints] = useState(0)
   const [templatePicker, setTemplatePicker] = useState(false)
   const [selectedTemplate, setSelectedTemplate] =
-    useState<TemplateName>("cinema")
+    useState<(typeof TEMPLATES)[number]>("cinema")
   const [isDownloading, setIsDownloading] = useState(false)
   const [launchSort, setLaunchSort] = useState<"desc" | "asc">("desc")
   const [fdvSort, setFdvSort] = useState<"desc" | "asc">("desc")
-
-  const [myPointsInput, setMyPointsInput] = useState("0")
-  const [fdvInput, setFdvInput] = useState("0.6")
-  const [totalPointsInput, setTotalPointsInput] = useState("9300000")
-  const [airdropInput, setAirdropInput] = useState("30")
 
   const [copiedRefName, setCopiedRefName] = useState<string | null>(null)
   const [copiedTicker, setCopiedTicker] = useState<string | null>(null)
@@ -699,9 +597,7 @@ export default function Home() {
   const [fundingRows, setFundingRows] = useState<FundingApiRow[]>([])
   const [fundingUpdatedAt, setFundingUpdatedAt] = useState<string | null>(null)
   const [fundingLoading, setFundingLoading] = useState(false)
-  const [fundingRefreshing, setFundingRefreshing] = useState(false)
   const [fundingError, setFundingError] = useState<string | null>(null)
-  const [fundingNotice, setFundingNotice] = useState<string | null>(null)
   const [fundingSort, setFundingSort] = useState<"desc" | "asc">("desc")
   const [searchTicker, setSearchTicker] = useState("")
   const [enabledFundingExchanges, setEnabledFundingExchanges] =
@@ -709,196 +605,85 @@ export default function Home() {
   const [fundingMetricMode, setFundingMetricMode] =
     useState<FundingMetricMode>("interval")
   const [onlyActionable, setOnlyActionable] = useState(true)
-  const [refreshCountdown, setRefreshCountdown] = useState(REFRESH_SECONDS)
+  const [refreshCountdown, setRefreshCountdown] = useState(60)
 
   const cardRef = useRef<HTMLDivElement>(null)
-  const dialogRef = useRef<HTMLDivElement>(null)
-  const previousFocusedElementRef = useRef<HTMLElement | null>(null)
-  const fundingAbortRef = useRef<AbortController | null>(null)
+  const fundingRequestInFlightRef = useRef(false)
   const listCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const tickerCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const fundingRowsCountRef = useRef(0)
 
-  const currentPreset = CALCULATOR_PRESETS[calcPerp]
-  const currentProtocolName = PROTOCOLS[calcPerp]?.name ?? calcPerp
+  const current = PERPS_CALC[calcPerp]
 
-  useEffect(() => {
-    fundingRowsCountRef.current = fundingRows.length
-  }, [fundingRows.length])
+  const [fdv, setFdv] = useState<number>(current.fdv)
+  const [totalPoints, setTotalPoints] = useState<number>(current.totalPoints)
+  const [airdrop, setAirdrop] = useState<number>(current.airdrop)
 
   useEffect(() => {
-    if (currentPreset.available) {
-      setMyPointsInput("0")
-      setFdvInput(String(currentPreset.fdv))
-      setTotalPointsInput(String(currentPreset.totalPoints))
-      setAirdropInput(String(currentPreset.airdrop))
-      return
-    }
-
-    setMyPointsInput("")
-    setFdvInput("")
-    setTotalPointsInput("")
-    setAirdropInput("")
-  }, [calcPerp, currentPreset])
+    setFdv(current.fdv)
+    setTotalPoints(current.totalPoints)
+    setAirdrop(current.airdrop)
+  }, [current])
 
   useEffect(() => {
     return () => {
       if (listCopyTimeoutRef.current) clearTimeout(listCopyTimeoutRef.current)
       if (tickerCopyTimeoutRef.current) clearTimeout(tickerCopyTimeoutRef.current)
-      fundingAbortRef.current?.abort()
     }
   }, [])
 
-  useEffect(() => {
-    if (!templatePicker) return
+  const loadFunding = useCallback(
+    async (silent = false) => {
+      if (fundingRequestInFlightRef.current) return
 
-    previousFocusedElementRef.current = document.activeElement as HTMLElement | null
-    document.body.style.overflow = "hidden"
-
-    const dialog = dialogRef.current
-    const focusable = getFocusableElements(dialog)
-    focusable[0]?.focus()
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setTemplatePicker(false)
-        return
-      }
-
-      if (event.key !== "Tab") return
-
-      const items = getFocusableElements(dialogRef.current)
-      if (!items.length) return
-
-      const first = items[0]
-      const last = items[items.length - 1]
-      const active = document.activeElement as HTMLElement | null
-
-      if (event.shiftKey && active === first) {
-        event.preventDefault()
-        last.focus()
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault()
-        first.focus()
-      }
-    }
-
-    document.addEventListener("keydown", onKeyDown)
-
-    return () => {
-      document.body.style.overflow = ""
-      document.removeEventListener("keydown", onKeyDown)
-      previousFocusedElementRef.current?.focus()
-    }
-  }, [templatePicker])
-
-  const loadFunding = useCallback(async (silent = false) => {
-    fundingAbortRef.current?.abort()
-
-    const controller = new AbortController()
-    fundingAbortRef.current = controller
-
-    try {
-      if (silent) {
-        setFundingRefreshing(true)
-        setFundingNotice(null)
-      } else {
-        setFundingLoading(true)
+      try {
+        fundingRequestInFlightRef.current = true
+        if (!silent) setFundingLoading(true)
         setFundingError(null)
-        setFundingNotice(null)
-      }
 
-      const res = await fetch("/api/funding", {
-        cache: "no-store",
-        headers: {
-          Accept: "application/json",
-        },
-        signal: controller.signal,
-      })
+        const res = await fetch(`/api/funding?ts=${Date.now()}`, {
+          cache: "no-store",
+        })
 
-      const contentType = res.headers.get("content-type") ?? ""
-      if (!contentType.includes("application/json")) {
-        throw new Error("Funding endpoint returned non-JSON data")
-      }
+        const data = await res.json()
 
-      const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to load funding data")
+        }
 
-      if (!res.ok) {
-        throw new Error(
-          typeof data?.error === "string" ? data.error : "Failed to load funding data"
+        const safeRows = Array.isArray(data?.rows)
+          ? data.rows
+              .filter((row: unknown) => row && typeof row === "object")
+              .map((row: any) => ({
+                exchange: String(row.exchange ?? ""),
+                display: String(row.display ?? row.exchange ?? ""),
+                symbol: String(row.symbol ?? "").toUpperCase(),
+                funding: Number.isFinite(Number(row.funding))
+                  ? Number(row.funding)
+                  : 0,
+                oiRank: String(row.oiRank ?? "500+"),
+                bias:
+                  row.bias === "longs_pay_shorts" ||
+                  row.bias === "shorts_pay_longs" ||
+                  row.bias === "neutral"
+                    ? row.bias
+                    : "neutral",
+              }))
+          : []
+
+        setFundingRows(safeRows)
+        setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
+        setRefreshCountdown(60)
+      } catch (error) {
+        setFundingError(
+          error instanceof Error ? error.message : "Failed to load funding data"
         )
+      } finally {
+        fundingRequestInFlightRef.current = false
+        if (!silent) setFundingLoading(false)
       }
-
-      const rawRows = Array.isArray(data?.rows) ? data.rows : []
-
-      const safeRows: FundingApiRow[] = rawRows.flatMap((row: unknown) => {
-        if (!row || typeof row !== "object") return []
-
-        const candidate = row as Record<string, unknown>
-        const exchange = normalizeExchangeKey(candidate.exchange)
-        if (!exchange) return []
-
-        const meta = getExchangeMeta(exchange)
-        const symbol = String(candidate.symbol ?? "")
-          .trim()
-          .toUpperCase()
-
-        if (!symbol) return []
-
-        const parsedFunding = Number(candidate.funding)
-        const parsedIntervalHours = Number(candidate.intervalHours)
-
-        const apiFundingMode: FundingApiMode =
-          candidate.apiFundingMode === "interval" ||
-          candidate.apiFundingMode === "normalized8h"
-            ? candidate.apiFundingMode
-            : meta.apiFundingMode
-
-        return [
-          {
-            exchange,
-            display:
-              String(candidate.display ?? "").trim() || meta.label,
-            symbol,
-            funding: Number.isFinite(parsedFunding) ? parsedFunding : 0,
-            oiRank: String(candidate.oiRank ?? "500+"),
-            intervalHours:
-              Number.isFinite(parsedIntervalHours) && parsedIntervalHours > 0
-                ? parsedIntervalHours
-                : meta.intervalHours,
-            apiFundingMode,
-          },
-        ]
-      })
-
-      setFundingRows(safeRows)
-      setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
-      setFundingError(null)
-      setFundingNotice(null)
-      setRefreshCountdown(REFRESH_SECONDS)
-    } catch (error) {
-      if (controller.signal.aborted) return
-
-      const message =
-        error instanceof Error ? error.message : "Failed to load funding data"
-
-      if (silent && fundingRowsCountRef.current > 0) {
-        setFundingNotice("Auto-refresh failed. Showing latest successful snapshot.")
-      } else {
-        setFundingError(message)
-      }
-    } finally {
-      if (fundingAbortRef.current === controller) {
-        fundingAbortRef.current = null
-      }
-
-      if (silent) {
-        setFundingRefreshing(false)
-      } else {
-        setFundingLoading(false)
-      }
-    }
-  }, [])
+    },
+    []
+  )
 
   useEffect(() => {
     if (tab !== "funding") return
@@ -912,9 +697,8 @@ export default function Home() {
       setRefreshCountdown((prev) => {
         if (prev <= 1) {
           void loadFunding(true)
-          return REFRESH_SECONDS
+          return 60
         }
-
         return prev - 1
       })
     }, 1000)
@@ -922,25 +706,12 @@ export default function Home() {
     return () => clearInterval(interval)
   }, [tab, loadFunding])
 
-  const safeMyPoints = currentPreset.available
-    ? parsePositiveNumber(myPointsInput)
-    : 0
-  const safeFdv = currentPreset.available ? parsePositiveNumber(fdvInput) : 0
-  const safeTotalPoints = currentPreset.available
-    ? Math.max(parsePositiveNumber(totalPointsInput), 1)
-    : 1
-  const safeAirdrop = currentPreset.available
-    ? clamp(parsePositiveNumber(airdropInput), 0, 100)
-    : 0
+  const safeTotalPoints = Math.max(totalPoints, 1)
+  const safeAirdrop = Math.min(Math.max(airdrop, 0), 100)
+  const safeFdv = Math.max(fdv, 0)
+  const safeMyPoints = Math.max(myPoints, 0)
 
   const { pricePerPoint, myValue } = useMemo(() => {
-    if (!currentPreset.available) {
-      return {
-        pricePerPoint: 0,
-        myValue: 0,
-      }
-    }
-
     const pool = safeFdv * 1_000_000_000 * (safeAirdrop / 100)
     const price = pool / safeTotalPoints
     const value = safeMyPoints * price
@@ -949,35 +720,24 @@ export default function Home() {
       pricePerPoint: price,
       myValue: value,
     }
-  }, [currentPreset.available, safeAirdrop, safeFdv, safeMyPoints, safeTotalPoints])
+  }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
 
-  const sortedLaunchOdds = useMemo(
-    () =>
-      [...POLYMARKET_LAUNCH_ODDS].sort((a, b) =>
-        launchSort === "desc"
-          ? b.probability - a.probability
-          : a.probability - b.probability
-      ),
-    [launchSort]
+  const sortedLaunchOdds = [...POLYMARKET_LAUNCH_ODDS].sort((a, b) =>
+    launchSort === "desc"
+      ? b.probability - a.probability
+      : a.probability - b.probability
   )
 
-  const sortedFdvOdds = useMemo(
-    () =>
-      [...POLYMARKET_FDV_ODDS].sort((a, b) =>
-        fdvSort === "desc"
-          ? b.probability - a.probability
-          : a.probability - b.probability
-      ),
-    [fdvSort]
+  const sortedFdvOdds = [...POLYMARKET_FDV_ODDS].sort((a, b) =>
+    fdvSort === "desc"
+      ? b.probability - a.probability
+      : a.probability - b.probability
   )
 
   const activeFundingExchanges = useMemo(
     () =>
-      ALL_FUNDING_KEYS.filter((key) => enabledFundingExchanges.includes(key)).map(
-        (key) => ({
-          key,
-          ...FUNDING_EXCHANGES[key],
-        })
+      FUNDING_EXCHANGE_ORDER.filter((exchange) =>
+        enabledFundingExchanges.includes(exchange.key)
       ),
     [enabledFundingExchanges]
   )
@@ -986,144 +746,136 @@ export default function Home() {
     const search = searchTicker.trim().toUpperCase()
 
     return fundingRows
-      .filter((row) => enabledFundingExchanges.includes(row.exchange))
+      .filter((row) =>
+        enabledFundingExchanges.includes(row.exchange as FundingExchangeKey)
+      )
       .filter((row) => !search || row.symbol.includes(search))
-      .map((row) => ({
-        ...row,
-        displayFunding: toDisplayedFundingValue(
-          row.funding,
-          row.intervalHours,
-          row.apiFundingMode,
-          fundingMetricMode
-        ),
-      }))
-  }, [enabledFundingExchanges, fundingMetricMode, fundingRows, searchTicker])
+      .map((row) => {
+        const exchangeKey = row.exchange as FundingExchangeKey
+        return {
+          ...row,
+          displayFunding: toDisplayedFundingValue(
+            row.funding,
+            exchangeKey,
+            fundingMetricMode
+          ),
+        }
+      })
+  }, [fundingRows, enabledFundingExchanges, searchTicker, fundingMetricMode])
 
   const fundingMatrixRows = useMemo(() => {
-    const grouped = new Map<
-      string,
-      {
-        symbol: string
-        oiRank: string
-        byExchange: Record<FundingExchangeKey, number | null>
+    try {
+      const grouped = new Map<
+        string,
+        {
+          symbol: string
+          oiRank: string
+          byExchange: Record<FundingExchangeKey, number | null>
+        }
+      >()
+
+      for (const row of visibleFundingRows) {
+        const exchangeKey = row.exchange as FundingExchangeKey
+        const symbol = String(row.symbol ?? "").trim()
+        if (!symbol) continue
+
+        if (!grouped.has(symbol)) {
+          grouped.set(symbol, {
+            symbol,
+            oiRank: String(row.oiRank ?? "500+"),
+            byExchange: {
+              edgex: null,
+              ethereal: null,
+              extended: null,
+              hibachi: null,
+              hyena: null,
+              hyperliquid: null,
+              pacifica: null,
+              variational: null,
+            },
+          })
+        }
+
+        const currentGroup = grouped.get(symbol)!
+        currentGroup.byExchange[exchangeKey] = Number.isFinite(row.displayFunding)
+          ? row.displayFunding
+          : null
+
+        if (parseOiRank(row.oiRank) < parseOiRank(currentGroup.oiRank)) {
+          currentGroup.oiRank = String(row.oiRank ?? "500+")
+        }
       }
-    >()
 
-    for (const row of visibleFundingRows) {
-      const symbol = row.symbol.trim()
-      if (!symbol) continue
+      const matrix = Array.from(grouped.values()).map((group) => {
+        const values = activeFundingExchanges
+          .map((exchange) => group.byExchange[exchange.key])
+          .filter((value): value is number => value !== null && Number.isFinite(value))
 
-      if (!grouped.has(symbol)) {
-        grouped.set(symbol, {
-          symbol,
-          oiRank: String(row.oiRank ?? "500+"),
-          byExchange: buildEmptyExchangeMap(),
-        })
-      }
+        const maxFunding = values.length ? Math.max(...values) : 0
+        const minFunding = values.length ? Math.min(...values) : 0
+        const maxArb = maxFunding - minFunding
 
-      const currentGroup = grouped.get(symbol)!
-      currentGroup.byExchange[row.exchange] = Number.isFinite(row.displayFunding)
-        ? row.displayFunding
-        : null
+        const highestEntry =
+  activeFundingExchanges
+    .map((exchange) => ({
+      key: exchange.key,
+      label: String(exchange.label),
+      value: group.byExchange[exchange.key] ?? null,
+    }))
+    .filter((item) => item.value !== null)
+    .sort((a, b) => Number(b.value ?? 0) - Number(a.value ?? 0))[0] ?? null
 
-      if (parseOiRank(row.oiRank) < parseOiRank(currentGroup.oiRank)) {
-        currentGroup.oiRank = String(row.oiRank ?? "500+")
-      }
-    }
+        const lowestEntry =
+  activeFundingExchanges
+    .map((exchange) => ({
+      key: exchange.key,
+      label: String(exchange.label),
+      value: group.byExchange[exchange.key] ?? null,
+    }))
+    .filter((item) => item.value !== null)
+    .sort((a, b) => Number(a.value ?? 0) - Number(b.value ?? 0))[0] ?? null
 
-    const matrix = Array.from(grouped.values()).map((group) => {
-  const activeValues: Array<{
-    key: FundingExchangeKey
-    label: string
-    value: number
-  }> = activeFundingExchanges.flatMap((exchange) => {
-    const value = group.byExchange[exchange.key]
+        return {
+          symbol: group.symbol,
+          oiRank: group.oiRank,
+          maxArb,
+          activeCount: values.length,
+          buyExchange:
+            lowestEntry && highestEntry && lowestEntry.key !== highestEntry.key
+              ? { key: lowestEntry.key, label: lowestEntry.label }
+              : null,
+          sellExchange:
+            lowestEntry && highestEntry && lowestEntry.key !== highestEntry.key
+              ? { key: highestEntry.key, label: highestEntry.label }
+              : null,
+          byExchange: group.byExchange,
+        } satisfies FundingMatrixRow
+      })
 
-    if (value === null || !Number.isFinite(value)) {
+      const filtered = onlyActionable
+        ? matrix.filter((row) => row.activeCount >= 2 && row.maxArb > 0)
+        : matrix
+
+      return filtered.sort((a, b) =>
+        fundingSort === "desc" ? b.maxArb - a.maxArb : a.maxArb - b.maxArb
+      )
+    } catch (error) {
+      console.error("Funding matrix build failed:", error)
       return []
     }
-
-    return [
-      {
-        key: exchange.key,
-        label: exchange.label,
-        value,
-      },
-    ]
-  })
-
-  const maxFunding = activeValues.length
-    ? Math.max(...activeValues.map((item) => item.value))
-    : 0
-
-  const minFunding = activeValues.length
-    ? Math.min(...activeValues.map((item) => item.value))
-    : 0
-
-  const lowFundingExchange =
-    [...activeValues].sort((a, b) => a.value - b.value)[0] ?? null
-
-  const highFundingExchange =
-    [...activeValues].sort((a, b) => b.value - a.value)[0] ?? null
-
-  return {
-    symbol: group.symbol,
-    oiRank: group.oiRank,
-    maxArb: maxFunding - minFunding,
-    activeCount: activeValues.length,
-    lowFundingExchange:
-      lowFundingExchange &&
-      highFundingExchange &&
-      lowFundingExchange.key !== highFundingExchange.key
-        ? {
-            key: lowFundingExchange.key,
-            label: lowFundingExchange.label,
-          }
-        : null,
-    highFundingExchange:
-      lowFundingExchange &&
-      highFundingExchange &&
-      lowFundingExchange.key !== highFundingExchange.key
-        ? {
-            key: highFundingExchange.key,
-            label: highFundingExchange.label,
-          }
-        : null,
-    byExchange: group.byExchange,
-  } satisfies FundingMatrixRow
-})
-
-    const filtered = onlyActionable
-      ? matrix.filter((row) => row.activeCount >= 2 && row.maxArb > 0)
-      : matrix
-
-    return filtered.sort((a, b) => {
-      if (fundingSort === "desc") {
-        return b.maxArb - a.maxArb || a.symbol.localeCompare(b.symbol)
-      }
-
-      return a.maxArb - b.maxArb || a.symbol.localeCompare(b.symbol)
-    })
-  }, [activeFundingExchanges, fundingSort, onlyActionable, visibleFundingRows])
-
-  const summaryFundingRows = useMemo(() => {
-    if (!onlyActionable) return visibleFundingRows
-
-    const actionableSymbols = new Set(fundingMatrixRows.map((row) => row.symbol))
-    return visibleFundingRows.filter((row) => actionableSymbols.has(row.symbol))
-  }, [fundingMatrixRows, onlyActionable, visibleFundingRows])
+  }, [visibleFundingRows, activeFundingExchanges, fundingSort, onlyActionable])
 
   const topFundingPositive = useMemo(() => {
-    const positive = summaryFundingRows.filter((row) => row.displayFunding > 0)
+    const positive = visibleFundingRows.filter((row) => row.displayFunding > 0)
     if (!positive.length) return null
     return [...positive].sort((a, b) => b.displayFunding - a.displayFunding)[0]
-  }, [summaryFundingRows])
+  }, [visibleFundingRows])
 
   const topFundingNegative = useMemo(() => {
-    const negative = summaryFundingRows.filter((row) => row.displayFunding < 0)
+    const negative = visibleFundingRows.filter((row) => row.displayFunding < 0)
     if (!negative.length) return null
     return [...negative].sort((a, b) => a.displayFunding - b.displayFunding)[0]
-  }, [summaryFundingRows])
+  }, [visibleFundingRows])
 
   const topFundingSpread = fundingMatrixRows[0] ?? null
 
@@ -1175,18 +927,13 @@ export default function Home() {
   }
 
   const downloadCard = async () => {
-    if (!cardRef.current || isDownloading || !currentPreset.available) return
+    if (!cardRef.current || isDownloading) return
 
     try {
       setIsDownloading(true)
 
-      const { toPng } = await import("html-to-image")
-
-      if ("fonts" in document) {
-        await document.fonts.ready
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 150))
+      await document.fonts.ready
+      await new Promise((resolve) => setTimeout(resolve, 250))
 
       const dataUrl = await toPng(cardRef.current, {
         cacheBust: true,
@@ -1195,7 +942,7 @@ export default function Home() {
       })
 
       const link = document.createElement("a")
-      link.download = `${currentProtocolName.toLowerCase()}-airdrop-card.png`
+      link.download = `${current.name.toLowerCase()}-airdrop-card.png`
       link.href = dataUrl
       document.body.appendChild(link)
       link.click()
@@ -1209,9 +956,7 @@ export default function Home() {
   }
 
   const shareOnX = () => {
-    if (!currentPreset.available) return
-
-    const text = `My potential ${currentProtocolName} airdrop is ${formatMoney(myValue, 0)}.
+    const text = `My potential ${current.name} airdrop is ${formatMoney(myValue, 0)}.
 
 My points: ${formatNumber(safeMyPoints)}
 Est. FDV: ${formatCompactMoney(safeFdv * 1_000_000_000)}
@@ -1243,7 +988,7 @@ Calculate yours on capys.app`
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z" />
             </svg>
             Capy
@@ -1255,7 +1000,7 @@ Calculate yours on capys.app`
             rel="noopener noreferrer"
             className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M21.5 2.5L2.7 9.6c-1 .4-1 1.1-.2 1.3l4.8 1.5 1.8 5.7c.2.6.1.8.7.8.5 0 .7-.2 1-.5l2.4-2.3 5 3.7c.9.5 1.5.2 1.8-.8L23 3.7c.4-1.3-.5-1.9-1.5-1.2z" />
             </svg>
             Capy
@@ -1269,16 +1014,8 @@ Calculate yours on capys.app`
         <p className="mt-4 opacity-60">Crypto-native Perp Tier List</p>
 
         <div className="mt-8 flex justify-center">
-          <div
-            role="tablist"
-            aria-label="Capy Perp Hub sections"
-            className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur"
-          >
+          <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
             <button
-              id="tab-list"
-              role="tab"
-              aria-selected={tab === "list"}
-              aria-controls="panel-list"
               onClick={() => setTab("list")}
               className={`rounded-full px-5 py-2 text-sm transition ${
                 tab === "list"
@@ -1290,10 +1027,6 @@ Calculate yours on capys.app`
             </button>
 
             <button
-              id="tab-calculator"
-              role="tab"
-              aria-selected={tab === "calculator"}
-              aria-controls="panel-calculator"
               onClick={() => setTab("calculator")}
               className={`rounded-full px-5 py-2 text-sm transition ${
                 tab === "calculator"
@@ -1305,10 +1038,6 @@ Calculate yours on capys.app`
             </button>
 
             <button
-              id="tab-odds"
-              role="tab"
-              aria-selected={tab === "odds"}
-              aria-controls="panel-odds"
               onClick={() => setTab("odds")}
               className={`rounded-full px-5 py-2 text-sm transition ${
                 tab === "odds"
@@ -1320,10 +1049,6 @@ Calculate yours on capys.app`
             </button>
 
             <button
-              id="tab-funding"
-              role="tab"
-              aria-selected={tab === "funding"}
-              aria-controls="panel-funding"
               onClick={() => setTab("funding")}
               className={`rounded-full px-5 py-2 text-sm transition ${
                 tab === "funding"
@@ -1338,115 +1063,95 @@ Calculate yours on capys.app`
       </div>
 
       {tab === "list" && (
-        <section
-          id="panel-list"
-          role="tabpanel"
-          aria-labelledby="tab-list"
-          className="mx-auto mt-16 max-w-5xl space-y-6 px-4 sm:mt-20 sm:px-6"
-        >
-          <div className="hidden grid-cols-[100px_1fr_260px_auto] border-b border-neutral-800 pb-4 text-xs uppercase tracking-widest opacity-50 md:grid">
+        <section className="mx-auto mt-16 max-w-5xl space-y-6 px-4 sm:mt-20 sm:px-6">
+          <div className="hidden grid-cols-[100px_1fr_220px_auto] border-b border-neutral-800 pb-4 text-xs uppercase tracking-widest opacity-50 md:grid">
             <div className="pl-2">Tier</div>
             <div>Protocol</div>
             <div className="pr-6 text-right">Boost</div>
             <div />
           </div>
 
-          {LIST_PROTOCOL_IDS.map((id) => {
-            const perp = PROTOCOLS[id]
-            if (!perp.logo || !perp.tradeUrl || !perp.refCode || !perp.boost || !perp.farm || !perp.tier) {
-              return null
-            }
-
-            return (
-              <div
-                key={perp.name}
-                className="group flex flex-col items-start gap-4 rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-4 backdrop-blur-xl transition hover:scale-[1.01] hover:border-cyan-400/40 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] md:grid md:grid-cols-[100px_1fr_260px_auto] md:items-center md:p-5"
-              >
-                <div className="flex md:justify-center">
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl border font-bold ${getTierStyle(
-                      perp.tier
-                    )}`}
-                  >
-                    {perp.tier}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <Image
-                    src={perp.logo}
-                    alt={perp.name}
-                    width={48}
-                    height={48}
-                    className="rounded-lg"
-                  />
-
-                  <div>
-                    <div className="text-lg font-medium">{perp.name}</div>
-                    <div className="text-xs text-white/45">Farm tip: {perp.farm}</div>
-                  </div>
-                </div>
-
-                <div className="flex w-full md:justify-center">
-                  <button
-                    type="button"
-                    onClick={() => void copyRefCode(perp.name, perp.refCode)}
-                    className="w-full rounded-2xl border border-emerald-400 bg-emerald-400/5 px-3 py-2 text-left transition hover:bg-emerald-400/10 md:max-w-[250px]"
-                  >
-                    <div className="text-xs font-medium text-emerald-300 sm:text-sm">
-                      {copiedRefName === perp.name ? "Copied code" : perp.boost}
-                    </div>
-                    <div className="mt-1 text-[11px] text-white/45">
-                      Code: <span className="text-cyan-300">{perp.refCode}</span> · click to copy
-                    </div>
-                  </button>
-                </div>
-
-                <a
-                  href={perp.tradeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-2 w-full rounded-xl border border-cyan-400 bg-cyan-400/5 px-6 py-2 text-center font-semibold text-cyan-300 transition hover:bg-cyan-400/10 md:ml-4 md:mt-0 md:w-auto"
+          {PERPS.map((perp) => (
+            <div
+              key={perp.name}
+              className="group flex flex-col items-start gap-4 rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-4 backdrop-blur-xl transition hover:scale-[1.01] hover:border-cyan-400/40 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] md:grid md:grid-cols-[100px_1fr_220px_auto] md:items-center md:p-5"
+            >
+              <div className="flex md:justify-center">
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl border font-bold ${getTierStyle(
+                    perp.tier
+                  )}`}
                 >
-                  TRADE →
-                </a>
+                  {perp.tier}
+                </div>
               </div>
-            )
-          })}
+
+              <div className="flex items-center gap-4">
+                <Image
+                  src={perp.logo}
+                  alt={perp.name}
+                  width={48}
+                  height={48}
+                  className="rounded-lg"
+                />
+
+                <div>
+                  <div className="text-lg font-medium">{perp.name}</div>
+                  <div className="text-xs text-white/45">
+                    Farm tip: {perp.farm}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex md:justify-center">
+                <button
+                  type="button"
+                  onClick={() => copyRefCode(perp.name, perp.refCode)}
+                  className="group/boost relative rounded-full border border-emerald-400 bg-emerald-400/5 px-3 py-1 text-center text-xs font-medium text-emerald-300 transition hover:bg-emerald-400/10 sm:text-sm"
+                >
+                  {copiedRefName === perp.name ? "Copied code" : perp.boost}
+
+                  <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max -translate-x-1/2 rounded-lg border border-neutral-700 bg-[#0b111d] px-3 py-2 text-[11px] text-white opacity-0 shadow-lg transition group-hover/boost:opacity-100">
+                    Code: <span className="text-cyan-300">{perp.refCode}</span> • click to copy
+                  </span>
+                </button>
+              </div>
+
+              <a
+                href={perp.ref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 w-full rounded-xl border border-cyan-400 bg-cyan-400/5 px-6 py-2 text-center font-semibold text-cyan-300 transition hover:bg-cyan-400/10 md:ml-4 md:mt-0 md:w-auto"
+              >
+                TRADE →
+              </a>
+            </div>
+          ))}
         </section>
       )}
 
       {tab === "calculator" && (
-        <section
-          id="panel-calculator"
-          role="tabpanel"
-          aria-labelledby="tab-calculator"
-          className="mx-auto mt-20 max-w-5xl space-y-8 px-4"
-        >
+        <section className="mx-auto mt-20 max-w-5xl space-y-8 px-4">
           <p className="text-center opacity-50">
             Calculate your potential airdrop based on your perp DEX points balance.
           </p>
 
           <div className="flex flex-wrap justify-center gap-3">
-            {CALCULATOR_PROTOCOL_IDS.map((key) => {
-              const isActive = calcPerp === key
-              const isAvailable = CALCULATOR_PRESETS[key].available
-              const label = PROTOCOLS[key]?.name ?? key
+            {Object.keys(PERPS_CALC).map((key) => {
+              const perpKey = key as CalcPerpKey
+              const isActive = calcPerp === perpKey
 
               return (
                 <button
                   key={key}
-                  onClick={() => setCalcPerp(key)}
+                  onClick={() => setCalcPerp(perpKey)}
                   className={`rounded-full border px-4 py-2 text-sm transition ${
                     isActive
                       ? "border-cyan-400 bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.2)]"
-                      : isAvailable
-                      ? "border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white"
-                      : "border-neutral-800 text-white/30"
+                      : "border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white"
                   }`}
                 >
-                  {label}
-                  {!isAvailable && <span className="ml-2 text-[10px] uppercase text-white/35">Soon</span>}
+                  {PERPS_CALC[perpKey].name}
                 </button>
               )
             })}
@@ -1456,58 +1161,46 @@ Calculate yours on capys.app`
             <div>
               <p className="mb-2 text-xs opacity-50">MY POINTS</p>
               <input
-                type="text"
-                inputMode="numeric"
-                disabled={!currentPreset.available}
-                value={myPointsInput}
-                onChange={(e) =>
-                  setMyPointsInput(normalizeNumberInput(e.target.value))
-                }
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                type="number"
+                min="0"
+                value={myPoints}
+                onChange={(e) => setMyPoints(sanitizeNumber(e.target.value))}
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
 
             <div>
               <p className="mb-2 text-xs opacity-50">FDV (billions $)</p>
               <input
-                type="text"
-                inputMode="decimal"
-                disabled={!currentPreset.available}
-                value={fdvInput}
-                onChange={(e) =>
-                  setFdvInput(
-                    normalizeNumberInput(e.target.value, { allowDecimal: true })
-                  )
-                }
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                type="number"
+                min="0"
+                step="0.1"
+                value={fdv}
+                onChange={(e) => setFdv(sanitizeNumber(e.target.value))}
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
 
             <div>
               <p className="mb-2 text-xs opacity-50">TOTAL POINTS</p>
               <input
-                type="text"
-                inputMode="numeric"
-                disabled={!currentPreset.available}
-                value={totalPointsInput}
-                onChange={(e) =>
-                  setTotalPointsInput(normalizeNumberInput(e.target.value))
-                }
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                type="number"
+                min="1"
+                value={totalPoints}
+                onChange={(e) => setTotalPoints(sanitizeNumber(e.target.value))}
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
 
             <div>
               <p className="mb-2 text-xs opacity-50">AIRDROP % SUPPLY</p>
               <input
-                type="text"
-                inputMode="numeric"
-                disabled={!currentPreset.available}
-                value={airdropInput}
-                onChange={(e) =>
-                  setAirdropInput(normalizeNumberInput(e.target.value))
-                }
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                type="number"
+                min="0"
+                max="100"
+                value={airdrop}
+                onChange={(e) => setAirdrop(sanitizeNumber(e.target.value))}
+                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
               />
             </div>
           </div>
@@ -1533,38 +1226,24 @@ Calculate yours on capys.app`
                   </div>
 
                   <div className="mb-3 inline-flex items-center rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-sm text-cyan-300 sm:text-base">
-                    {currentProtocolName}
+                    {current.name}
                   </div>
 
                   <div className="text-[10px] uppercase tracking-[0.35em] text-white/45 sm:text-xs">
                     Potential Airdrop Value
                   </div>
 
-                  {currentPreset.available ? (
-                    <>
-                      <div className="mt-3 text-3xl font-bold leading-none text-white sm:text-4xl md:text-6xl">
-                        {formatMoney(myValue, 0)}
-                      </div>
+                  <div className="mt-3 text-3xl font-bold leading-none text-white sm:text-4xl md:text-6xl">
+                    {formatMoney(myValue, 0)}
+                  </div>
 
-                      <div className="mt-3 text-sm text-white/65 sm:text-base">
-                        {formatNumber(safeMyPoints)} points · {formatPointPrice(pricePerPoint)} per point
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="mt-3 text-2xl font-bold leading-tight text-white sm:text-3xl md:text-5xl">
-                        Estimates unavailable
-                      </div>
-
-                      <div className="mt-3 max-w-xl text-sm text-white/65 sm:text-base">
-                        This project is shown in the calculator list, but default supply assumptions are not ready yet.
-                      </div>
-                    </>
-                  )}
+                  <div className="mt-3 text-sm text-white/65 sm:text-base">
+                    {formatNumber(safeMyPoints)} points • {formatMoney(pricePerPoint, 2)} per point
+                  </div>
                 </div>
 
                 <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:px-4 sm:text-xs">
-                  {currentPreset.available ? "estimate only" : "coming soon"}
+                  estimate only
                 </div>
               </div>
 
@@ -1574,7 +1253,7 @@ Calculate yours on capys.app`
                     My Points
                   </div>
                   <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
-                    {currentPreset.available ? formatNumber(safeMyPoints) : "—"}
+                    {formatNumber(safeMyPoints)}
                   </div>
                 </div>
 
@@ -1583,7 +1262,7 @@ Calculate yours on capys.app`
                     Total Supply
                   </div>
                   <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
-                    {currentPreset.available ? formatNumber(safeTotalPoints) : "—"}
+                    {formatNumber(safeTotalPoints)}
                   </div>
                 </div>
 
@@ -1592,7 +1271,7 @@ Calculate yours on capys.app`
                     Est. FDV
                   </div>
                   <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
-                    {currentPreset.available ? formatCompactMoney(safeFdv * 1_000_000_000) : "—"}
+                    {formatCompactMoney(safeFdv * 1_000_000_000)}
                   </div>
                 </div>
 
@@ -1601,7 +1280,7 @@ Calculate yours on capys.app`
                     Airdrop %
                   </div>
                   <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
-                    {currentPreset.available ? `${safeAirdrop}%` : "—"}
+                    {safeAirdrop}%
                   </div>
                 </div>
               </div>
@@ -1622,7 +1301,7 @@ Calculate yours on capys.app`
 
             <button
               onClick={downloadCard}
-              disabled={isDownloading || !currentPreset.available}
+              disabled={isDownloading}
               className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isDownloading ? "Downloading..." : "Download Card"}
@@ -1630,8 +1309,7 @@ Calculate yours on capys.app`
 
             <button
               onClick={shareOnX}
-              disabled={!currentPreset.available}
-              className="rounded-xl bg-white px-6 py-3 font-semibold text-black transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-xl bg-white px-6 py-3 font-semibold text-black"
             >
               Share on X
             </button>
@@ -1640,21 +1318,16 @@ Calculate yours on capys.app`
       )}
 
       {tab === "odds" && (
-        <section
-          id="panel-odds"
-          role="tabpanel"
-          aria-labelledby="tab-odds"
-          className="mx-auto mt-20 max-w-6xl space-y-8 px-4 sm:px-6"
-        >
+        <section className="mx-auto mt-20 max-w-6xl space-y-8 px-4 sm:px-6">
           <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
             <h2 className="text-2xl font-semibold text-white">Polymarket Odds</h2>
 
             <p className="mt-2 text-sm text-white/50">
-              Market-implied launch timing and FDV expectations based on manually curated Polymarket references.
+              Market-implied launch timing and FDV expectations based on current Polymarket pricing.
             </p>
 
             <div className="mt-3 inline-flex rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-fuchsia-300/80">
-              {ODDS_UPDATED_LABEL}
+              Last updated: Mar 11, 7:00 UTC
             </div>
           </div>
 
@@ -1712,7 +1385,9 @@ Calculate yours on capys.app`
                         </div>
                       </div>
 
-                      <div className="text-sm text-white/45">Deadline: {item.deadline}</div>
+                      <div className="text-sm text-white/45">
+                        Deadline: {item.deadline}
+                      </div>
 
                       <a
                         href={item.link}
@@ -1783,11 +1458,13 @@ Calculate yours on capys.app`
                             item.probability
                           )}`}
                         >
-                          {item.threshold} · {item.probability}%
+                          {item.threshold} • {item.probability}%
                         </div>
                       </div>
 
-                      <div className="text-sm text-cyan-300/75">Current market leader</div>
+                      <div className="text-sm text-cyan-300/75">
+                        Current market leader
+                      </div>
 
                       <a
                         href={item.link}
@@ -1811,12 +1488,7 @@ Calculate yours on capys.app`
       )}
 
       {tab === "funding" && (
-        <section
-          id="panel-funding"
-          role="tabpanel"
-          aria-labelledby="tab-funding"
-          className="mx-auto mt-20 max-w-[1750px] space-y-8 px-4 sm:px-6"
-        >
+        <section className="mx-auto mt-20 max-w-[1750px] space-y-8 px-4 sm:px-6">
           <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
             <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
               <div>
@@ -1840,12 +1512,6 @@ Calculate yours on capys.app`
                   <div className="inline-flex rounded-full border border-neutral-700 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white/60">
                     View: {fundingMetricMode === "interval" ? "Per interval" : "Annualized"}
                   </div>
-
-                  {fundingRefreshing && (
-                    <div className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-yellow-300/80">
-                      Refreshing...
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -2027,88 +1693,81 @@ Calculate yours on capys.app`
                     All
                   </button>
 
-                  {ALL_FUNDING_KEYS.map((exchangeKey) => {
-                    const enabled = enabledFundingExchanges.includes(exchangeKey)
-                    const exchange = FUNDING_EXCHANGES[exchangeKey]
+                  {FUNDING_EXCHANGE_ORDER.map((exchange) => {
+  const enabled = enabledFundingExchanges.includes(exchange.key)
 
-                    return (
-                      <button
-                        key={exchangeKey}
-                        onClick={() => toggleFundingExchange(exchangeKey)}
-                        className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
-                          enabled
-                            ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
-                            : "border-neutral-700 text-white/50"
-                        }`}
-                      >
-                        {exchange.label}
-                      </button>
-                    )
-                  })}
+  return (
+    <button
+      key={exchange.key}
+      onClick={() => toggleFundingExchange(exchange.key)}
+      className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
+        enabled
+          ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
+          : "border-neutral-700 text-white/50"
+      }`}
+    >
+      {exchange.label}
+    </button>
+  )
+})}
                 </div>
               </div>
 
               <div className="text-xs text-white/30">
-                Potential routes ignore execution fees, slippage, spread and timing to the next funding event.
-              </div>
+  Live funding data with interval and annualized views.
+</div>
             </div>
           </div>
 
           <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
-            {fundingNotice && (
-              <div className="mb-4 rounded-2xl border border-yellow-400/20 bg-yellow-400/10 p-4 text-sm text-yellow-300">
-                {fundingNotice}
-              </div>
-            )}
-
-            {fundingLoading && !fundingRows.length && (
+            {fundingLoading && (
               <div className="rounded-2xl border border-neutral-800 bg-black/20 p-6 text-white/60">
                 Loading funding data...
               </div>
             )}
 
-            {fundingError && !fundingRows.length && (
+            {fundingError && (
               <div className="rounded-2xl border border-red-400/20 bg-red-400/10 p-6 text-red-300">
                 {fundingError}
               </div>
             )}
 
-            {(!fundingLoading || fundingRows.length > 0) && !fundingError && (
+            {!fundingLoading && !fundingError && (
               <div className="overflow-x-auto rounded-2xl border border-neutral-800">
-                <table className="w-full table-fixed border-separate border-spacing-0">
+  <table className="w-full table-fixed border-separate border-spacing-0">
                   <thead>
                     <tr className="text-left">
                       <th className="sticky left-0 top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-                        Symbol
-                      </th>
+  Symbol
+</th>
 
-                      <th className="sticky left-[96px] top-0 z-40 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-                        OI Rank
-                      </th>
+<th className="sticky left-[96px] top-0 z-40 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+  OI Rank
+</th>
 
-                      <th className="sticky left-[172px] top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-                        Max Arb
-                      </th>
+<th className="sticky left-[172px] top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+  Max Arb
+</th>
 
-                      <th className="sticky left-[268px] top-0 z-40 w-[240px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-                        Potential Route
-                      </th>
+<th className="sticky left-[268px] top-0 z-40 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+  Action
+</th>
 
                       {activeFundingExchanges.map((exchange) => (
-                        <th
-                          key={exchange.key}
-                          className="sticky top-0 z-30 border-b border-r border-neutral-800 bg-[#0b111d] px-2 py-3 text-center last:border-r-0"
-                        >
-                          <a
-                            href={exchange.tradeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition hover:text-cyan-300"
-                          >
-                            {exchange.label}
-                          </a>
-                        </th>
-                      ))}
+  <th
+    key={exchange.key}
+    className="sticky top-0 z-30 border-b border-r border-neutral-800 bg-[#0b111d] px-2 py-3 text-center last:border-r-0"
+  >
+    <a
+      href={exchange.tradeUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition hover:text-cyan-300"
+    >
+      {exchange.label}
+    </a>
+  </th>
+))}
                     </tr>
                   </thead>
 
@@ -2135,29 +1794,29 @@ Calculate yours on capys.app`
                           </span>
                         </td>
 
-                        <td className="sticky left-[268px] z-20 w-[240px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4">
-                          {row.lowFundingExchange && row.highFundingExchange ? (
+                        <td className="sticky left-[268px] z-20 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4">
+                          {row.buyExchange && row.sellExchange ? (
                             <div className="flex flex-wrap gap-2">
                               <a
-                                href={getExchangeMeta(row.lowFundingExchange.key).tradeUrl}
+                                href={getExchangeMeta(row.buyExchange.key).tradeUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/15"
                               >
-                                Low funding: {row.lowFundingExchange.label}
+                                BUY {row.buyExchange.label}
                               </a>
 
                               <a
-                                href={getExchangeMeta(row.highFundingExchange.key).tradeUrl}
+                                href={getExchangeMeta(row.sellExchange.key).tradeUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-500/15"
                               >
-                                High funding: {row.highFundingExchange.label}
+                                SELL {row.sellExchange.label}
                               </a>
                             </div>
                           ) : (
-                            <span className="text-xs text-white/35">No clear route</span>
+                            <span className="text-xs text-white/35">No trade route</span>
                           )}
                         </td>
 
@@ -2168,8 +1827,8 @@ Calculate yours on capys.app`
                             <td
                               key={`${row.symbol}-${exchange.key}`}
                               className={`border-b border-r border-neutral-800 px-2 py-4 text-center text-xs font-semibold sm:text-sm last:border-r-0 ${getFundingCellClass(
-                                value
-                              )}`}
+  value
+)}`}
                             >
                               <a
                                 href={exchange.tradeUrl}
@@ -2179,7 +1838,7 @@ Calculate yours on capys.app`
                                 title={
                                   exchange.hasPersonalRef
                                     ? `Open ${exchange.label} with your ref`
-                                    : `Open ${exchange.label}`
+                                    : `Open ${exchange.label} (generic link)`
                                 }
                               >
                                 {value === null ? "—" : formatFundingValue(value)}
@@ -2206,55 +1865,39 @@ Calculate yours on capys.app`
             )}
 
             <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-white/35">
-              <span>
-                Rows: <span className="text-white/60">{fundingMatrixRows.length}</span>
-              </span>
+  <span>
+    Rows: <span className="text-white/60">{fundingMatrixRows.length}</span>
+  </span>
 
-              <span>
-                Active exchanges:{" "}
-                <span className="text-white/60">{activeFundingExchanges.length}</span>
-              </span>
+  <span>
+    Active exchanges:{" "}
+    <span className="text-white/60">{activeFundingExchanges.length}</span>
+  </span>
 
-              <span>
-                Funding rate data provided by{" "}
-                <a
-                  href="https://loris.tools"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-cyan-300 transition hover:text-cyan-200"
-                >
-                  Loris Tools
-                </a>
-              </span>
-            </div>
+  <span>
+    Funding rate data provided by{" "}
+    <a
+      href="https://loris.tools"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-cyan-300 transition hover:text-cyan-200"
+    >
+      Loris Tools
+    </a>
+  </span>
+</div>
           </div>
         </section>
       )}
 
       {templatePicker && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur"
-          onClick={(event) => {
-            if (event.target === event.currentTarget) {
-              setTemplatePicker(false)
-            }
-          }}
-        >
-          <div
-            ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="template-picker-title"
-            className="max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0c1220] p-6"
-          >
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur">
+          <div className="max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0c1220] p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 id="template-picker-title" className="text-lg">
-                Choose Card Background
-              </h3>
+              <h3 className="text-lg">Choose Card Background</h3>
 
               <button
                 onClick={() => setTemplatePicker(false)}
-                aria-label="Close template picker"
                 className="opacity-60 transition hover:opacity-100"
               >
                 ✕

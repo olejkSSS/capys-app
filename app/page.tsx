@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toPng } from "html-to-image"
+import { AnimatePresence, motion } from "motion/react"
 
 const PERPS = [
   {
@@ -11,7 +12,7 @@ const PERPS = [
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     refCode: "OMNICAPY",
     logo: "/variational.png",
-    boost: "OMNICAPY: +16% points boost",
+    boost: "OMNICAPY: +15% points boost",
     farm: "Holding positions + volume on mid-OI tokens",
   },
   {
@@ -47,7 +48,7 @@ const PERPS = [
     ref: "https://app.hyena.trade/ref/CAPY",
     refCode: "CAPY",
     logo: "/hyena.png",
-    boost: "+10% points boost",
+    boost: "+15% points boost",
     farm: "Activity + steady volume",
   },
   {
@@ -580,6 +581,13 @@ function intervalLabel(hours: number) {
   return `${hours}h`
 }
 
+const TABS = [
+  { id: "list", label: "Perp DEX List" },
+  { id: "calculator", label: "Perp DEX Airdrop Calculator" },
+  { id: "odds", label: "Polymarket Odds" },
+  { id: "funding", label: "Funding Rates" },
+] as const
+
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list")
   const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
@@ -1014,52 +1022,32 @@ Calculate yours on capys.app`
         <p className="mt-4 opacity-60">Crypto-native Perp Tier List</p>
 
         <div className="mt-8 flex justify-center">
-          <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
-            <button
-              onClick={() => setTab("list")}
-              className={`rounded-full px-5 py-2 text-sm transition ${
-                tab === "list"
-                  ? "border border-cyan-400 bg-cyan-500/20 text-cyan-300"
-                  : "text-neutral-400"
-              }`}
-            >
-              Perp DEX List
-            </button>
+  <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
+    {TABS.map((item) => {
+      const isActive = tab === item.id
 
-            <button
-              onClick={() => setTab("calculator")}
-              className={`rounded-full px-5 py-2 text-sm transition ${
-                tab === "calculator"
-                  ? "border border-purple-400 bg-purple-500/20 text-purple-300"
-                  : "text-neutral-400"
-              }`}
-            >
-              Perp DEX Airdrop Calculator
-            </button>
+      return (
+        <button
+          key={item.id}
+          onClick={() => setTab(item.id as Tab)}
+          className={`relative rounded-full px-5 py-2 text-sm transition-colors duration-300 ${
+            isActive ? "text-cyan-200" : "text-neutral-400 hover:text-white"
+          }`}
+        >
+          {isActive && (
+            <motion.span
+              layoutId="active-tab"
+              className="absolute inset-0 rounded-full border border-cyan-400 bg-cyan-500/20"
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+            />
+          )}
 
-            <button
-              onClick={() => setTab("odds")}
-              className={`rounded-full px-5 py-2 text-sm transition ${
-                tab === "odds"
-                  ? "border border-fuchsia-400 bg-fuchsia-500/20 text-fuchsia-300"
-                  : "text-neutral-400"
-              }`}
-            >
-              Polymarket Odds
-            </button>
-
-            <button
-              onClick={() => setTab("funding")}
-              className={`rounded-full px-5 py-2 text-sm transition ${
-                tab === "funding"
-                  ? "border border-emerald-400 bg-emerald-500/20 text-emerald-300"
-                  : "text-neutral-400"
-              }`}
-            >
-              Funding Rates
-            </button>
-          </div>
-        </div>
+          <span className="relative z-10">{item.label}</span>
+        </button>
+      )
+    })}
+  </div>
+</div>
       </div>
 
       {tab === "list" && (

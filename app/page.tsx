@@ -12,7 +12,7 @@ const PERPS = [
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     refCode: "OMNICAPY",
     logo: "/variational.png",
-    boost: "OMNICAPY: +15% points boost",
+    boost: "OMNICAPY: +12.5% points boost",
     farm: "Holding positions + volume on mid-OI tokens",
   },
   {
@@ -1315,7 +1315,7 @@ Calculate yours on capys.app`
             </p>
 
             <div className="mt-3 inline-flex rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-fuchsia-300/80">
-              Last updated: Mar 23, 12:00 UTC
+              Last updated: Mar 24, 9:00 UTC
             </div>
           </div>
 

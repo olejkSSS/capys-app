@@ -18,6 +18,7 @@ type CalcPerpKey = keyof typeof PERPS_CALC
 type FundingMetricMode = "interval" | "annualized"
 type FundingBias = "longs_pay_shorts" | "shorts_pay_longs" | "neutral"
 type FundingExchangeKey = string
+type FundingRowLimit = 100 | 250 | 500 | "all"
 
 type FundingApiRow = {
   exchange: string
@@ -209,6 +210,7 @@ export default function Home() {
   const [fundingMetricMode, setFundingMetricMode] =
     useState<FundingMetricMode>("interval")
   const [onlyActionable, setOnlyActionable] = useState(true)
+  const [fundingRowLimit, setFundingRowLimit] = useState<FundingRowLimit>(100)
   const [refreshCountdown, setRefreshCountdown] = useState(90)
   const [customTemplate, setCustomTemplate] = useState<string | null>(null)
 
@@ -518,6 +520,17 @@ export default function Home() {
   }, [visibleFundingRows])
 
   const topFundingSpread = fundingMatrixRows[0] ?? null
+  const renderedFundingRows = useMemo(
+    () =>
+      fundingRowLimit === "all"
+        ? fundingMatrixRows
+        : fundingMatrixRows.slice(0, fundingRowLimit),
+    [fundingMatrixRows, fundingRowLimit]
+  )
+  const hiddenFundingRows = Math.max(
+    fundingMatrixRows.length - renderedFundingRows.length,
+    0
+  )
 
   const copyRefCode = async (perpName: string, refCode: string) => {
     try {
@@ -550,7 +563,6 @@ export default function Home() {
   const toggleFundingExchange = (exchangeKey: FundingExchangeKey) => {
     setEnabledFundingExchanges((prev) => {
       if (prev.includes(exchangeKey)) {
-        if (prev.length === 1) return prev
         return prev.filter((key) => key !== exchangeKey)
       }
 
@@ -564,6 +576,7 @@ export default function Home() {
     setOnlyActionable(true)
     setFundingMetricMode("interval")
     setFundingSort("desc")
+    setFundingRowLimit(100)
   }
 
   const uploadCustomTemplate = (file: File | undefined) => {
@@ -1410,7 +1423,7 @@ Calculate yours on ${SITE_URL}`
 
               <div>
                 <div className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">
-                  Toggle exchanges
+                  Exchanges
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -1422,7 +1435,27 @@ Calculate yours on ${SITE_URL}`
                     }
                     className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-medium text-cyan-200 transition hover:bg-cyan-300/15"
                   >
-                    All
+                    Select all
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setEnabledFundingExchanges(
+                        fundingExchanges
+                          .filter((exchange) => exchange.hasPersonalRef)
+                          .map((exchange) => exchange.key)
+                      )
+                    }
+                    className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-xs font-medium text-emerald-200 transition hover:bg-emerald-300/15"
+                  >
+                    Capy refs only
+                  </button>
+
+                  <button
+                    onClick={() => setEnabledFundingExchanges([])}
+                    className="rounded-full border border-red-300/25 bg-red-300/10 px-3 py-2 text-xs font-medium text-red-200 transition hover:bg-red-300/15"
+                  >
+                    Clear all
                   </button>
 
                   {fundingExchanges.map((exchange) => {
@@ -1445,9 +1478,32 @@ Calculate yours on ${SITE_URL}`
                 </div>
               </div>
 
-              <div className="text-xs text-white/30">
-  Live funding data with interval and annualized views.
-</div>
+              <div>
+                <div className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">
+                  Render rows
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {([100, 250, 500, "all"] as const).map((limit) => (
+                    <button
+                      key={limit}
+                      onClick={() => setFundingRowLimit(limit)}
+                      className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
+                        fundingRowLimit === limit
+                          ? "border-cyan-300/25 bg-cyan-300/10 text-cyan-200"
+                          : "border-white/10 text-white/50 hover:text-white"
+                      }`}
+                    >
+                      {limit === "all" ? "All rows" : `Top ${limit}`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="text-xs leading-5 text-white/30">
+                Default view renders only the strongest rows so the table stays
+                smooth. Search still scans the full Loris dataset.
+              </div>
             </div>
           </div>
 
@@ -1504,7 +1560,7 @@ Calculate yours on ${SITE_URL}`
                   </thead>
 
                   <tbody>
-                    {fundingMatrixRows.map((row) => (
+                    {renderedFundingRows.map((row) => (
                       <tr key={row.symbol} className="hover:bg-white/[0.02]">
                         <td className="sticky left-0 z-20 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm font-semibold text-white">
                           <button
@@ -1602,9 +1658,33 @@ Calculate yours on ${SITE_URL}`
               </div>
             )}
 
+            {!fundingLoading && !fundingError && hiddenFundingRows > 0 && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={() =>
+                    setFundingRowLimit((prev) =>
+                      prev === "all"
+                        ? "all"
+                        : prev === 100
+                          ? 250
+                          : prev === 250
+                            ? 500
+                            : "all"
+                    )
+                  }
+                  className="rounded-2xl border border-cyan-300/25 bg-cyan-300/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
+                >
+                  Show more rows ({hiddenFundingRows} hidden)
+                </button>
+              </div>
+            )}
+
             <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-white/35">
   <span>
-    Rows: <span className="text-white/60">{fundingMatrixRows.length}</span>
+    Showing:{" "}
+    <span className="text-white/60">
+      {renderedFundingRows.length}/{fundingMatrixRows.length}
+    </span>
   </span>
 
   <span>

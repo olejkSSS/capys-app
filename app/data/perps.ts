@@ -133,8 +133,6 @@ export const PERPS = [
 ] as const
 
 export const TEMPLATES = [
-  "capycommand",
-  "moonpoints",
   "cinema",
   "aurafarming",
   "capypistol",

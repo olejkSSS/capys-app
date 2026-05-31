@@ -9,6 +9,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 1,
     },
+    {
+      url: `${SITE_URL}/perp-airdrop-calculator`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.92,
+    },
+    {
+      url: `${SITE_URL}/funding-rates`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.92,
+    },
     ...PERPS.map((perp) => ({
       url: `${SITE_URL}/perps/${perp.slug}`,
       lastModified: new Date(),

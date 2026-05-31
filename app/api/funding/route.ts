@@ -67,7 +67,7 @@ async function fetchFundingPayload(): Promise<FundingPayload> {
   const rawData = await res.json()
   const data = typeof rawData === "string" ? JSON.parse(rawData) : rawData
 
-  const exchangeNames: LorisExchangeName[] = Array.isArray(
+  const parsedExchangeNames: LorisExchangeName[] = Array.isArray(
     data?.exchanges?.exchange_names
   )
     ? data.exchanges.exchange_names
@@ -79,6 +79,12 @@ async function fetchFundingPayload(): Promise<FundingPayload> {
   const oiRankings: Record<string, string> = data?.oi_rankings ?? {}
   const defaultOiRank: string = data?.default_oi_rank ?? "500+"
   const updatedAt: string | null = data?.timestamp ?? null
+  const exchangeNames: LorisExchangeName[] = parsedExchangeNames.length
+    ? parsedExchangeNames
+    : Object.keys(fundingRates).map((key) => ({
+        name: key,
+        display: key,
+      }))
 
   const exchangePairs = exchangeNames.map((exchange) => ({
     originalName: exchange.name,

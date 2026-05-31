@@ -4,269 +4,20 @@ import Image from "next/image"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toPng } from "html-to-image"
 import { motion } from "motion/react"
-
-const PERPS = [
-  {
-    tier: "S+",
-    name: "Variational",
-    ref: "https://omni.variational.io/?ref=OMNICAPY",
-    refCode: "OMNICAPY",
-    logo: "/variational.png",
-    boost: "OMNICAPY: +12.5% points boost",
-    farm: "Holding positions + volume on mid-OI tokens",
-  },
-  {
-    tier: "S+",
-    name: "Extended",
-    ref: "https://app.extended.exchange/join/CAPY",
-    refCode: "CAPY",
-    logo: "/extended.png",
-    boost: "-10% fees + 5% points boost + 30% refback",
-    farm: "Volume + holding positions",
-  },
-  {
-    tier: "S",
-    name: "Hibachi",
-    ref: "http://hibachi.xyz/r/capy",
-    refCode: "capy",
-    logo: "/hibachi.png",
-    boost: "-15% fees + 15% points boost",
-    farm: "Volume + holding positions",
-  },
-  {
-    tier: "S",
-    name: "Ethereal",
-    ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
-    refCode: "UM68P2M9JZ6D",
-    logo: "/ethereal.png",
-    boost: "+15% points boost",
-    farm: "Boost farming + low OI tokens",
-  },
-  {
-    tier: "S",
-    name: "Hyena",
-    ref: "https://app.hyena.trade/ref/CAPY",
-    refCode: "CAPY",
-    logo: "/hyena.png",
-    boost: "+10% points boost",
-    farm: "Activity + steady volume",
-  },
-  {
-    tier: "A",
-    name: "Pacifica",
-    ref: "https://app.pacifica.fi/?referral=Capy",
-    refCode: "Capy",
-    logo: "/pacifica.png",
-    boost: "+15% points boost",
-    farm: "High volume + active trading",
-  },
-  {
-    tier: "A",
-    name: "EdgeX",
-    ref: "https://pro.edgex.exchange/referral/OLEJK",
-    refCode: "OLEJK",
-    logo: "/edgex.png",
-    boost: "-10% fees + 10% points boost + VIP1",
-    farm: "High volume + hold positions",
-  },
-  {
-    tier: "A",
-    name: "Dreamcash",
-    ref: "https://dreamcash.xyz/share?code=CAPYCR",
-    refCode: "CAPYCR",
-    logo: "/dreamcash.png",
-    boost: "boost from 10K to 1M points",
-    farm: "Low OI tokens + active trading",
-  },
-] as const
-
-const TEMPLATES = [
-  "cinema",
-  "aurafarming",
-  "capypistol",
-  "fck",
-  "heaven",
-  "offer",
-  "omg",
-  "poor",
-  "punchcover",
-  "rich",
-  "scarcover",
-  "skeletons",
-  "locedin",
-] as const
-
-const PERPS_CALC = {
-  variational: {
-    name: "Variational",
-    fdv: 0.6,
-    totalPoints: 9300000,
-    airdrop: 30,
-  },
-  extended: {
-    name: "Extended",
-    fdv: 0.5,
-    totalPoints: 50000000,
-    airdrop: 30,
-  },
-  pacifica: {
-    name: "Pacifica",
-    fdv: 0.3,
-    totalPoints: 240000000,
-    airdrop: 20,
-  },
-  nado: {
-    name: "Nado",
-    fdv: 0.3,
-    totalPoints: 4300000,
-    airdrop: 8,
-  },
-  o1: {
-    name: "01Exchange",
-    fdv: 0.2,
-    totalPoints: 10000000,
-    airdrop: 20,
-  },
-  treadfi: {
-    name: "Tread Fi",
-    fdv: 0.3,
-    totalPoints: 2800000,
-    airdrop: 20,
-  },
-  dreamcash: {
-    name: "Dreamcash",
-    fdv: 0.1,
-    totalPoints: 6000000,
-    airdrop: 12,
-  },
-  hibachi: {
-    name: "Hibachi",
-    fdv: 0.4,
-    totalPoints: 60000000,
-    airdrop: 15,
-  },
-  ethereal: {
-    name: "Ethereal",
-    fdv: 0.3,
-    totalPoints: 8000000000,
-    airdrop: 15,
-  },
-  ostium: {
-    name: "Ostium",
-    fdv: 0.3,
-    totalPoints: 56000000,
-    airdrop: 15,
-  },
-  grvt: {
-    name: "Grvt",
-    fdv: 0.15,
-    totalPoints: 3000000,
-    airdrop: 15,
-  },
-  bullpen: {
-    name: "Bullpen",
-    fdv: 0.15,
-    totalPoints: 69900000,
-    airdrop: 15,
-  },
-  edgex: {
-    name: "EdgeX",
-    fdv: 1,
-    totalPoints: 10000000,
-    airdrop: 30,
-  },
-  standx: {
-    name: "StandX",
-    fdv: 0.2,
-    totalPoints: 50000000,
-    airdrop: 20,
-  },
-  hyena: {
-    name: "Hyena",
-    fdv: 0,
-    totalPoints: 1,
-    airdrop: 15,
-  },
-  liquid: {
-    name: "Liquid",
-    fdv: 0,
-    totalPoints: 1,
-    airdrop: 15,
-  },
-  decibel: {
-    name: "Decibel",
-    fdv: 0,
-    totalPoints: 1,
-    airdrop: 15,
-  },
-} as const
-
-
-
-const FUNDING_EXCHANGE_ORDER = [
-  {
-    key: "edgex",
-    label: "EdgeX",
-    intervalHours: 8,
-    tradeUrl: "https://pro.edgex.exchange/referral/OLEJK",
-    hasPersonalRef: true,
-  },
-  {
-    key: "ethereal",
-    label: "Ethereal",
-    intervalHours: 8,
-    tradeUrl: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
-    hasPersonalRef: true,
-  },
-  {
-    key: "extended",
-    label: "Extended",
-    intervalHours: 1,
-    tradeUrl: "https://app.extended.exchange/join/CAPY",
-    hasPersonalRef: true,
-  },
-  {
-    key: "hibachi",
-    label: "Hibachi",
-    intervalHours: 8,
-    tradeUrl: "http://hibachi.xyz/r/capy",
-    hasPersonalRef: true,
-  },
-  {
-    key: "hyena",
-    label: "Hyena",
-    intervalHours: 8,
-    tradeUrl: "https://app.hyena.trade/ref/CAPY",
-    hasPersonalRef: true,
-  },
-  {
-    key: "hyperliquid",
-    label: "Hyperliquid",
-    intervalHours: 1,
-    tradeUrl: "https://app.hyperliquid.xyz/",
-    hasPersonalRef: false,
-  },
-  {
-    key: "pacifica",
-    label: "Pacifica",
-    intervalHours: 8,
-    tradeUrl: "https://app.pacifica.fi/?referral=Capy",
-    hasPersonalRef: true,
-  },
-  {
-    key: "variational",
-    label: "Variational",
-    intervalHours: 8,
-    tradeUrl: "https://omni.variational.io/?ref=OMNICAPY",
-    hasPersonalRef: true,
-  },
-] as const
+import {
+  DEFAULT_FUNDING_EXCHANGES,
+  type FundingExchangeMeta,
+  PERPS,
+  PERPS_CALC,
+  SITE_URL,
+  TEMPLATES,
+} from "./data/perps"
 
 type Tab = "list" | "calculator" | "funding"
 type CalcPerpKey = keyof typeof PERPS_CALC
 type FundingMetricMode = "interval" | "annualized"
 type FundingBias = "longs_pay_shorts" | "shorts_pay_longs" | "neutral"
-type FundingExchangeKey = (typeof FUNDING_EXCHANGE_ORDER)[number]["key"]
+type FundingExchangeKey = string
 
 type FundingApiRow = {
   exchange: string
@@ -276,6 +27,8 @@ type FundingApiRow = {
   oiRank: string
   bias: FundingBias
 }
+
+type FundingApiExchange = FundingExchangeMeta
 
 type RawFundingApiRow = Partial<FundingApiRow> & {
   [key: string]: unknown
@@ -288,10 +41,10 @@ type FundingMatrixRow = {
   activeCount: number
   buyExchange: { key: FundingExchangeKey; label: string } | null
   sellExchange: { key: FundingExchangeKey; label: string } | null
-  byExchange: Record<FundingExchangeKey, number | null>
+  byExchange: Record<string, number | null>
 }
 
-const ALL_FUNDING_KEYS = FUNDING_EXCHANGE_ORDER.map(
+const INITIAL_FUNDING_KEYS = DEFAULT_FUNDING_EXCHANGES.map(
   (exchange) => exchange.key
 ) as FundingExchangeKey[]
 
@@ -405,19 +158,12 @@ function parseOiRank(value: unknown) {
   return Number.isFinite(numeric) ? numeric : 999999
 }
 
-function getExchangeMeta(exchangeKey: FundingExchangeKey) {
-  return (
-    FUNDING_EXCHANGE_ORDER.find((exchange) => exchange.key === exchangeKey) ??
-    FUNDING_EXCHANGE_ORDER[0]
-  )
-}
-
 function toDisplayedFundingValue(
   rawFunding: number,
-  exchangeKey: FundingExchangeKey,
+  exchange: FundingExchangeMeta | undefined,
   metricMode: FundingMetricMode
 ) {
-  const meta = getExchangeMeta(exchangeKey)
+  const meta = exchange ?? DEFAULT_FUNDING_EXCHANGES[0]
 
   const actualIntervalFunding =
     meta.intervalHours === 1 ? rawFunding / 8 : rawFunding
@@ -449,17 +195,22 @@ export default function Home() {
   const [copiedTicker, setCopiedTicker] = useState<string | null>(null)
 
   const [fundingRows, setFundingRows] = useState<FundingApiRow[]>([])
+  const [fundingExchanges, setFundingExchanges] = useState<FundingApiExchange[]>(
+    DEFAULT_FUNDING_EXCHANGES
+  )
   const [fundingUpdatedAt, setFundingUpdatedAt] = useState<string | null>(null)
+  const [fundingStale, setFundingStale] = useState(false)
   const [fundingLoading, setFundingLoading] = useState(false)
   const [fundingError, setFundingError] = useState<string | null>(null)
   const [fundingSort, setFundingSort] = useState<"desc" | "asc">("desc")
   const [searchTicker, setSearchTicker] = useState("")
   const [enabledFundingExchanges, setEnabledFundingExchanges] =
-    useState<FundingExchangeKey[]>(ALL_FUNDING_KEYS)
+    useState<FundingExchangeKey[]>(INITIAL_FUNDING_KEYS)
   const [fundingMetricMode, setFundingMetricMode] =
     useState<FundingMetricMode>("interval")
   const [onlyActionable, setOnlyActionable] = useState(true)
-  const [refreshCountdown, setRefreshCountdown] = useState(60)
+  const [refreshCountdown, setRefreshCountdown] = useState(90)
+  const [customTemplate, setCustomTemplate] = useState<string | null>(null)
 
   const cardRef = useRef<HTMLDivElement>(null)
   const fundingRequestInFlightRef = useRef(false)
@@ -467,6 +218,12 @@ export default function Home() {
   const tickerCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const current = PERPS_CALC[calcPerp]
+  const cardTemplateSrc = customTemplate ?? `/templates/${selectedTemplate}.png`
+
+  const selectTab = (nextTab: Tab) => {
+    setTab(nextTab)
+    window.history.replaceState(null, "", `#${nextTab}`)
+  }
 
   const [fdv, setFdv] = useState<number>(current.fdv)
   const [totalPoints, setTotalPoints] = useState<number>(current.totalPoints)
@@ -477,6 +234,13 @@ export default function Home() {
     setTotalPoints(current.totalPoints)
     setAirdrop(current.airdrop)
   }, [current])
+
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "")
+    if (hash === "calculator" || hash === "funding" || hash === "list") {
+      setTab(hash)
+    }
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -494,9 +258,7 @@ export default function Home() {
         if (!silent) setFundingLoading(true)
         setFundingError(null)
 
-        const res = await fetch(`/api/funding?ts=${Date.now()}`, {
-          cache: "no-store",
-        })
+        const res = await fetch("/api/funding")
 
         const data = await res.json()
 
@@ -524,9 +286,29 @@ export default function Home() {
               }))
           : []
 
+        const safeExchanges: FundingApiExchange[] = Array.isArray(data?.exchanges)
+          ? data.exchanges
+              .filter((exchange: unknown) => exchange && typeof exchange === "object")
+              .map((exchange: Partial<FundingApiExchange>) => ({
+                key: String(exchange.key ?? ""),
+                label: String(exchange.label ?? exchange.key ?? ""),
+                intervalHours: exchange.intervalHours === 1 ? 1 : 8,
+                tradeUrl: String(exchange.tradeUrl ?? "#"),
+                hasPersonalRef: Boolean(exchange.hasPersonalRef),
+              }))
+              .filter((exchange: FundingApiExchange) => exchange.key && exchange.label)
+          : DEFAULT_FUNDING_EXCHANGES
+
+        setFundingExchanges(safeExchanges)
+        setEnabledFundingExchanges((prev) => {
+          const availableKeys = safeExchanges.map((exchange) => exchange.key)
+          const kept = prev.filter((key) => availableKeys.includes(key))
+          return kept.length ? kept : availableKeys
+        })
         setFundingRows(safeRows)
         setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
-        setRefreshCountdown(60)
+        setFundingStale(Boolean(data?.stale))
+        setRefreshCountdown(90)
       } catch (error) {
         setFundingError(
           error instanceof Error ? error.message : "Failed to load funding data"
@@ -551,7 +333,7 @@ export default function Home() {
       setRefreshCountdown((prev) => {
         if (prev <= 1) {
           void loadFunding(true)
-          return 60
+          return 90
         }
         return prev - 1
       })
@@ -580,10 +362,18 @@ export default function Home() {
 
   const activeFundingExchanges = useMemo(
     () =>
-      FUNDING_EXCHANGE_ORDER.filter((exchange) =>
+      fundingExchanges.filter((exchange) =>
         enabledFundingExchanges.includes(exchange.key)
       ),
-    [enabledFundingExchanges]
+    [fundingExchanges, enabledFundingExchanges]
+  )
+
+  const fundingExchangeByKey = useMemo(
+    () =>
+      new Map(
+        fundingExchanges.map((exchange) => [exchange.key, exchange] as const)
+      ),
+    [fundingExchanges]
   )
 
   const visibleFundingRows = useMemo(() => {
@@ -596,16 +386,23 @@ export default function Home() {
       .filter((row) => !search || row.symbol.includes(search))
       .map((row) => {
         const exchangeKey = row.exchange as FundingExchangeKey
+        const exchangeMeta = fundingExchangeByKey.get(exchangeKey)
         return {
           ...row,
           displayFunding: toDisplayedFundingValue(
             row.funding,
-            exchangeKey,
+            exchangeMeta,
             fundingMetricMode
           ),
         }
       })
-  }, [fundingRows, enabledFundingExchanges, searchTicker, fundingMetricMode])
+  }, [
+    fundingRows,
+    enabledFundingExchanges,
+    searchTicker,
+    fundingMetricMode,
+    fundingExchangeByKey,
+  ])
 
   const fundingMatrixRows = useMemo(() => {
     try {
@@ -614,7 +411,7 @@ export default function Home() {
         {
           symbol: string
           oiRank: string
-          byExchange: Record<FundingExchangeKey, number | null>
+          byExchange: Record<string, number | null>
         }
       >()
 
@@ -627,16 +424,9 @@ export default function Home() {
           grouped.set(symbol, {
             symbol,
             oiRank: String(row.oiRank ?? "500+"),
-            byExchange: {
-              edgex: null,
-              ethereal: null,
-              extended: null,
-              hibachi: null,
-              hyena: null,
-              hyperliquid: null,
-              pacifica: null,
-              variational: null,
-            },
+            byExchange: Object.fromEntries(
+              fundingExchanges.map((exchange) => [exchange.key, null])
+            ),
           })
         }
 
@@ -707,7 +497,13 @@ export default function Home() {
       console.error("Funding matrix build failed:", error)
       return []
     }
-  }, [visibleFundingRows, activeFundingExchanges, fundingSort, onlyActionable])
+  }, [
+    visibleFundingRows,
+    activeFundingExchanges,
+    fundingExchanges,
+    fundingSort,
+    onlyActionable,
+  ])
 
   const topFundingPositive = useMemo(() => {
     const positive = visibleFundingRows.filter((row) => row.displayFunding > 0)
@@ -763,11 +559,24 @@ export default function Home() {
   }
 
   const resetFundingFilters = () => {
-    setEnabledFundingExchanges(ALL_FUNDING_KEYS)
+    setEnabledFundingExchanges(fundingExchanges.map((exchange) => exchange.key))
     setSearchTicker("")
     setOnlyActionable(true)
     setFundingMetricMode("interval")
     setFundingSort("desc")
+  }
+
+  const uploadCustomTemplate = (file: File | undefined) => {
+    if (!file || !file.type.startsWith("image/")) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setCustomTemplate(reader.result)
+        setTemplatePicker(false)
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   const downloadCard = async () => {
@@ -779,11 +588,7 @@ export default function Home() {
       await document.fonts.ready
       await new Promise((resolve) => setTimeout(resolve, 250))
 
-      const dataUrl = await toPng(cardRef.current, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: "#060b16",
-      })
+      const dataUrl = await createCardDataUrl()
 
       const link = document.createElement("a")
       link.download = `${current.name.toLowerCase()}-airdrop-card.png`
@@ -799,17 +604,68 @@ export default function Home() {
     }
   }
 
-  const shareOnX = () => {
+  const createCardDataUrl = async () => {
+    if (!cardRef.current) throw new Error("Card is not ready")
+
+    await document.fonts.ready
+    await new Promise((resolve) => setTimeout(resolve, 250))
+
+    return toPng(cardRef.current, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: "#060b16",
+    })
+  }
+
+  const shareOnX = async () => {
     const text = `My potential ${current.name} airdrop is ${formatMoney(myValue, 0)}.
 
 My points: ${formatNumber(safeMyPoints)}
 Est. FDV: ${formatCompactMoney(safeFdv * 1_000_000_000)}
 Airdrop: ${safeAirdrop}%
 
-Calculate yours on capys.app`
+Calculate yours on ${SITE_URL}`
 
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
-    window.open(url, "_blank", "noopener,noreferrer")
+    try {
+      setIsDownloading(true)
+      const dataUrl = await createCardDataUrl()
+      const imageBlob = await fetch(dataUrl).then((res) => res.blob())
+      const file = new File(
+        [imageBlob],
+        `${current.name.toLowerCase()}-airdrop-card.png`,
+        { type: "image/png" }
+      )
+
+      if (
+        navigator.canShare?.({ files: [file] }) &&
+        typeof navigator.share === "function"
+      ) {
+        await navigator.share({
+          title: `${current.name} airdrop estimate`,
+          text,
+          files: [file],
+        })
+        return
+      }
+
+      const link = document.createElement("a")
+      link.download = file.name
+      link.href = dataUrl
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+        `${text}\n\nCard image downloaded. Attach it to the post.`
+      )}`
+      window.open(url, "_blank", "noopener,noreferrer")
+    } catch (error) {
+      console.error("X share failed:", error)
+      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+      window.open(url, "_blank", "noopener,noreferrer")
+    } finally {
+      setIsDownloading(false)
+    }
   }
 
   return (
@@ -826,7 +682,7 @@ Calculate yours on capys.app`
         <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <button
             type="button"
-            onClick={() => setTab("list")}
+            onClick={() => selectTab("list")}
             className="flex items-center gap-3 text-left"
             aria-label="Go to Capys app home"
           >
@@ -845,7 +701,7 @@ Calculate yours on capys.app`
             {TABS.map((item) => (
               <button
                 key={`nav-${item.id}`}
-                onClick={() => setTab(item.id as Tab)}
+                onClick={() => selectTab(item.id as Tab)}
                 className={`rounded-full px-4 py-2 transition ${
                   tab === item.id
                     ? "bg-white text-black"
@@ -899,14 +755,14 @@ Calculate yours on capys.app`
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
-                onClick={() => setTab("funding")}
+                onClick={() => selectTab("funding")}
                 className="rounded-2xl bg-cyan-300 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_0_34px_rgba(34,211,238,0.28)] transition hover:-translate-y-0.5 hover:bg-cyan-200"
               >
                 Scan funding
               </button>
 
               <button
-                onClick={() => setTab("calculator")}
+                onClick={() => selectTab("calculator")}
                 className="rounded-2xl border border-white/12 bg-white/[0.04] px-6 py-4 text-sm font-semibold text-white/80 transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08]"
               >
                 Estimate airdrop
@@ -915,9 +771,9 @@ Calculate yours on capys.app`
 
             <div className="mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                ["8", "tracked DEXs"],
+                ["40+", "tracked venues"],
                 ["17", "calc presets"],
-                ["60s", "funding refresh"],
+                ["90s", "safe refresh"],
                 ["100%", "ref links kept"],
               ].map(([value, label]) => (
                 <div
@@ -948,11 +804,14 @@ Calculate yours on capys.app`
                 </div>
               </div>
 
-              <div className="space-y-3">
-                {PERPS.slice(0, 4).map((perp) => (
-                  <div
+              <div className="max-h-[360px] space-y-3 overflow-y-auto pr-1">
+                {PERPS.map((perp) => (
+                  <a
+                    href={perp.ref}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     key={`hero-${perp.name}`}
-                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/[0.035] p-3"
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/[0.035] p-3 transition hover:border-cyan-300/35 hover:bg-white/[0.07]"
                   >
                     <div className="flex items-center gap-3">
                       <Image
@@ -964,7 +823,9 @@ Calculate yours on capys.app`
                       />
                       <div>
                         <div className="font-semibold text-white">{perp.name}</div>
-                        <div className="text-xs text-white/42">{perp.refCode}</div>
+                        <div className="text-xs text-white/42">
+                          {perp.refCode} · {perp.boost}
+                        </div>
                       </div>
                     </div>
                     <span
@@ -974,7 +835,7 @@ Calculate yours on capys.app`
                     >
                       {perp.tier}
                     </span>
-                  </div>
+                  </a>
                 ))}
               </div>
 
@@ -985,11 +846,11 @@ Calculate yours on capys.app`
                       Best next action
                     </div>
                     <div className="mt-1 text-sm text-white/75">
-                      Open funding screener, sort by spread, then route through ref links.
+                      Click any perp above to open it with the best available Capy ref.
                     </div>
                   </div>
                   <button
-                    onClick={() => setTab("funding")}
+                    onClick={() => selectTab("funding")}
                     className="shrink-0 rounded-xl bg-white px-4 py-2 text-sm font-bold text-black"
                   >
                     Open
@@ -1008,7 +869,7 @@ Calculate yours on capys.app`
               return (
                 <button
                   key={item.id}
-                  onClick={() => setTab(item.id as Tab)}
+                  onClick={() => selectTab(item.id as Tab)}
                   className={`relative flex-1 rounded-xl px-4 py-3 text-xs font-semibold transition-colors duration-300 sm:flex-none sm:px-5 sm:text-sm ${
                     isActive ? "text-slate-950" : "text-white/52 hover:text-white"
                   }`}
@@ -1229,7 +1090,7 @@ Calculate yours on capys.app`
             className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[28px] border border-cyan-300/20 bg-[#060b16] shadow-[0_0_48px_rgba(34,211,238,0.12)]"
           >
             <Image
-              src={`/templates/${selectedTemplate}.png`}
+              src={cardTemplateSrc}
               alt="Card template"
               fill
               sizes="(max-width: 768px) 100vw, 1024px"
@@ -1333,7 +1194,7 @@ Calculate yours on capys.app`
               onClick={shareOnX}
               className="rounded-2xl bg-white px-6 py-3 text-sm font-black text-black transition hover:-translate-y-0.5"
             >
-              Share on X
+              {isDownloading ? "Preparing..." : "Share on X + Card"}
             </button>
           </div>
         </section>
@@ -1355,8 +1216,8 @@ Calculate yours on capys.app`
                 </h2>
 
                 <p className="mt-2 text-sm text-white/50">
-                  Compare interval-normalized funding across EdgeX, Ethereal,
-                  Extended, Hibachi, Hyena, Hyperliquid, Pacifica and Variational.
+                  Compare interval-normalized funding across every exchange returned
+                  by Loris Tools, with Capy referral routes applied where available.
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -1367,6 +1228,12 @@ Calculate yours on capys.app`
                   {fundingUpdatedAt && (
                     <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-cyan-300/80">
                       Updated: {fundingUpdatedAt}
+                    </div>
+                  )}
+
+                  {fundingStale && (
+                    <div className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-yellow-200/80">
+                      Showing cached Loris data
                     </div>
                   )}
 
@@ -1548,13 +1415,17 @@ Calculate yours on capys.app`
 
                 <div className="flex flex-wrap gap-2">
                   <button
-                    onClick={() => setEnabledFundingExchanges(ALL_FUNDING_KEYS)}
+                    onClick={() =>
+                      setEnabledFundingExchanges(
+                        fundingExchanges.map((exchange) => exchange.key)
+                      )
+                    }
                     className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-medium text-cyan-200 transition hover:bg-cyan-300/15"
                   >
                     All
                   </button>
 
-                  {FUNDING_EXCHANGE_ORDER.map((exchange) => {
+                  {fundingExchanges.map((exchange) => {
   const enabled = enabledFundingExchanges.includes(exchange.key)
 
   return (
@@ -1659,7 +1530,10 @@ Calculate yours on capys.app`
                           {row.buyExchange && row.sellExchange ? (
                             <div className="flex flex-wrap gap-2">
                               <a
-                                href={getExchangeMeta(row.buyExchange.key).tradeUrl}
+                                href={
+                                  fundingExchangeByKey.get(row.buyExchange.key)
+                                    ?.tradeUrl ?? "#"
+                                }
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/15"
@@ -1668,7 +1542,10 @@ Calculate yours on capys.app`
                               </a>
 
                               <a
-                                href={getExchangeMeta(row.sellExchange.key).tradeUrl}
+                                href={
+                                  fundingExchangeByKey.get(row.sellExchange.key)
+                                    ?.tradeUrl ?? "#"
+                                }
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center rounded-full border border-red-400/25 bg-red-500/10 px-3 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-500/15"
@@ -1765,12 +1642,28 @@ Calculate yours on capys.app`
               </button>
             </div>
 
+            <label className="mb-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-cyan-300/30 bg-cyan-300/10 p-6 text-center transition hover:bg-cyan-300/15">
+              <span className="text-sm font-semibold text-cyan-100">
+                Upload your own meme or screenshot
+              </span>
+              <span className="mt-1 text-xs text-white/45">
+                PNG, JPG, GIF or WebP. It stays local in your browser.
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(event) => uploadCustomTemplate(event.target.files?.[0])}
+              />
+            </label>
+
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {TEMPLATES.map((template) => (
                 <button
                   key={template}
                   onClick={() => {
                     setSelectedTemplate(template)
+                    setCustomTemplate(null)
                     setTemplatePicker(false)
                   }}
                   className={`overflow-hidden rounded-xl border transition ${

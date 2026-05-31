@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
+import { SEO_PROTOCOL_KEYWORDS } from "./data/perps";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://capys.app"),
@@ -9,14 +10,20 @@ export const metadata: Metadata = {
     template: "%s | Capys.app",
   },
   description:
-    "Crypto-native perp DEX farming hub with referral boosts, airdrop calculators, tier lists, and live funding rate opportunities.",
+    "Crypto-native perp DEX farming hub with referral boosts, airdrop calculators, tier lists, and live funding rate opportunities for Variational, Hibachi, Extended, Ethereal, EdgeX, Pacifica, Hyena and more.",
   keywords: [
     "perp dex",
     "airdrop calculator",
+    "perp points calculator",
     "funding rates",
+    "funding rate arbitrage",
     "crypto referrals",
+    "referral code",
+    "best perp referral",
+    "maximum referral bonus",
     "perp farming",
     "Capy",
+    ...SEO_PROTOCOL_KEYWORDS,
   ],
   authors: [{ name: "Capy", url: "https://x.com/capy_onchain" }],
   creator: "Capy",
@@ -27,6 +34,14 @@ export const metadata: Metadata = {
       "Compare perp DEX boosts, estimate airdrops, and scan funding rate opportunities in one crypto-native dashboard.",
     url: "https://capys.app",
     siteName: "Capys.app",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Capys.app perp DEX farming hub",
+      },
+    ],
     locale: "en_US",
     type: "website",
   },
@@ -36,6 +51,7 @@ export const metadata: Metadata = {
     description:
       "Perp DEX referral boosts, airdrop calculators, tier lists, and live funding rates.",
     creator: "@capy_onchain",
+    images: ["/opengraph-image"],
   },
   alternates: {
     canonical: "/",

@@ -19,6 +19,8 @@ type FundingMetricMode = "interval" | "annualized"
 type FundingBias = "longs_pay_shorts" | "shorts_pay_longs" | "neutral"
 type FundingExchangeKey = string
 type FundingRowLimit = 100 | 250 | 500 | "all"
+type FundingSortKey = "maxArb" | "oiRank" | "symbol"
+type FundingSortDirection = "desc" | "asc"
 
 type FundingApiRow = {
   exchange: string
@@ -203,7 +205,10 @@ export default function Home() {
   const [fundingStale, setFundingStale] = useState(false)
   const [fundingLoading, setFundingLoading] = useState(false)
   const [fundingError, setFundingError] = useState<string | null>(null)
-  const [fundingSort, setFundingSort] = useState<"desc" | "asc">("desc")
+  const [fundingSort, setFundingSort] = useState<{
+    key: FundingSortKey
+    direction: FundingSortDirection
+  }>({ key: "maxArb", direction: "desc" })
   const [searchTicker, setSearchTicker] = useState("")
   const [enabledFundingExchanges, setEnabledFundingExchanges] =
     useState<FundingExchangeKey[]>(INITIAL_FUNDING_KEYS)
@@ -492,9 +497,23 @@ export default function Home() {
         ? matrix.filter((row) => row.activeCount >= 2 && row.maxArb > 0)
         : matrix
 
-      return filtered.sort((a, b) =>
-        fundingSort === "desc" ? b.maxArb - a.maxArb : a.maxArb - b.maxArb
-      )
+      return filtered.sort((a, b) => {
+        let comparison = 0
+
+        if (fundingSort.key === "symbol") {
+          comparison = a.symbol.localeCompare(b.symbol)
+        }
+
+        if (fundingSort.key === "oiRank") {
+          comparison = parseOiRank(a.oiRank) - parseOiRank(b.oiRank)
+        }
+
+        if (fundingSort.key === "maxArb") {
+          comparison = a.maxArb - b.maxArb
+        }
+
+        return fundingSort.direction === "asc" ? comparison : -comparison
+      })
     } catch (error) {
       console.error("Funding matrix build failed:", error)
       return []
@@ -531,6 +550,25 @@ export default function Home() {
     fundingMatrixRows.length - renderedFundingRows.length,
     0
   )
+
+  const setFundingSortKey = (key: FundingSortKey) => {
+    setFundingSort((prev) => ({
+      key,
+      direction:
+        prev.key === key
+          ? prev.direction === "desc"
+            ? "asc"
+            : "desc"
+          : key === "symbol"
+            ? "asc"
+            : "desc",
+    }))
+  }
+
+  const sortLabel = (key: FundingSortKey) => {
+    if (fundingSort.key !== key) return ""
+    return fundingSort.direction === "desc" ? "↓" : "↑"
+  }
 
   const copyRefCode = async (perpName: string, refCode: string) => {
     try {
@@ -575,7 +613,7 @@ export default function Home() {
     setSearchTicker("")
     setOnlyActionable(true)
     setFundingMetricMode("interval")
-    setFundingSort("desc")
+    setFundingSort({ key: "maxArb", direction: "desc" })
     setFundingRowLimit(100)
   }
 
@@ -836,9 +874,6 @@ Calculate yours on ${SITE_URL}`
                       />
                       <div>
                         <div className="font-semibold text-white">{perp.name}</div>
-                        <div className="text-xs text-white/42">
-                          {perp.refCode} · {perp.boost}
-                        </div>
                       </div>
                     </div>
                     <span
@@ -853,21 +888,15 @@ Calculate yours on ${SITE_URL}`
               </div>
 
               <div className="mt-5 rounded-2xl border border-cyan-300/15 bg-cyan-300/8 p-4">
-                <div className="flex items-center justify-between gap-4">
+                <div>
                   <div>
                     <div className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
                       Best next action
                     </div>
                     <div className="mt-1 text-sm text-white/75">
-                      Click any perp above to open it with the best available Capy ref.
+                      Click any perp above to open it with the best available terms through Capy links.
                     </div>
                   </div>
-                  <button
-                    onClick={() => selectTab("funding")}
-                    className="shrink-0 rounded-xl bg-white px-4 py-2 text-sm font-bold text-black"
-                  >
-                    Open
-                  </button>
                 </div>
               </div>
             </div>
@@ -1377,33 +1406,28 @@ Calculate yours on ${SITE_URL}`
                     </button>
                   </div>
                 </div>
-
                 <div>
                   <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                    Sort by spread
+                    Sort
                   </label>
-                  <div className="flex rounded-2xl border border-white/10 bg-[#07101d] p-1">
-                    <button
-                      onClick={() => setFundingSort("desc")}
-                      className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
-                        fundingSort === "desc"
-                          ? "bg-emerald-300 text-slate-950"
-                          : "text-white/60"
-                      }`}
-                    >
-                      High → Low
-                    </button>
-
-                    <button
-                      onClick={() => setFundingSort("asc")}
-                      className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
-                        fundingSort === "asc"
-                          ? "bg-red-300 text-slate-950"
-                          : "text-white/60"
-                      }`}
-                    >
-                      Low → High
-                    </button>
+                  <div className="grid grid-cols-3 rounded-2xl border border-white/10 bg-[#07101d] p-1">
+                    {[
+                      ["maxArb", "Max Arb"],
+                      ["oiRank", "OI Rank"],
+                      ["symbol", "Symbol"],
+                    ].map(([key, label]) => (
+                      <button
+                        key={key}
+                        onClick={() => setFundingSortKey(key as FundingSortKey)}
+                        className={`rounded-lg px-3 py-2 text-sm transition ${
+                          fundingSort.key === key
+                            ? "bg-cyan-300 text-slate-950"
+                            : "text-white/60"
+                        }`}
+                      >
+                        {label} {sortLabel(key as FundingSortKey)}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -1526,15 +1550,30 @@ Calculate yours on ${SITE_URL}`
                   <thead>
                     <tr className="text-left">
                       <th className="sticky left-0 top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-  Symbol
+  <button
+    onClick={() => setFundingSortKey("symbol")}
+    className="text-left transition hover:text-cyan-200"
+  >
+    Symbol {sortLabel("symbol")}
+  </button>
 </th>
 
 <th className="sticky left-[96px] top-0 z-40 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-  OI Rank
+  <button
+    onClick={() => setFundingSortKey("oiRank")}
+    className="text-left transition hover:text-cyan-200"
+  >
+    OI Rank {sortLabel("oiRank")}
+  </button>
 </th>
 
 <th className="sticky left-[172px] top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-  Max Arb
+  <button
+    onClick={() => setFundingSortKey("maxArb")}
+    className="text-left transition hover:text-cyan-200"
+  >
+    Max Arb {sortLabel("maxArb")}
+  </button>
 </th>
 
 <th className="sticky left-[268px] top-0 z-40 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
@@ -1769,3 +1808,5 @@ Calculate yours on ${SITE_URL}`
     </main>
   )
 }
+
+

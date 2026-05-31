@@ -389,12 +389,20 @@ export function normalizeExchangeKey(key: string) {
 
 export function prettifyExchangeLabel(key: string) {
   return key
+    .toLowerCase()
     .replace(/[_-]+/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase())
+    .replace(/\b01\b/g, "01")
     .replace("Okx", "OKX")
     .replace("Htx", "HTX")
     .replace("Mexc", "MEXC")
+    .replace("Bybit", "Bybit")
     .replace("Woofi", "WOOFi")
+    .replace("Woofipro", "WOOFi Pro")
+    .replace("Cryptocom", "Crypto.com")
+    .replace("Gateio", "Gate.io")
+    .replace("Qfex", "QFEX")
+    .replace("Grvt", "GRVT")
 }
 
 export function getFundingExchangeMeta(
@@ -408,7 +416,7 @@ export function getFundingExchangeMeta(
 
   return {
     key: normalizedKey,
-    label: display || prettifyExchangeLabel(normalizedKey),
+    label: prettifyExchangeLabel(display || normalizedKey),
     intervalHours: ONE_HOUR_FUNDING_EXCHANGES.has(normalizedKey) ? 1 : 8,
     tradeUrl:
       GENERIC_EXCHANGE_URLS[normalizedKey] ??

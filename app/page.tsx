@@ -184,10 +184,315 @@ const TABS = [
   { id: "funding", label: "Funding Screener" },
 ] as const
 
+const CALC_KEYS = Object.keys(PERPS_CALC) as CalcPerpKey[]
+
+const LANGUAGES = [
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "zh", label: "中文", flag: "🇨🇳" },
+  { code: "ko", label: "한국어", flag: "🇰🇷" },
+  { code: "ja", label: "日本語", flag: "🇯🇵" },
+  { code: "uk", label: "Українська", flag: "🇺🇦" },
+  { code: "ru", label: "Русский", flag: "🇷🇺" },
+  { code: "ar", label: "العربية", flag: "🇦🇪" },
+  { code: "pt", label: "Português", flag: "🇵🇹" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "tr", label: "Türkçe", flag: "🇹🇷" },
+  { code: "vi", label: "Tiếng Việt", flag: "🇻🇳" },
+  { code: "id", label: "Bahasa Indonesia", flag: "🇮🇩" },
+  { code: "hi", label: "हिन्दी", flag: "🇮🇳" },
+  { code: "th", label: "ไทย", flag: "🇹🇭" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+  { code: "pl", label: "Polski", flag: "🇵🇱" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
+  { code: "cs", label: "Čeština", flag: "🇨🇿" },
+  { code: "bn", label: "বাংলা", flag: "🇧🇩" },
+] as const
+
+type LanguageCode = (typeof LANGUAGES)[number]["code"]
+type HeroText = Record<
+  Tab,
+  {
+    badge: string
+    title: string
+    body: string
+    primary: string
+    secondary: string
+  }
+>
+
+const COPY = {
+  en: {
+    tabs: ["Perp List", "Airdrop Calculator", "Funding Screener"],
+    contact: "Contact",
+    console: "Perp farming console",
+    language: "Language",
+    hero: {
+      list: {
+        badge: "Referral boost board",
+        title: "Find the best perp farming terms.",
+        body: "Compare fee discounts, point boosts, and refback routes across the perp DEXs that matter. Built for fast decisions, clean links, and less spreadsheet pain.",
+        primary: "Explore perps",
+        secondary: "Estimate airdrop",
+      },
+      calculator: {
+        badge: "Points to dollars",
+        title: "Estimate your airdrop upside.",
+        body: "Model FDV, token allocation, point supply, and your full point portfolio before deciding where the next trading cycle goes.",
+        primary: "Open calculator",
+        secondary: "Scan funding",
+      },
+      funding: {
+        badge: "Live market scanner",
+        title: "Scan funding spreads faster.",
+        body: "Track Loris funding data across perp venues, sort by max arb, OI rank, or symbol, and open the best available route in one click.",
+        primary: "Scan funding",
+        secondary: "Reset filters",
+      },
+    },
+    stats: ["tracked venues", "calc presets", "safe refresh", "ref links kept"],
+    commandEyebrow: "Opportunity snapshot",
+    commandTitle: "Perp command center",
+    online: "Online",
+    nextAction: "Best next action",
+    nextActionText:
+      "Click any perp above to open it with the best available terms.",
+    listEyebrow: "Referral boost board",
+    listTitle: "Perp DEX tier list",
+    listBody:
+      "Ranked by practical farming value: points boosts, fee discounts, refback, and the kind of activity each venue rewards.",
+    copyHint: "Click a boost pill to copy the referral code.",
+    tier: "Tier",
+    protocol: "Protocol",
+    boost: "Boost",
+    farmTip: "Farm tip:",
+    trade: "TRADE",
+    copiedCode: "Copied code",
+    code: "Code",
+    clickToCopy: "click to copy",
+    calcEyebrow: "Points to dollars",
+    calcTitle: "Airdrop value calculator",
+    calcBody:
+      "Stress-test FDV, supply allocation, and your points balance before you decide where the next trading cycle goes.",
+    currentEstimate: "Current estimate",
+    perPoint: "per point at",
+    myPoints: "My points",
+    fdv: "FDV (billions $)",
+    totalPoints: "Total points",
+    airdropSupply: "Airdrop % supply",
+    portfolioEyebrow: "Portfolio mode",
+    portfolioTitle: "Point portfolio estimator",
+    portfolioBody:
+      "Enter points across multiple perp programs and estimate the combined dollar value using each preset's FDV, point supply, and allocation.",
+    estimatedTotal: "Estimated total",
+    clearPortfolio: "Clear portfolio",
+    pointBalance: "Point balance",
+    estValue: "Est. value",
+    noPortfolio: "Add any point balance to build a portfolio estimate.",
+    potentialValue: "Potential Airdrop Value",
+    estimateOnly: "estimate only",
+    totalSupply: "Total Supply",
+    estFdv: "Est. FDV",
+    pickTemplate: "Pick a Template",
+    downloadCard: "Download Card",
+    downloading: "Downloading...",
+    preparing: "Preparing...",
+    shareX: "Share on X + Card",
+    chooseBackground: "Choose Card Background",
+    uploadTemplate: "Upload your own meme or screenshot",
+    uploadNote: "PNG, JPG, GIF or WebP. It stays local in your browser.",
+    fundingEyebrow: "Live market scanner",
+    fundingTitle: "Funding rate screener",
+    fundingBody:
+      "Compare interval-normalized funding across every exchange returned by Loris Tools, with Capy referral routes applied where available.",
+    refreshNow: "Refresh now",
+    resetFilters: "Reset filters",
+    mostPositive: "Most Positive Funding",
+    mostNegative: "Most Negative Funding",
+    highestSpread: "Highest Spread",
+    searchTicker: "Search by ticker",
+    fundingView: "Funding view",
+    perInterval: "Per interval",
+    annualized: "Annualized",
+    sort: "Sort",
+    maxArb: "Max Arb",
+    oiRank: "OI Rank",
+    symbol: "Symbol",
+    action: "Action",
+    onlyOpps: "Only opportunities",
+    showAllSymbols: "Show all symbols",
+    exchanges: "Exchanges",
+    selectAll: "Select all",
+    capyRefsOnly: "Capy refs only",
+    clearAll: "Clear all",
+    renderRows: "Render rows",
+    allRows: "All rows",
+    defaultRows:
+      "Default view renders only the strongest rows so the table stays smooth. Search still scans the full Loris dataset.",
+    loadingFunding: "Loading funding data...",
+    noTradeRoute: "No trade route",
+    noRows: "No rows match your current filters.",
+    showMore: "Show more rows",
+    hidden: "hidden",
+    showing: "Showing",
+    activeExchanges: "Active exchanges",
+    dataBy: "Funding rate data provided by",
+    updated: "Updated",
+    cached: "Showing cached Loris data",
+    view: "View",
+  },
+} as const
+
+type LanguageOverride = Partial<
+  Record<
+    keyof typeof COPY.en,
+    string | readonly string[] | Partial<HeroText>
+  >
+>
+
+const LANGUAGE_OVERRIDES: Partial<Record<LanguageCode, LanguageOverride>> = {
+  zh: {
+    tabs: ["Perp 列表", "空投计算器", "Funding 筛选器"],
+    contact: "联系",
+    language: "语言",
+    hero: {
+      list: {
+        badge: "返佣与加成看板",
+        title: "找到更好的 perp farming 条件。",
+        body: "对比手续费折扣、积分加成和返佣路线。协议名称保持原样，重点是更快做决策。",
+        primary: "查看 perps",
+        secondary: "估算空投",
+      },
+      calculator: {
+        badge: "积分换美元",
+        title: "估算你的空投上行空间。",
+        body: "用 FDV、分配比例、总积分和完整积分组合来估算潜在价值。",
+        primary: "打开计算器",
+        secondary: "扫描 funding",
+      },
+      funding: {
+        badge: "实时市场扫描",
+        title: "更快扫描 funding spread。",
+        body: "查看 Loris funding 数据，按 Max Arb、OI Rank 或 Symbol 排序，并一键打开可用路线。",
+        primary: "扫描 funding",
+        secondary: "重置筛选",
+      },
+    },
+    portfolioTitle: "积分组合估算器",
+    pointBalance: "积分余额",
+    estimatedTotal: "估算总额",
+  },
+  ko: {
+    tabs: ["Perp 목록", "에어드롭 계산기", "Funding 스크리너"],
+    contact: "연락",
+    language: "언어",
+    hero: {
+      list: { badge: "추천 혜택 보드", title: "더 좋은 perp farming 조건을 찾으세요.", body: "수수료 할인, 포인트 부스트, refback 루트를 빠르게 비교하세요.", primary: "Perps 보기", secondary: "에어드롭 계산" },
+      calculator: { badge: "포인트를 달러로", title: "에어드롭 업사이드를 추정하세요.", body: "FDV, 배분, 포인트 공급량과 포트폴리오를 함께 모델링합니다.", primary: "계산기 열기", secondary: "Funding 스캔" },
+      funding: { badge: "실시간 시장 스캐너", title: "Funding spread를 더 빠르게 스캔하세요.", body: "Loris 데이터를 정렬하고 가장 좋은 사용 가능한 경로를 바로 여세요.", primary: "Funding 스캔", secondary: "필터 초기화" },
+    },
+    portfolioTitle: "포인트 포트폴리오 추정기",
+    pointBalance: "포인트 잔액",
+    estimatedTotal: "예상 합계",
+  },
+  ja: {
+    tabs: ["Perp リスト", "エアドロップ計算", "Funding スクリーナー"],
+    contact: "連絡",
+    language: "言語",
+    hero: {
+      list: { badge: "紹介特典ボード", title: "より良い perp farming 条件を見つける。", body: "手数料割引、ポイントブースト、refback ルートを素早く比較できます。", primary: "Perpsを見る", secondary: "空投を試算" },
+      calculator: { badge: "ポイントをドルへ", title: "エアドロップの期待値を見積もる。", body: "FDV、配分、総ポイント、保有ポイントをまとめて試算します。", primary: "計算機を開く", secondary: "Fundingを見る" },
+      funding: { badge: "ライブ市場スキャナー", title: "Funding spread をすばやく確認。", body: "Loris データを並べ替え、最適な利用可能ルートを開けます。", primary: "Funding確認", secondary: "リセット" },
+    },
+    portfolioTitle: "ポイントポートフォリオ試算",
+    pointBalance: "ポイント残高",
+    estimatedTotal: "推定合計",
+  },
+  uk: {
+    tabs: ["Список perp", "Калькулятор airdrop", "Funding скринер"],
+    contact: "Контакт",
+    language: "Мова",
+    hero: {
+      list: { badge: "Дошка реф-бонусів", title: "Знайди найкращі умови для perp farming.", body: "Порівнюй знижки, бусти поінтів і refback-маршрути без зайвих таблиць.", primary: "Дивитись perps", secondary: "Оцінити airdrop" },
+      calculator: { badge: "Поінти в долари", title: "Оціни потенціал свого airdrop.", body: "Моделюй FDV, алокацію, supply поінтів і весь портфель поінтів.", primary: "Відкрити калькулятор", secondary: "Сканувати funding" },
+      funding: { badge: "Live market scanner", title: "Швидше скануй funding spreads.", body: "Дані Loris, сортування за Max Arb, OI Rank або Symbol і швидкі переходи.", primary: "Сканувати funding", secondary: "Скинути фільтри" },
+    },
+    portfolioTitle: "Оцінка портфеля поінтів",
+    pointBalance: "Баланс поінтів",
+    estimatedTotal: "Оцінка разом",
+  },
+  ru: {
+    tabs: ["Список perp", "Калькулятор airdrop", "Funding скринер"],
+    contact: "Контакт",
+    language: "Язык",
+    hero: {
+      list: { badge: "Доска реф-бонусов", title: "Найди лучшие условия для perp farming.", body: "Сравнивай скидки, бусты поинтов и refback-маршруты без лишних таблиц.", primary: "Смотреть perps", secondary: "Оценить airdrop" },
+      calculator: { badge: "Поинты в доллары", title: "Оцени потенциал своего airdrop.", body: "Моделируй FDV, аллокацию, общий supply поинтов и весь портфель.", primary: "Открыть калькулятор", secondary: "Сканировать funding" },
+      funding: { badge: "Live market scanner", title: "Быстрее сканируй funding spreads.", body: "Данные Loris, сортировка по Max Arb, OI Rank или Symbol и быстрые переходы.", primary: "Сканировать funding", secondary: "Сбросить фильтры" },
+    },
+    portfolioTitle: "Оценка портфеля поинтов",
+    pointBalance: "Баланс поинтов",
+    estimatedTotal: "Итого примерно",
+  },
+  ar: {
+    tabs: ["قائمة Perp", "حاسبة Airdrop", "ماسح Funding"],
+    contact: "تواصل",
+    language: "اللغة",
+    hero: {
+      list: { badge: "لوحة مزايا الإحالة", title: "اعثر على أفضل شروط perp farming.", body: "قارن الخصومات، تعزيزات النقاط، ومسارات refback مع إبقاء أسماء البروتوكولات كما هي.", primary: "استعرض perps", secondary: "قدّر airdrop" },
+      calculator: { badge: "النقاط إلى دولار", title: "قدّر قيمة airdrop المحتملة.", body: "اختبر FDV والتخصيص وإجمالي النقاط ومحفظتك الكاملة.", primary: "افتح الحاسبة", secondary: "افحص funding" },
+      funding: { badge: "ماسح سوق مباشر", title: "افحص funding spreads بسرعة.", body: "بيانات Loris مع ترتيب حسب Max Arb أو OI Rank أو Symbol وروابط مباشرة.", primary: "افحص funding", secondary: "إعادة ضبط" },
+    },
+    portfolioTitle: "مقدر محفظة النقاط",
+    pointBalance: "رصيد النقاط",
+    estimatedTotal: "الإجمالي المقدر",
+  },
+  pt: { tabs: ["Lista de Perps", "Calculadora de Airdrop", "Screener de Funding"], contact: "Contato", language: "Idioma", hero: { list: { badge: "Painel de boosts", title: "Encontre os melhores termos de perp farming.", body: "Compare descontos, boosts de pontos e rotas de refback sem traduzir nomes de protocolos.", primary: "Ver perps", secondary: "Estimar airdrop" }, calculator: { badge: "Pontos em dólares", title: "Estime o potencial do seu airdrop.", body: "Modele FDV, alocação, supply de pontos e seu portfólio completo.", primary: "Abrir calculadora", secondary: "Escanear funding" }, funding: { badge: "Scanner de mercado", title: "Escaneie funding spreads mais rápido.", body: "Dados Loris com ordenação por Max Arb, OI Rank ou Symbol e rotas diretas.", primary: "Escanear funding", secondary: "Resetar filtros" } }, portfolioTitle: "Estimador de portfólio de pontos", pointBalance: "Saldo de pontos", estimatedTotal: "Total estimado" },
+  es: { tabs: ["Lista de Perps", "Calculadora de Airdrop", "Screener de Funding"], contact: "Contacto", language: "Idioma", hero: { list: { badge: "Panel de boosts", title: "Encuentra las mejores condiciones de perp farming.", body: "Compara descuentos, boosts de puntos y rutas de refback sin tocar los nombres de protocolos.", primary: "Ver perps", secondary: "Estimar airdrop" }, calculator: { badge: "Puntos a dólares", title: "Estima el potencial de tu airdrop.", body: "Modela FDV, asignación, supply de puntos y tu portafolio completo.", primary: "Abrir calculadora", secondary: "Escanear funding" }, funding: { badge: "Scanner de mercado", title: "Escanea funding spreads más rápido.", body: "Datos de Loris con orden por Max Arb, OI Rank o Symbol y rutas directas.", primary: "Escanear funding", secondary: "Resetear filtros" } }, portfolioTitle: "Estimador de portafolio de puntos", pointBalance: "Saldo de puntos", estimatedTotal: "Total estimado" },
+  tr: { tabs: ["Perp Listesi", "Airdrop Hesaplayıcı", "Funding Tarayıcı"], contact: "İletişim", language: "Dil", hero: { list: { badge: "Ref boost paneli", title: "En iyi perp farming şartlarını bul.", body: "Ücret indirimlerini, puan boostlarını ve refback rotalarını hızlıca karşılaştır.", primary: "Perps göster", secondary: "Airdrop hesapla" }, calculator: { badge: "Puanları dolara çevir", title: "Airdrop potansiyelini tahmin et.", body: "FDV, dağıtım, toplam puan ve tüm puan portföyünü birlikte modelle.", primary: "Hesaplayıcıyı aç", secondary: "Funding tara" }, funding: { badge: "Canlı piyasa tarayıcı", title: "Funding spreadlerini daha hızlı tara.", body: "Loris verisini Max Arb, OI Rank veya Symbol ile sırala ve rotayı aç.", primary: "Funding tara", secondary: "Filtreleri sıfırla" } }, portfolioTitle: "Puan portföy tahmini", pointBalance: "Puan bakiyesi", estimatedTotal: "Tahmini toplam" },
+  vi: { tabs: ["Danh sách Perp", "Máy tính Airdrop", "Bộ lọc Funding"], contact: "Liên hệ", language: "Ngôn ngữ", hero: { list: { badge: "Bảng referral boost", title: "Tìm điều kiện perp farming tốt hơn.", body: "So sánh giảm phí, boost điểm và refback route, giữ nguyên tên protocol.", primary: "Xem perps", secondary: "Ước tính airdrop" }, calculator: { badge: "Điểm sang USD", title: "Ước tính upside airdrop.", body: "Mô phỏng FDV, allocation, tổng điểm và toàn bộ danh mục điểm.", primary: "Mở máy tính", secondary: "Quét funding" }, funding: { badge: "Quét thị trường live", title: "Quét funding spreads nhanh hơn.", body: "Dữ liệu Loris, sắp xếp theo Max Arb, OI Rank hoặc Symbol và mở route nhanh.", primary: "Quét funding", secondary: "Đặt lại lọc" } }, portfolioTitle: "Ước tính danh mục điểm", pointBalance: "Số điểm", estimatedTotal: "Tổng ước tính" },
+  id: { tabs: ["Daftar Perp", "Kalkulator Airdrop", "Penyaring Funding"], contact: "Kontak", language: "Bahasa", hero: { list: { badge: "Papan referral boost", title: "Temukan syarat perp farming terbaik.", body: "Bandingkan diskon fee, boost poin, dan rute refback tanpa mengubah nama protokol.", primary: "Lihat perps", secondary: "Estimasi airdrop" }, calculator: { badge: "Poin ke dolar", title: "Estimasi potensi airdrop kamu.", body: "Modelkan FDV, alokasi, total poin, dan portofolio poin penuh.", primary: "Buka kalkulator", secondary: "Pindai funding" }, funding: { badge: "Pemindai pasar live", title: "Pindai funding spreads lebih cepat.", body: "Data Loris dengan sort Max Arb, OI Rank, atau Symbol dan rute cepat.", primary: "Pindai funding", secondary: "Reset filter" } }, portfolioTitle: "Estimator portofolio poin", pointBalance: "Saldo poin", estimatedTotal: "Total estimasi" },
+  hi: { tabs: ["Perp सूची", "Airdrop कैलकुलेटर", "Funding स्क्रीनर"], contact: "संपर्क", language: "भाषा", hero: { list: { badge: "Referral boost बोर्ड", title: "बेहतर perp farming terms खोजें।", body: "Fee discount, point boost और refback routes की तुलना करें; protocol names जैसे हैं वैसे रहें।", primary: "Perps देखें", secondary: "Airdrop अनुमान" }, calculator: { badge: "Points to dollars", title: "अपने airdrop upside का अनुमान लगाएँ।", body: "FDV, allocation, total points और पूरे point portfolio को साथ में मॉडल करें।", primary: "Calculator खोलें", secondary: "Funding scan" }, funding: { badge: "Live market scanner", title: "Funding spreads तेज़ी से scan करें।", body: "Loris data को Max Arb, OI Rank या Symbol से sort करें और route खोलें।", primary: "Funding scan", secondary: "Filters reset" } }, portfolioTitle: "पॉइंट पोर्टफोलियो अनुमान", pointBalance: "पॉइंट बैलेंस", estimatedTotal: "अनुमानित कुल" },
+  th: { tabs: ["รายการ Perp", "เครื่องคำนวณ Airdrop", "Funding Screener"], contact: "ติดต่อ", language: "ภาษา", hero: { list: { badge: "บอร์ด referral boost", title: "หาเงื่อนไข perp farming ที่ดีที่สุด", body: "เทียบส่วนลดค่าธรรมเนียม point boost และ refback route โดยคงชื่อ protocol เดิมไว้", primary: "ดู perps", secondary: "ประเมิน airdrop" }, calculator: { badge: "แต้มเป็นดอลลาร์", title: "ประเมิน upside ของ airdrop", body: "จำลอง FDV, allocation, total points และ point portfolio ทั้งหมด", primary: "เปิดเครื่องคำนวณ", secondary: "สแกน funding" }, funding: { badge: "ตัวสแกนตลาดสด", title: "สแกน funding spreads ได้เร็วขึ้น", body: "ข้อมูล Loris พร้อมเรียงตาม Max Arb, OI Rank หรือ Symbol", primary: "สแกน funding", secondary: "รีเซ็ตฟิลเตอร์" } }, portfolioTitle: "ตัวประเมินพอร์ตคะแนน", pointBalance: "ยอดคะแนน", estimatedTotal: "ยอดประเมินรวม" },
+  fr: { tabs: ["Liste Perp", "Calculateur Airdrop", "Screener Funding"], contact: "Contact", language: "Langue", hero: { list: { badge: "Tableau des boosts", title: "Trouvez les meilleures conditions de perp farming.", body: "Comparez réductions, boosts de points et routes refback sans traduire les noms de protocoles.", primary: "Voir les perps", secondary: "Estimer l'airdrop" }, calculator: { badge: "Points en dollars", title: "Estimez le potentiel de votre airdrop.", body: "Modélisez FDV, allocation, supply de points et portefeuille complet.", primary: "Ouvrir le calculateur", secondary: "Scanner funding" }, funding: { badge: "Scanner de marché live", title: "Scannez les funding spreads plus vite.", body: "Données Loris, tri Max Arb, OI Rank ou Symbol, avec routes directes.", primary: "Scanner funding", secondary: "Réinitialiser" } }, portfolioTitle: "Estimateur de portefeuille de points", pointBalance: "Solde de points", estimatedTotal: "Total estimé" },
+  de: { tabs: ["Perp-Liste", "Airdrop-Rechner", "Funding-Screener"], contact: "Kontakt", language: "Sprache", hero: { list: { badge: "Referral-Boost-Board", title: "Finde bessere perp farming Konditionen.", body: "Vergleiche Fee-Rabatte, Point-Boosts und Refback-Routen, ohne Protokollnamen zu übersetzen.", primary: "Perps ansehen", secondary: "Airdrop schätzen" }, calculator: { badge: "Punkte in Dollar", title: "Schätze dein Airdrop-Potenzial.", body: "Modelliere FDV, Allocation, Gesamtpunkte und dein komplettes Punkteportfolio.", primary: "Rechner öffnen", secondary: "Funding scannen" }, funding: { badge: "Live-Market-Scanner", title: "Scanne funding spreads schneller.", body: "Loris-Daten nach Max Arb, OI Rank oder Symbol sortieren und Route öffnen.", primary: "Funding scannen", secondary: "Filter zurücksetzen" } }, portfolioTitle: "Point-Portfolio-Schätzer", pointBalance: "Punktestand", estimatedTotal: "Geschätzter Gesamtwert" },
+  pl: { tabs: ["Lista Perp", "Kalkulator Airdrop", "Screener Funding"], contact: "Kontakt", language: "Język", hero: { list: { badge: "Tablica referral boostów", title: "Znajdź lepsze warunki perp farming.", body: "Porównuj zniżki fee, boosty punktów i trasy refback bez tłumaczenia nazw protokołów.", primary: "Zobacz perps", secondary: "Oszacuj airdrop" }, calculator: { badge: "Punkty na dolary", title: "Oszacuj potencjał swojego airdropu.", body: "Modeluj FDV, alokację, podaż punktów i cały portfel punktów.", primary: "Otwórz kalkulator", secondary: "Skanuj funding" }, funding: { badge: "Live market scanner", title: "Skanuj funding spreads szybciej.", body: "Dane Loris z sortowaniem po Max Arb, OI Rank lub Symbol i szybkimi trasami.", primary: "Skanuj funding", secondary: "Reset filtrów" } }, portfolioTitle: "Estymator portfela punktów", pointBalance: "Saldo punktów", estimatedTotal: "Szacowana suma" },
+  it: { tabs: ["Lista Perp", "Calcolatore Airdrop", "Screener Funding"], contact: "Contatto", language: "Lingua", hero: { list: { badge: "Board referral boost", title: "Trova le migliori condizioni di perp farming.", body: "Confronta sconti fee, boost punti e rotte refback mantenendo invariati i nomi dei protocolli.", primary: "Vedi perps", secondary: "Stima airdrop" }, calculator: { badge: "Punti in dollari", title: "Stima il potenziale del tuo airdrop.", body: "Modella FDV, allocation, supply punti e tutto il point portfolio.", primary: "Apri calcolatore", secondary: "Scansiona funding" }, funding: { badge: "Scanner mercato live", title: "Scansiona funding spreads più velocemente.", body: "Dati Loris ordinabili per Max Arb, OI Rank o Symbol con rotte dirette.", primary: "Scansiona funding", secondary: "Reset filtri" } }, portfolioTitle: "Stima portafoglio punti", pointBalance: "Saldo punti", estimatedTotal: "Totale stimato" },
+  cs: { tabs: ["Seznam Perp", "Airdrop kalkulačka", "Funding screener"], contact: "Kontakt", language: "Jazyk", hero: { list: { badge: "Referral boost panel", title: "Najdi lepší podmínky pro perp farming.", body: "Porovnej fee slevy, point boosty a refback trasy bez překladu názvů protokolů.", primary: "Zobrazit perps", secondary: "Odhadnout airdrop" }, calculator: { badge: "Body na dolary", title: "Odhadni potenciál svého airdropu.", body: "Modeluj FDV, alokaci, celkový počet bodů a celé point portfolio.", primary: "Otevřít kalkulačku", secondary: "Skenovat funding" }, funding: { badge: "Live market scanner", title: "Skenuj funding spreads rychleji.", body: "Data Loris se sortováním podle Max Arb, OI Rank nebo Symbol a rychlými trasami.", primary: "Skenovat funding", secondary: "Reset filtrů" } }, portfolioTitle: "Odhad portfolia bodů", pointBalance: "Zůstatek bodů", estimatedTotal: "Odhad celkem" },
+  bn: { tabs: ["Perp তালিকা", "Airdrop ক্যালকুলেটর", "Funding স্ক্রিনার"], contact: "যোগাযোগ", language: "ভাষা", hero: { list: { badge: "Referral boost বোর্ড", title: "ভালো perp farming terms খুঁজুন।", body: "Fee discount, point boost এবং refback route তুলনা করুন; protocol names অপরিবর্তিত থাকে।", primary: "Perps দেখুন", secondary: "Airdrop estimate" }, calculator: { badge: "Points to dollars", title: "আপনার airdrop upside অনুমান করুন।", body: "FDV, allocation, total points এবং পুরো point portfolio একসাথে model করুন।", primary: "Calculator খুলুন", secondary: "Funding scan" }, funding: { badge: "Live market scanner", title: "Funding spreads দ্রুত scan করুন।", body: "Loris data Max Arb, OI Rank বা Symbol দিয়ে sort করে route খুলুন।", primary: "Funding scan", secondary: "Filters reset" } }, portfolioTitle: "পয়েন্ট পোর্টফোলিও অনুমান", pointBalance: "পয়েন্ট ব্যালেন্স", estimatedTotal: "আনুমানিক মোট" },
+}
+
+function getCopy(language: LanguageCode) {
+  const override = LANGUAGE_OVERRIDES[language] ?? {}
+  const heroOverride =
+    override.hero && typeof override.hero === "object" && !Array.isArray(override.hero)
+      ? (override.hero as Partial<HeroText>)
+      : {}
+
+  return {
+    ...COPY.en,
+    ...override,
+    hero: {
+      ...COPY.en.hero,
+      ...heroOverride,
+    },
+  } as typeof COPY.en
+}
+
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list")
+  const [language, setLanguage] = useState<LanguageCode>("en")
+  const [languageOpen, setLanguageOpen] = useState(false)
   const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
   const [myPoints, setMyPoints] = useState(0)
+  const [portfolioPoints, setPortfolioPoints] = useState<
+    Record<CalcPerpKey, number>
+  >(() =>
+    Object.fromEntries(CALC_KEYS.map((key) => [key, 0])) as Record<
+      CalcPerpKey,
+      number
+    >
+  )
   const [templatePicker, setTemplatePicker] = useState(false)
   const [selectedTemplate, setSelectedTemplate] =
     useState<(typeof TEMPLATES)[number]>("cinema")
@@ -226,6 +531,9 @@ export default function Home() {
 
   const current = PERPS_CALC[calcPerp]
   const cardTemplateSrc = customTemplate ?? `/templates/${selectedTemplate}.png`
+  const t = getCopy(language)
+  const activeLanguage = LANGUAGES.find((item) => item.code === language)!
+  const hero = t.hero[tab]
 
   const selectTab = (nextTab: Tab) => {
     setTab(nextTab)
@@ -247,7 +555,16 @@ export default function Home() {
     if (hash === "calculator" || hash === "funding" || hash === "list") {
       setTab(hash)
     }
+
+    const savedLanguage = window.localStorage.getItem("capys-language")
+    if (LANGUAGES.some((item) => item.code === savedLanguage)) {
+      setLanguage(savedLanguage as LanguageCode)
+    }
   }, [])
+
+  useEffect(() => {
+    window.localStorage.setItem("capys-language", language)
+  }, [language])
 
   useEffect(() => {
     return () => {
@@ -364,6 +681,39 @@ export default function Home() {
       myValue: value,
     }
   }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
+
+  const portfolioRows = useMemo(
+    () =>
+      CALC_KEYS.map((key) => {
+        const preset = PERPS_CALC[key]
+        const points = Math.max(portfolioPoints[key] ?? 0, 0)
+        const presetPool = preset.fdv * 1_000_000_000 * (preset.airdrop / 100)
+        const presetPrice = presetPool / Math.max(preset.totalPoints, 1)
+
+        return {
+          key,
+          name: preset.name,
+          points,
+          price: presetPrice,
+          value: points * presetPrice,
+        }
+      }),
+    [portfolioPoints]
+  )
+
+  const portfolioTotalValue = useMemo(
+    () => portfolioRows.reduce((total, row) => total + row.value, 0),
+    [portfolioRows]
+  )
+
+  const resetPortfolio = () => {
+    setPortfolioPoints(
+      Object.fromEntries(CALC_KEYS.map((key) => [key, 0])) as Record<
+        CalcPerpKey,
+        number
+      >
+    )
+  }
 
   
 
@@ -744,12 +1094,12 @@ Calculate yours on ${SITE_URL}`
               <span className="block text-sm font-semibold tracking-[0.24em] text-white">
                 CAPYS
               </span>
-              <span className="block text-xs text-white/45">Perp farming console</span>
+              <span className="block text-xs text-white/45">{t.console}</span>
             </span>
           </button>
 
           <div className="hidden items-center gap-2 text-sm md:flex">
-            {TABS.map((item) => (
+            {TABS.map((item, index) => (
               <button
                 key={`nav-${item.id}`}
                 onClick={() => selectTab(item.id as Tab)}
@@ -759,12 +1109,49 @@ Calculate yours on ${SITE_URL}`
                     : "text-white/55 hover:bg-white/10 hover:text-white"
                 }`}
               >
-                {item.label}
+                {t.tabs[index]}
               </button>
             ))}
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setLanguageOpen((prev) => !prev)}
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-white/75 transition hover:border-cyan-300/35 hover:text-white"
+                aria-expanded={languageOpen}
+                aria-label={t.language}
+              >
+                <span>{activeLanguage.flag}</span>
+                <span className="hidden sm:inline">{activeLanguage.label}</span>
+                <span className="text-white/35">⌄</span>
+              </button>
+
+              {languageOpen && (
+                <div className="absolute right-0 top-12 z-50 max-h-[440px] w-52 overflow-y-auto rounded-2xl border border-white/10 bg-[#08111f]/98 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                  {LANGUAGES.map((item) => (
+                    <button
+                      key={item.code}
+                      type="button"
+                      onClick={() => {
+                        setLanguage(item.code)
+                        setLanguageOpen(false)
+                      }}
+                      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition ${
+                        language === item.code
+                          ? "bg-cyan-300 text-slate-950"
+                          : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+                      }`}
+                    >
+                      <span>{item.flag}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             <a
               href="https://x.com/capy_onchain"
               target="_blank"
@@ -783,7 +1170,7 @@ Calculate yours on ${SITE_URL}`
               rel="noopener noreferrer"
               className="hidden rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15 sm:inline-flex"
             >
-              Contact
+              {t.contact}
             </a>
           </div>
         </header>
@@ -791,41 +1178,45 @@ Calculate yours on ${SITE_URL}`
         <section className="grid min-h-[680px] items-center gap-10 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-20">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-emerald-200">
-              Live perp farming dashboard
+              {hero.badge}
             </div>
 
             <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
-              Farm perps with a cleaner edge.
+              {hero.title}
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 sm:text-lg">
-              Compare referral boosts, estimate point upside, and scan live funding
-              spreads across the perp DEXs that matter. Built for fast decisions,
-              not spreadsheet archaeology.
+              {hero.body}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
-                onClick={() => selectTab("funding")}
+                onClick={() => {
+                  if (tab === "funding") void loadFunding(false)
+                  else selectTab(tab === "list" ? "list" : tab)
+                }}
                 className="rounded-2xl bg-cyan-300 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_0_34px_rgba(34,211,238,0.28)] transition hover:-translate-y-0.5 hover:bg-cyan-200"
               >
-                Scan funding
+                {hero.primary}
               </button>
 
               <button
-                onClick={() => selectTab("calculator")}
+                onClick={() => {
+                  if (tab === "funding") resetFundingFilters()
+                  else selectTab(tab === "calculator" ? "funding" : "calculator")
+                }}
                 className="rounded-2xl border border-white/12 bg-white/[0.04] px-6 py-4 text-sm font-semibold text-white/80 transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08]"
               >
-                Estimate airdrop
+                {hero.secondary}
               </button>
             </div>
 
             <div className="mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                ["40+", "tracked venues"],
-                ["17", "calc presets"],
-                ["90s", "safe refresh"],
-                ["100%", "ref links kept"],
+                ["40+", t.stats[0]],
+                ["17", t.stats[1]],
+                ["90s", t.stats[2]],
+                ["100%", t.stats[3]],
               ].map(([value, label]) => (
                 <div
                   key={label}
@@ -846,12 +1237,14 @@ Calculate yours on ${SITE_URL}`
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <div className="text-xs uppercase tracking-[0.28em] text-white/35">
-                    Opportunity snapshot
+                    {t.commandEyebrow}
                   </div>
-                  <div className="mt-2 text-2xl font-bold text-white">Perp command center</div>
+                  <div className="mt-2 text-2xl font-bold text-white">
+                    {t.commandTitle}
+                  </div>
                 </div>
                 <div className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-200">
-                  Online
+                  {t.online}
                 </div>
               </div>
 
@@ -891,10 +1284,10 @@ Calculate yours on ${SITE_URL}`
                 <div>
                   <div>
                     <div className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
-                      Best next action
+                      {t.nextAction}
                     </div>
                     <div className="mt-1 text-sm text-white/75">
-                      Click any perp above to open it with the best available terms through Capy links.
+                      {t.nextActionText}
                     </div>
                   </div>
                 </div>
@@ -905,7 +1298,7 @@ Calculate yours on ${SITE_URL}`
 
         <div className="sticky top-3 z-30 mx-auto flex max-w-3xl justify-center">
           <div className="flex w-full flex-wrap justify-center gap-1 rounded-2xl border border-white/10 bg-[#07101d]/88 p-1 shadow-2xl shadow-black/25 backdrop-blur-xl sm:w-auto">
-            {TABS.map((item) => {
+            {TABS.map((item, index) => {
               const isActive = tab === item.id
 
               return (
@@ -924,7 +1317,7 @@ Calculate yours on ${SITE_URL}`
                     />
                   )}
 
-                  <span className="relative z-10">{item.label}</span>
+                  <span className="relative z-10">{t.tabs[index]}</span>
                 </button>
               )
             })}
@@ -937,26 +1330,25 @@ Calculate yours on ${SITE_URL}`
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
-                Referral boost board
+                {t.listEyebrow}
               </div>
               <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
-                Perp DEX tier list
+                {t.listTitle}
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50">
-                Ranked by practical farming value: points boosts, fee discounts,
-                refback, and the kind of activity each venue rewards.
+                {t.listBody}
               </p>
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white/55">
-              Click a boost pill to copy the referral code.
+              {t.copyHint}
             </div>
           </div>
 
           <div className="hidden grid-cols-[88px_1fr_260px_auto] border-b border-white/10 px-2 pb-4 text-xs uppercase tracking-[0.22em] text-white/35 md:grid">
-            <div>Tier</div>
-            <div>Protocol</div>
-            <div className="pr-6 text-right">Boost</div>
+            <div>{t.tier}</div>
+            <div>{t.protocol}</div>
+            <div className="pr-6 text-right">{t.boost}</div>
             <div />
           </div>
 
@@ -989,7 +1381,7 @@ Calculate yours on ${SITE_URL}`
                 <div>
                   <div className="text-lg font-bold text-white">{perp.name}</div>
                   <div className="mt-1 text-xs leading-5 text-white/45">
-                    Farm tip: {perp.farm}
+                    {t.farmTip} {perp.farm}
                   </div>
                 </div>
               </div>
@@ -1000,10 +1392,10 @@ Calculate yours on ${SITE_URL}`
                   onClick={() => copyRefCode(perp.name, perp.refCode)}
                   className="group/boost relative rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-center text-xs font-semibold text-emerald-200 transition hover:bg-emerald-300/15 sm:text-sm"
                 >
-                  {copiedRefName === perp.name ? "Copied code" : perp.boost}
+                  {copiedRefName === perp.name ? t.copiedCode : perp.boost}
 
                   <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max -translate-x-1/2 rounded-xl border border-white/10 bg-[#07101d] px-3 py-2 text-[11px] text-white opacity-0 shadow-lg transition group-hover/boost:opacity-100">
-                    Code: <span className="text-cyan-300">{perp.refCode}</span> • click to copy
+                    {t.code}: <span className="text-cyan-300">{perp.refCode}</span> • {t.clickToCopy}
                   </span>
                 </button>
               </div>
@@ -1014,7 +1406,7 @@ Calculate yours on ${SITE_URL}`
                 rel="noopener noreferrer"
                 className="mt-2 w-full rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-3 text-center text-sm font-black uppercase tracking-[0.16em] text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950 md:ml-4 md:mt-0 md:w-auto"
               >
-                TRADE →
+                {t.trade} →
               </a>
             </div>
           ))}
@@ -1024,26 +1416,24 @@ Calculate yours on ${SITE_URL}`
       {tab === "calculator" && (
         <section className="mx-auto mt-14 max-w-6xl space-y-8 px-4 sm:px-6">
           <div className="text-center">
-            <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
-              Points to dollars
+              <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
+              {t.calcEyebrow}
             </div>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
-              Airdrop value calculator
+              {t.calcTitle}
             </h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/50">
-              Stress-test FDV, supply allocation, and your points balance before
-              you decide where the next trading cycle goes.
+              {t.calcBody}
             </p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-2 rounded-3xl border border-white/10 bg-white/[0.03] p-3 backdrop-blur-xl">
-            {Object.keys(PERPS_CALC).map((key) => {
-              const perpKey = key as CalcPerpKey
+            {CALC_KEYS.map((perpKey) => {
               const isActive = calcPerp === perpKey
 
               return (
                 <button
-                  key={key}
+                  key={perpKey}
                   onClick={() => setCalcPerp(perpKey)}
                   className={`rounded-full border px-4 py-2 text-sm transition ${
                     isActive
@@ -1061,20 +1451,20 @@ Calculate yours on ${SITE_URL}`
             <div className="md:col-span-2">
               <div className="rounded-3xl border border-cyan-300/15 bg-cyan-300/8 p-5">
                 <div className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">
-                  Current estimate
+                  {t.currentEstimate}
                 </div>
                 <div className="mt-3 text-4xl font-black text-white sm:text-5xl">
                   {formatMoney(myValue, 0)}
                 </div>
                 <div className="mt-2 text-sm text-white/55">
-                  {formatMoney(pricePerPoint, 4)} per point at {formatCompactMoney(safeFdv * 1_000_000_000)} FDV
+                  {formatMoney(pricePerPoint, 4)} {t.perPoint} {formatCompactMoney(safeFdv * 1_000_000_000)} FDV
                 </div>
               </div>
             </div>
 
             <div>
               <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                My points
+                {t.myPoints}
               </label>
               <input
                 type="number"
@@ -1087,7 +1477,7 @@ Calculate yours on ${SITE_URL}`
 
             <div>
               <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                FDV (billions $)
+                {t.fdv}
               </label>
               <input
                 type="number"
@@ -1101,7 +1491,7 @@ Calculate yours on ${SITE_URL}`
 
             <div>
               <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                Total points
+                {t.totalPoints}
               </label>
               <input
                 type="number"
@@ -1114,7 +1504,7 @@ Calculate yours on ${SITE_URL}`
 
             <div>
               <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                Airdrop % supply
+                {t.airdropSupply}
               </label>
               <input
                 type="number"
@@ -1124,6 +1514,81 @@ Calculate yours on ${SITE_URL}`
                 onChange={(e) => setAirdrop(sanitizeNumber(e.target.value))}
                 className="w-full rounded-2xl border border-white/10 bg-[#07101d] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
               />
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.055] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <div className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">
+                  {t.portfolioEyebrow}
+                </div>
+                <h3 className="mt-2 text-2xl font-black text-white">
+                  {t.portfolioTitle}
+                </h3>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/55">
+                  {t.portfolioBody}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/25 px-5 py-4">
+                <div className="text-xs uppercase tracking-[0.22em] text-white/40">
+                  {t.estimatedTotal}
+                </div>
+                <div className="mt-1 text-3xl font-black text-white">
+                  {formatMoney(portfolioTotalValue, 0)}
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {portfolioRows.map((row) => (
+                <div
+                  key={`portfolio-${row.key}`}
+                  className="rounded-2xl border border-white/10 bg-[#07101d]/80 p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-semibold text-white">{row.name}</div>
+                      <div className="mt-1 text-xs text-white/40">
+                        {formatMoney(row.price, 4)} / point
+                      </div>
+                    </div>
+                    <div className="text-right text-sm font-semibold text-cyan-200">
+                      {formatMoney(row.value, 0)}
+                    </div>
+                  </div>
+
+                  <label className="mt-3 block text-xs uppercase tracking-[0.2em] text-white/35">
+                    {t.pointBalance}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={portfolioPoints[row.key]}
+                    onChange={(event) =>
+                      setPortfolioPoints((prev) => ({
+                        ...prev,
+                        [row.key]: sanitizeNumber(event.target.value),
+                      }))
+                    }
+                    className="mt-2 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+              <div className="text-xs text-white/40">
+                {portfolioTotalValue > 0 ? t.estValue : t.noPortfolio}
+              </div>
+              <button
+                type="button"
+                onClick={resetPortfolio}
+                className="rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs font-semibold text-white/60 transition hover:border-white/20 hover:text-white"
+              >
+                {t.clearPortfolio}
+              </button>
             </div>
           </div>
 
@@ -1155,7 +1620,7 @@ Calculate yours on ${SITE_URL}`
                   </div>
 
                   <div className="text-[10px] uppercase tracking-[0.35em] text-white/45 sm:text-xs">
-                    Potential Airdrop Value
+                    {t.potentialValue}
                   </div>
 
                   <div className="mt-3 text-3xl font-bold leading-none text-white sm:text-4xl md:text-6xl">
@@ -1163,19 +1628,19 @@ Calculate yours on ${SITE_URL}`
                   </div>
 
                   <div className="mt-3 text-sm text-white/65 sm:text-base">
-                    {formatNumber(safeMyPoints)} points • {formatMoney(pricePerPoint, 2)} per point
+                    {formatNumber(safeMyPoints)} points • {formatMoney(pricePerPoint, 2)} / point
                   </div>
                 </div>
 
                 <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[10px] uppercase tracking-[0.22em] text-white/45 sm:px-4 sm:text-xs">
-                  estimate only
+                  {t.estimateOnly}
                 </div>
               </div>
 
               <div className="mt-auto grid grid-cols-2 gap-3 md:grid-cols-4">
                 <div className="rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur-md sm:p-4">
                   <div className="text-[10px] uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
-                    My Points
+                    {t.myPoints}
                   </div>
                   <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
                     {formatNumber(safeMyPoints)}
@@ -1184,7 +1649,7 @@ Calculate yours on ${SITE_URL}`
 
                 <div className="rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur-md sm:p-4">
                   <div className="text-[10px] uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
-                    Total Supply
+                    {t.totalSupply}
                   </div>
                   <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
                     {formatNumber(safeTotalPoints)}
@@ -1193,7 +1658,7 @@ Calculate yours on ${SITE_URL}`
 
                 <div className="rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur-md sm:p-4">
                   <div className="text-[10px] uppercase tracking-[0.22em] text-white/40 sm:text-[11px]">
-                    Est. FDV
+                    {t.estFdv}
                   </div>
                   <div className="mt-2 text-lg font-semibold text-white sm:text-xl">
                     {formatCompactMoney(safeFdv * 1_000_000_000)}
@@ -1221,7 +1686,7 @@ Calculate yours on ${SITE_URL}`
               onClick={() => setTemplatePicker(true)}
               className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white/75 transition hover:border-cyan-300/35 hover:text-white"
             >
-              Pick a Template
+              {t.pickTemplate}
             </button>
 
             <button
@@ -1229,14 +1694,14 @@ Calculate yours on ${SITE_URL}`
               disabled={isDownloading}
               className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white/75 transition hover:border-indigo-300/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isDownloading ? "Downloading..." : "Download Card"}
+              {isDownloading ? t.downloading : t.downloadCard}
             </button>
 
             <button
               onClick={shareOnX}
               className="rounded-2xl bg-white px-6 py-3 text-sm font-black text-black transition hover:-translate-y-0.5"
             >
-              {isDownloading ? "Preparing..." : "Share on X + Card"}
+              {isDownloading ? t.preparing : t.shareX}
             </button>
           </div>
         </section>
@@ -1250,16 +1715,15 @@ Calculate yours on ${SITE_URL}`
             <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
               <div>
                 <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
-                  Live market scanner
+                  {t.fundingEyebrow}
                 </div>
 
                 <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
-                  Funding rate screener
+                  {t.fundingTitle}
                 </h2>
 
                 <p className="mt-2 text-sm text-white/50">
-                  Compare interval-normalized funding across every exchange returned
-                  by Loris Tools, with Capy referral routes applied where available.
+                  {t.fundingBody}
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -1269,18 +1733,18 @@ Calculate yours on ${SITE_URL}`
 
                   {fundingUpdatedAt && (
                     <div className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-cyan-300/80">
-                      Updated: {fundingUpdatedAt}
+                      {t.updated}: {fundingUpdatedAt}
                     </div>
                   )}
 
                   {fundingStale && (
                     <div className="inline-flex rounded-full border border-yellow-400/20 bg-yellow-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-yellow-200/80">
-                      Showing cached Loris data
+                      {t.cached}
                     </div>
                   )}
 
                   <div className="inline-flex rounded-full border border-neutral-700 bg-white/5 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-white/60">
-                    View: {fundingMetricMode === "interval" ? "Per interval" : "Annualized"}
+                    {t.view}: {fundingMetricMode === "interval" ? t.perInterval : t.annualized}
                   </div>
                 </div>
               </div>
@@ -1290,14 +1754,14 @@ Calculate yours on ${SITE_URL}`
                   onClick={() => void loadFunding(false)}
                   className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
                 >
-                  Refresh now
+                  {t.refreshNow}
                 </button>
 
                 <button
                   onClick={resetFundingFilters}
                   className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white/70 transition hover:border-white/20 hover:text-white"
                 >
-                  Reset filters
+                  {t.resetFilters}
                 </button>
               </div>
             </div>
@@ -1306,7 +1770,7 @@ Calculate yours on ${SITE_URL}`
           <div className="grid gap-4 xl:grid-cols-[1.2fr_1.2fr_1fr]">
             <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
-                Most Positive Funding
+                {t.mostPositive}
               </div>
 
               <div className="mt-3 text-2xl font-semibold text-white">
@@ -1326,7 +1790,7 @@ Calculate yours on ${SITE_URL}`
 
             <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
-                Most Negative Funding
+                {t.mostNegative}
               </div>
 
               <div className="mt-3 text-2xl font-semibold text-white">
@@ -1346,7 +1810,7 @@ Calculate yours on ${SITE_URL}`
 
             <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
-                Highest Spread
+                {t.highestSpread}
               </div>
 
               <div className="mt-3 text-2xl font-semibold text-white">
@@ -1368,7 +1832,7 @@ Calculate yours on ${SITE_URL}`
               <div className="grid gap-4 xl:grid-cols-[1.25fr_1fr_1fr_auto]">
                 <div>
                   <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                    Search by ticker
+                    {t.searchTicker}
                   </label>
                   <input
                     value={searchTicker}
@@ -1380,7 +1844,7 @@ Calculate yours on ${SITE_URL}`
 
                 <div>
                   <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                    Funding view
+                    {t.fundingView}
                   </label>
                   <div className="flex rounded-2xl border border-white/10 bg-[#07101d] p-1">
                     <button
@@ -1391,7 +1855,7 @@ Calculate yours on ${SITE_URL}`
                           : "text-white/60"
                       }`}
                     >
-                      Per interval
+                      {t.perInterval}
                     </button>
 
                     <button
@@ -1402,19 +1866,19 @@ Calculate yours on ${SITE_URL}`
                           : "text-white/60"
                       }`}
                     >
-                      Annualized
+                      {t.annualized}
                     </button>
                   </div>
                 </div>
                 <div>
                   <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
-                    Sort
+                    {t.sort}
                   </label>
                   <div className="grid grid-cols-3 rounded-2xl border border-white/10 bg-[#07101d] p-1">
                     {[
-                      ["maxArb", "Max Arb"],
-                      ["oiRank", "OI Rank"],
-                      ["symbol", "Symbol"],
+                      ["maxArb", t.maxArb],
+                      ["oiRank", t.oiRank],
+                      ["symbol", t.symbol],
                     ].map(([key, label]) => (
                       <button
                         key={key}
@@ -1440,14 +1904,14 @@ Calculate yours on ${SITE_URL}`
                         : "border-white/10 bg-white/[0.03] text-white/60"
                     }`}
                   >
-                    {onlyActionable ? "Only opportunities" : "Show all symbols"}
+                    {onlyActionable ? t.onlyOpps : t.showAllSymbols}
                   </button>
                 </div>
               </div>
 
               <div>
                 <div className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">
-                  Exchanges
+                  {t.exchanges}
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -1459,7 +1923,7 @@ Calculate yours on ${SITE_URL}`
                     }
                     className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-medium text-cyan-200 transition hover:bg-cyan-300/15"
                   >
-                    Select all
+                    {t.selectAll}
                   </button>
 
                   <button
@@ -1472,14 +1936,14 @@ Calculate yours on ${SITE_URL}`
                     }
                     className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-xs font-medium text-emerald-200 transition hover:bg-emerald-300/15"
                   >
-                    Capy refs only
+                    {t.capyRefsOnly}
                   </button>
 
                   <button
                     onClick={() => setEnabledFundingExchanges([])}
                     className="rounded-full border border-red-300/25 bg-red-300/10 px-3 py-2 text-xs font-medium text-red-200 transition hover:bg-red-300/15"
                   >
-                    Clear all
+                    {t.clearAll}
                   </button>
 
                   {fundingExchanges.map((exchange) => {
@@ -1504,7 +1968,7 @@ Calculate yours on ${SITE_URL}`
 
               <div>
                 <div className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">
-                  Render rows
+                  {t.renderRows}
                 </div>
 
                 <div className="flex flex-wrap gap-2">
@@ -1518,15 +1982,14 @@ Calculate yours on ${SITE_URL}`
                           : "border-white/10 text-white/50 hover:text-white"
                       }`}
                     >
-                      {limit === "all" ? "All rows" : `Top ${limit}`}
+                      {limit === "all" ? t.allRows : `Top ${limit}`}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="text-xs leading-5 text-white/30">
-                Default view renders only the strongest rows so the table stays
-                smooth. Search still scans the full Loris dataset.
+                {t.defaultRows}
               </div>
             </div>
           </div>
@@ -1534,7 +1997,7 @@ Calculate yours on ${SITE_URL}`
           <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
             {fundingLoading && (
               <div className="rounded-2xl border border-neutral-800 bg-black/20 p-6 text-white/60">
-                Loading funding data...
+                {t.loadingFunding}
               </div>
             )}
 
@@ -1554,7 +2017,7 @@ Calculate yours on ${SITE_URL}`
     onClick={() => setFundingSortKey("symbol")}
     className="text-left transition hover:text-cyan-200"
   >
-    Symbol {sortLabel("symbol")}
+    {t.symbol} {sortLabel("symbol")}
   </button>
 </th>
 
@@ -1563,7 +2026,7 @@ Calculate yours on ${SITE_URL}`
     onClick={() => setFundingSortKey("oiRank")}
     className="text-left transition hover:text-cyan-200"
   >
-    OI Rank {sortLabel("oiRank")}
+    {t.oiRank} {sortLabel("oiRank")}
   </button>
 </th>
 
@@ -1572,12 +2035,12 @@ Calculate yours on ${SITE_URL}`
     onClick={() => setFundingSortKey("maxArb")}
     className="text-left transition hover:text-cyan-200"
   >
-    Max Arb {sortLabel("maxArb")}
+    {t.maxArb} {sortLabel("maxArb")}
   </button>
 </th>
 
 <th className="sticky left-[268px] top-0 z-40 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
-  Action
+  {t.action}
 </th>
 
                       {activeFundingExchanges.map((exchange) => (
@@ -1649,7 +2112,7 @@ Calculate yours on ${SITE_URL}`
                               </a>
                             </div>
                           ) : (
-                            <span className="text-xs text-white/35">No trade route</span>
+                            <span className="text-xs text-white/35">{t.noTradeRoute}</span>
                           )}
                         </td>
 
@@ -1688,7 +2151,7 @@ Calculate yours on ${SITE_URL}`
                           colSpan={4 + activeFundingExchanges.length}
                           className="px-6 py-12 text-center text-white/45"
                         >
-                          No rows match your current filters.
+                          {t.noRows}
                         </td>
                       </tr>
                     )}
@@ -1713,26 +2176,26 @@ Calculate yours on ${SITE_URL}`
                   }
                   className="rounded-2xl border border-cyan-300/25 bg-cyan-300/10 px-5 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
                 >
-                  Show more rows ({hiddenFundingRows} hidden)
+                  {t.showMore} ({hiddenFundingRows} {t.hidden})
                 </button>
               </div>
             )}
 
             <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-white/35">
   <span>
-    Showing:{" "}
+    {t.showing}:{" "}
     <span className="text-white/60">
       {renderedFundingRows.length}/{fundingMatrixRows.length}
     </span>
   </span>
 
   <span>
-    Active exchanges:{" "}
+    {t.activeExchanges}:{" "}
     <span className="text-white/60">{activeFundingExchanges.length}</span>
   </span>
 
   <span>
-    Funding rate data provided by{" "}
+    {t.dataBy}{" "}
     <a
       href="https://loris.tools"
       target="_blank"
@@ -1751,22 +2214,22 @@ Calculate yours on ${SITE_URL}`
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur">
           <div className="max-h-[85vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-neutral-800 bg-[#0c1220] p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg">Choose Card Background</h3>
+              <h3 className="text-lg">{t.chooseBackground}</h3>
 
               <button
                 onClick={() => setTemplatePicker(false)}
                 className="opacity-60 transition hover:opacity-100"
               >
-                ✕
+                ×
               </button>
             </div>
 
             <label className="mb-5 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-cyan-300/30 bg-cyan-300/10 p-6 text-center transition hover:bg-cyan-300/15">
               <span className="text-sm font-semibold text-cyan-100">
-                Upload your own meme or screenshot
+                {t.uploadTemplate}
               </span>
               <span className="mt-1 text-xs text-white/45">
-                PNG, JPG, GIF or WebP. It stays local in your browser.
+                {t.uploadNote}
               </span>
               <input
                 type="file"

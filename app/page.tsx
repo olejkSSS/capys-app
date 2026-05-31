@@ -430,9 +430,9 @@ function toDisplayedFundingValue(
 }
 
 const TABS = [
-  { id: "list", label: "Perp DEX List" },
-  { id: "calculator", label: "Perp DEX Airdrop Calculator" },
-  { id: "funding", label: "Funding Rates" },
+  { id: "list", label: "Perp List" },
+  { id: "calculator", label: "Airdrop Calculator" },
+  { id: "funding", label: "Funding Screener" },
 ] as const
 
 export default function Home() {
@@ -815,81 +815,243 @@ Calculate yours on capys.app`
   return (
     <main className="relative z-10 min-h-screen overflow-x-hidden bg-[#050814] pb-20 text-white">
       <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#070b14] via-[#0f1630] to-[#050814]" />
-        <div className="absolute left-[-250px] top-[-250px] h-[700px] w-[700px] animate-blob rounded-full bg-purple-500/40 blur-[200px]" />
-        <div className="animation-delay-2000 absolute bottom-[-250px] right-[-250px] h-[700px] w-[700px] animate-blob rounded-full bg-cyan-500/30 blur-[200px]" />
-        <div className="animation-delay-4000 absolute left-[50%] top-[40%] h-[600px] w-[600px] animate-blob rounded-full bg-emerald-500/25 blur-[200px]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:60px_60px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_32%),linear-gradient(135deg,#030610_0%,#07111f_44%,#050814_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
+        <div className="absolute left-[-260px] top-[-260px] h-[680px] w-[680px] animate-blob rounded-full bg-cyan-500/20 blur-[170px]" />
+        <div className="animation-delay-2000 absolute right-[-260px] top-[18%] h-[620px] w-[620px] animate-blob rounded-full bg-indigo-500/20 blur-[180px]" />
+        <div className="animation-delay-4000 absolute bottom-[-280px] left-[35%] h-[640px] w-[640px] animate-blob rounded-full bg-emerald-500/15 blur-[190px]" />
       </div>
 
-      <div className="relative z-20 mx-auto max-w-6xl px-4 pt-16 text-center sm:px-6 sm:pt-24">
-        <div className="mb-6 flex items-center justify-center gap-4 text-sm">
-          <span className="opacity-40">Made by</span>
-
-          <a
-            href="https://x.com/capy_onchain"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40"
+      <div className="relative z-20 mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={() => setTab("list")}
+            className="flex items-center gap-3 text-left"
+            aria-label="Go to Capys app home"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z" />
-            </svg>
-            Capy
-          </a>
+            <span className="grid h-10 w-10 place-items-center rounded-xl border border-cyan-300/25 bg-cyan-300/10 text-sm font-black text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.18)]">
+              C
+            </span>
+            <span>
+              <span className="block text-sm font-semibold tracking-[0.24em] text-white">
+                CAPYS
+              </span>
+              <span className="block text-xs text-white/45">Perp farming console</span>
+            </span>
+          </button>
 
-          <a
-            href="https://t.me/olejk_2k"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg border border-neutral-700 bg-[#0c1220]/60 px-3 py-1 transition hover:border-cyan-400/40"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21.5 2.5L2.7 9.6c-1 .4-1 1.1-.2 1.3l4.8 1.5 1.8 5.7c.2.6.1.8.7.8.5 0 .7-.2 1-.5l2.4-2.3 5 3.7c.9.5 1.5.2 1.8-.8L23 3.7c.4-1.3-.5-1.9-1.5-1.2z" />
-            </svg>
-            Capy
-          </a>
+          <div className="hidden items-center gap-2 text-sm md:flex">
+            {TABS.map((item) => (
+              <button
+                key={`nav-${item.id}`}
+                onClick={() => setTab(item.id as Tab)}
+                className={`rounded-full px-4 py-2 transition ${
+                  tab === item.id
+                    ? "bg-white text-black"
+                    : "text-white/55 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="https://x.com/capy_onchain"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/70 transition hover:border-cyan-300/40 hover:text-cyan-200"
+              aria-label="Open Capy on X"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z" />
+              </svg>
+            </a>
+
+            <a
+              href="https://t.me/olejk_2k"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15 sm:inline-flex"
+            >
+              Contact
+            </a>
+          </div>
+        </header>
+
+        <section className="grid min-h-[680px] items-center gap-10 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-20">
+          <div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-emerald-200">
+              Live perp farming dashboard
+            </div>
+
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
+              Farm perps with a cleaner edge.
+            </h1>
+
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/62 sm:text-lg">
+              Compare referral boosts, estimate point upside, and scan live funding
+              spreads across the perp DEXs that matter. Built for fast decisions,
+              not spreadsheet archaeology.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={() => setTab("funding")}
+                className="rounded-2xl bg-cyan-300 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_0_34px_rgba(34,211,238,0.28)] transition hover:-translate-y-0.5 hover:bg-cyan-200"
+              >
+                Scan funding
+              </button>
+
+              <button
+                onClick={() => setTab("calculator")}
+                className="rounded-2xl border border-white/12 bg-white/[0.04] px-6 py-4 text-sm font-semibold text-white/80 transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08]"
+              >
+                Estimate airdrop
+              </button>
+            </div>
+
+            <div className="mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                ["8", "tracked DEXs"],
+                ["17", "calc presets"],
+                ["60s", "funding refresh"],
+                ["100%", "ref links kept"],
+              ].map(([value, label]) => (
+                <div
+                  key={label}
+                  className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 backdrop-blur"
+                >
+                  <div className="text-2xl font-black text-white">{value}</div>
+                  <div className="mt-1 text-xs uppercase tracking-[0.18em] text-white/38">
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-6 rounded-[2rem] bg-cyan-300/10 blur-3xl" />
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#08111f]/88 p-5 shadow-2xl shadow-black/40 backdrop-blur-xl">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.28em] text-white/35">
+                    Opportunity snapshot
+                  </div>
+                  <div className="mt-2 text-2xl font-bold text-white">Perp command center</div>
+                </div>
+                <div className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-semibold text-emerald-200">
+                  Online
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {PERPS.slice(0, 4).map((perp) => (
+                  <div
+                    key={`hero-${perp.name}`}
+                    className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/[0.035] p-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={perp.logo}
+                        alt={perp.name}
+                        width={40}
+                        height={40}
+                        className="rounded-xl"
+                      />
+                      <div>
+                        <div className="font-semibold text-white">{perp.name}</div>
+                        <div className="text-xs text-white/42">{perp.refCode}</div>
+                      </div>
+                    </div>
+                    <span
+                      className={`rounded-xl border px-3 py-1 text-xs font-black ${getTierStyle(
+                        perp.tier
+                      )}`}
+                    >
+                      {perp.tier}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 rounded-2xl border border-cyan-300/15 bg-cyan-300/8 p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
+                      Best next action
+                    </div>
+                    <div className="mt-1 text-sm text-white/75">
+                      Open funding screener, sort by spread, then route through ref links.
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setTab("funding")}
+                    className="shrink-0 rounded-xl bg-white px-4 py-2 text-sm font-bold text-black"
+                  >
+                    Open
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="sticky top-3 z-30 mx-auto flex max-w-3xl justify-center">
+          <div className="flex w-full flex-wrap justify-center gap-1 rounded-2xl border border-white/10 bg-[#07101d]/88 p-1 shadow-2xl shadow-black/25 backdrop-blur-xl sm:w-auto">
+            {TABS.map((item) => {
+              const isActive = tab === item.id
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setTab(item.id as Tab)}
+                  className={`relative flex-1 rounded-xl px-4 py-3 text-xs font-semibold transition-colors duration-300 sm:flex-none sm:px-5 sm:text-sm ${
+                    isActive ? "text-slate-950" : "text-white/52 hover:text-white"
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="active-tab"
+                      className="absolute inset-0 rounded-xl bg-cyan-300 shadow-[0_0_24px_rgba(34,211,238,0.22)]"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+
+                  <span className="relative z-10">{item.label}</span>
+                </button>
+              )
+            })}
+          </div>
         </div>
-
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-6xl">
-          CAPY <span className="text-red-500">PERP</span> HUB
-        </h1>
-
-        <p className="mt-4 opacity-60">Crypto-native Perp Tier List</p>
-
-        <div className="mt-8 flex justify-center">
-  <div className="flex flex-wrap justify-center rounded-full border border-neutral-800 bg-[#0c1220]/70 p-1 backdrop-blur">
-    {TABS.map((item) => {
-      const isActive = tab === item.id
-
-      return (
-        <button
-          key={item.id}
-          onClick={() => setTab(item.id as Tab)}
-          className={`relative rounded-full px-5 py-2 text-sm transition-colors duration-300 ${
-            isActive ? "text-cyan-200" : "text-neutral-400 hover:text-white"
-          }`}
-        >
-          {isActive && (
-            <motion.span
-              layoutId="active-tab"
-              className="absolute inset-0 rounded-full border border-cyan-400 bg-cyan-500/20"
-              transition={{ type: "spring", stiffness: 380, damping: 30 }}
-            />
-          )}
-
-          <span className="relative z-10">{item.label}</span>
-        </button>
-      )
-    })}
-  </div>
-</div>
       </div>
 
       {tab === "list" && (
-        <section className="mx-auto mt-16 max-w-5xl space-y-6 px-4 sm:mt-20 sm:px-6">
-          <div className="hidden grid-cols-[100px_1fr_220px_auto] border-b border-neutral-800 pb-4 text-xs uppercase tracking-widest opacity-50 md:grid">
-            <div className="pl-2">Tier</div>
+        <section className="mx-auto mt-14 max-w-6xl space-y-6 px-4 sm:px-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
+                Referral boost board
+              </div>
+              <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
+                Perp DEX tier list
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50">
+                Ranked by practical farming value: points boosts, fee discounts,
+                refback, and the kind of activity each venue rewards.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white/55">
+              Click a boost pill to copy the referral code.
+            </div>
+          </div>
+
+          <div className="hidden grid-cols-[88px_1fr_260px_auto] border-b border-white/10 px-2 pb-4 text-xs uppercase tracking-[0.22em] text-white/35 md:grid">
+            <div>Tier</div>
             <div>Protocol</div>
             <div className="pr-6 text-right">Boost</div>
             <div />
@@ -898,11 +1060,13 @@ Calculate yours on capys.app`
           {PERPS.map((perp) => (
             <div
               key={perp.name}
-              className="group flex flex-col items-start gap-4 rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-4 backdrop-blur-xl transition hover:scale-[1.01] hover:border-cyan-400/40 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] md:grid md:grid-cols-[100px_1fr_220px_auto] md:items-center md:p-5"
+              className="group relative flex flex-col items-start gap-4 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-xl shadow-black/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-white/[0.055] hover:shadow-[0_0_36px_rgba(34,211,238,0.12)] md:grid md:grid-cols-[88px_1fr_260px_auto] md:items-center md:p-5"
             >
-              <div className="flex md:justify-center">
+              <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-cyan-300/0 via-cyan-300/55 to-emerald-300/0 opacity-0 transition group-hover:opacity-100" />
+
+              <div className="flex md:justify-start">
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl border font-bold ${getTierStyle(
+                  className={`flex h-12 w-12 items-center justify-center rounded-2xl border text-sm font-black ${getTierStyle(
                     perp.tier
                   )}`}
                 >
@@ -920,8 +1084,8 @@ Calculate yours on capys.app`
                 />
 
                 <div>
-                  <div className="text-lg font-medium">{perp.name}</div>
-                  <div className="text-xs text-white/45">
+                  <div className="text-lg font-bold text-white">{perp.name}</div>
+                  <div className="mt-1 text-xs leading-5 text-white/45">
                     Farm tip: {perp.farm}
                   </div>
                 </div>
@@ -931,11 +1095,11 @@ Calculate yours on capys.app`
                 <button
                   type="button"
                   onClick={() => copyRefCode(perp.name, perp.refCode)}
-                  className="group/boost relative rounded-full border border-emerald-400 bg-emerald-400/5 px-3 py-1 text-center text-xs font-medium text-emerald-300 transition hover:bg-emerald-400/10 sm:text-sm"
+                  className="group/boost relative rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-center text-xs font-semibold text-emerald-200 transition hover:bg-emerald-300/15 sm:text-sm"
                 >
                   {copiedRefName === perp.name ? "Copied code" : perp.boost}
 
-                  <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max -translate-x-1/2 rounded-lg border border-neutral-700 bg-[#0b111d] px-3 py-2 text-[11px] text-white opacity-0 shadow-lg transition group-hover/boost:opacity-100">
+                  <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max -translate-x-1/2 rounded-xl border border-white/10 bg-[#07101d] px-3 py-2 text-[11px] text-white opacity-0 shadow-lg transition group-hover/boost:opacity-100">
                     Code: <span className="text-cyan-300">{perp.refCode}</span> • click to copy
                   </span>
                 </button>
@@ -945,7 +1109,7 @@ Calculate yours on capys.app`
                 href={perp.ref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 w-full rounded-xl border border-cyan-400 bg-cyan-400/5 px-6 py-2 text-center font-semibold text-cyan-300 transition hover:bg-cyan-400/10 md:ml-4 md:mt-0 md:w-auto"
+                className="mt-2 w-full rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-3 text-center text-sm font-black uppercase tracking-[0.16em] text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950 md:ml-4 md:mt-0 md:w-auto"
               >
                 TRADE →
               </a>
@@ -955,12 +1119,21 @@ Calculate yours on capys.app`
       )}
 
       {tab === "calculator" && (
-        <section className="mx-auto mt-20 max-w-5xl space-y-8 px-4">
-          <p className="text-center opacity-50">
-            Calculate your potential airdrop based on your perp DEX points balance.
-          </p>
+        <section className="mx-auto mt-14 max-w-6xl space-y-8 px-4 sm:px-6">
+          <div className="text-center">
+            <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
+              Points to dollars
+            </div>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
+              Airdrop value calculator
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-white/50">
+              Stress-test FDV, supply allocation, and your points balance before
+              you decide where the next trading cycle goes.
+            </p>
+          </div>
 
-          <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-wrap justify-center gap-2 rounded-3xl border border-white/10 bg-white/[0.03] p-3 backdrop-blur-xl">
             {Object.keys(PERPS_CALC).map((key) => {
               const perpKey = key as CalcPerpKey
               const isActive = calcPerp === perpKey
@@ -971,8 +1144,8 @@ Calculate yours on capys.app`
                   onClick={() => setCalcPerp(perpKey)}
                   className={`rounded-full border px-4 py-2 text-sm transition ${
                     isActive
-                      ? "border-cyan-400 bg-cyan-400/10 text-cyan-300 shadow-[0_0_18px_rgba(34,211,238,0.2)]"
-                      : "border-neutral-700 text-neutral-400 hover:border-neutral-500 hover:text-white"
+                      ? "border-cyan-300 bg-cyan-300 text-slate-950 shadow-[0_0_18px_rgba(34,211,238,0.22)]"
+                      : "border-white/10 bg-white/[0.03] text-white/52 hover:border-white/20 hover:text-white"
                   }`}
                 >
                   {PERPS_CALC[perpKey].name}
@@ -981,57 +1154,79 @@ Calculate yours on capys.app`
             })}
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl md:grid-cols-2">
+            <div className="md:col-span-2">
+              <div className="rounded-3xl border border-cyan-300/15 bg-cyan-300/8 p-5">
+                <div className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">
+                  Current estimate
+                </div>
+                <div className="mt-3 text-4xl font-black text-white sm:text-5xl">
+                  {formatMoney(myValue, 0)}
+                </div>
+                <div className="mt-2 text-sm text-white/55">
+                  {formatMoney(pricePerPoint, 4)} per point at {formatCompactMoney(safeFdv * 1_000_000_000)} FDV
+                </div>
+              </div>
+            </div>
+
             <div>
-              <p className="mb-2 text-xs opacity-50">MY POINTS</p>
+              <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
+                My points
+              </label>
               <input
                 type="number"
                 min="0"
                 value={myPoints}
                 onChange={(e) => setMyPoints(sanitizeNumber(e.target.value))}
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
+                className="w-full rounded-2xl border border-white/10 bg-[#07101d] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
               />
             </div>
 
             <div>
-              <p className="mb-2 text-xs opacity-50">FDV (billions $)</p>
+              <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
+                FDV (billions $)
+              </label>
               <input
                 type="number"
                 min="0"
                 step="0.1"
                 value={fdv}
                 onChange={(e) => setFdv(sanitizeNumber(e.target.value))}
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
+                className="w-full rounded-2xl border border-white/10 bg-[#07101d] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
               />
             </div>
 
             <div>
-              <p className="mb-2 text-xs opacity-50">TOTAL POINTS</p>
+              <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
+                Total points
+              </label>
               <input
                 type="number"
                 min="1"
                 value={totalPoints}
                 onChange={(e) => setTotalPoints(sanitizeNumber(e.target.value))}
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
+                className="w-full rounded-2xl border border-white/10 bg-[#07101d] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
               />
             </div>
 
             <div>
-              <p className="mb-2 text-xs opacity-50">AIRDROP % SUPPLY</p>
+              <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
+                Airdrop % supply
+              </label>
               <input
                 type="number"
                 min="0"
                 max="100"
                 value={airdrop}
                 onChange={(e) => setAirdrop(sanitizeNumber(e.target.value))}
-                className="w-full rounded-xl border border-neutral-800 bg-[#0c1220] p-4 outline-none transition focus:border-cyan-400"
+                className="w-full rounded-2xl border border-white/10 bg-[#07101d] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
               />
             </div>
           </div>
 
           <div
             ref={cardRef}
-            className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[28px] border border-cyan-400/20 bg-[#060b16] shadow-[0_0_40px_rgba(0,255,255,0.08)]"
+            className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[28px] border border-cyan-300/20 bg-[#060b16] shadow-[0_0_48px_rgba(34,211,238,0.12)]"
           >
             <Image
               src={`/templates/${selectedTemplate}.png`}
@@ -1121,7 +1316,7 @@ Calculate yours on capys.app`
           <div className="flex flex-wrap justify-center gap-4">
             <button
               onClick={() => setTemplatePicker(true)}
-              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-cyan-400"
+              className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white/75 transition hover:border-cyan-300/35 hover:text-white"
             >
               Pick a Template
             </button>
@@ -1129,14 +1324,14 @@ Calculate yours on capys.app`
             <button
               onClick={downloadCard}
               disabled={isDownloading}
-              className="rounded-xl border border-neutral-700 px-6 py-3 transition hover:border-purple-400 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white/75 transition hover:border-indigo-300/35 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isDownloading ? "Downloading..." : "Download Card"}
             </button>
 
             <button
               onClick={shareOnX}
-              className="rounded-xl bg-white px-6 py-3 font-semibold text-black"
+              className="rounded-2xl bg-white px-6 py-3 text-sm font-black text-black transition hover:-translate-y-0.5"
             >
               Share on X
             </button>
@@ -1147,14 +1342,21 @@ Calculate yours on capys.app`
     
 
       {tab === "funding" && (
-        <section className="mx-auto mt-20 max-w-[1750px] space-y-8 px-4 sm:px-6">
-          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+        <section className="mx-auto mt-14 max-w-[1750px] space-y-8 px-4 sm:px-6">
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
             <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-white">Funding Rate Screener</h2>
+                <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
+                  Live market scanner
+                </div>
+
+                <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
+                  Funding rate screener
+                </h2>
 
                 <p className="mt-2 text-sm text-white/50">
-                  Live funding matrix for EdgeX, Ethereal, Extended, Hibachi, Hyena, Hyperliquid, Pacifica and Variational.
+                  Compare interval-normalized funding across EdgeX, Ethereal,
+                  Extended, Hibachi, Hyena, Hyperliquid, Pacifica and Variational.
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -1177,14 +1379,14 @@ Calculate yours on capys.app`
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => void loadFunding(false)}
-                  className="rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-medium text-cyan-300 transition hover:bg-cyan-400/15"
+                  className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
                 >
                   Refresh now
                 </button>
 
                 <button
                   onClick={resetFundingFilters}
-                  className="rounded-xl border border-neutral-700 px-4 py-2 text-sm text-white/70 transition hover:border-neutral-500 hover:text-white"
+                  className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white/70 transition hover:border-white/20 hover:text-white"
                 >
                   Reset filters
                 </button>
@@ -1193,7 +1395,7 @@ Calculate yours on capys.app`
           </div>
 
           <div className="grid gap-4 xl:grid-cols-[1.2fr_1.2fr_1fr]">
-            <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
                 Most Positive Funding
               </div>
@@ -1213,7 +1415,7 @@ Calculate yours on capys.app`
               </div>
             </div>
 
-            <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
                 Most Negative Funding
               </div>
@@ -1233,7 +1435,7 @@ Calculate yours on capys.app`
               </div>
             </div>
 
-            <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-5 backdrop-blur-xl">
+            <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
                 Highest Spread
               </div>
@@ -1252,7 +1454,7 @@ Calculate yours on capys.app`
             </div>
           </div>
 
-          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 shadow-xl shadow-black/10 backdrop-blur-xl">
             <div className="flex flex-col gap-4">
               <div className="grid gap-4 xl:grid-cols-[1.25fr_1fr_1fr_auto]">
                 <div>
@@ -1263,7 +1465,7 @@ Calculate yours on capys.app`
                     value={searchTicker}
                     onChange={(e) => setSearchTicker(e.target.value.toUpperCase())}
                     placeholder="BTC, ETH, SOL, ICP..."
-                    className="w-full rounded-xl border border-neutral-800 bg-[#0b111d] px-4 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-400"
+                    className="w-full rounded-2xl border border-white/10 bg-[#07101d] px-4 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
                   />
                 </div>
 
@@ -1271,12 +1473,12 @@ Calculate yours on capys.app`
                   <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
                     Funding view
                   </label>
-                  <div className="flex rounded-xl border border-neutral-800 bg-[#0b111d] p-1">
+                  <div className="flex rounded-2xl border border-white/10 bg-[#07101d] p-1">
                     <button
                       onClick={() => setFundingMetricMode("interval")}
                       className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
                         fundingMetricMode === "interval"
-                          ? "bg-cyan-500/15 text-cyan-300"
+                          ? "bg-cyan-300 text-slate-950"
                           : "text-white/60"
                       }`}
                     >
@@ -1287,7 +1489,7 @@ Calculate yours on capys.app`
                       onClick={() => setFundingMetricMode("annualized")}
                       className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
                         fundingMetricMode === "annualized"
-                          ? "bg-fuchsia-500/15 text-fuchsia-300"
+                          ? "bg-indigo-300 text-slate-950"
                           : "text-white/60"
                       }`}
                     >
@@ -1300,12 +1502,12 @@ Calculate yours on capys.app`
                   <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
                     Sort by spread
                   </label>
-                  <div className="flex rounded-xl border border-neutral-800 bg-[#0b111d] p-1">
+                  <div className="flex rounded-2xl border border-white/10 bg-[#07101d] p-1">
                     <button
                       onClick={() => setFundingSort("desc")}
                       className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
                         fundingSort === "desc"
-                          ? "bg-emerald-500/15 text-emerald-300"
+                          ? "bg-emerald-300 text-slate-950"
                           : "text-white/60"
                       }`}
                     >
@@ -1316,7 +1518,7 @@ Calculate yours on capys.app`
                       onClick={() => setFundingSort("asc")}
                       className={`flex-1 rounded-lg px-3 py-2 text-sm transition ${
                         fundingSort === "asc"
-                          ? "bg-red-500/15 text-red-300"
+                          ? "bg-red-300 text-slate-950"
                           : "text-white/60"
                       }`}
                     >
@@ -1330,8 +1532,8 @@ Calculate yours on capys.app`
                     onClick={() => setOnlyActionable((prev) => !prev)}
                     className={`w-full rounded-xl border px-4 py-3 text-sm font-medium transition ${
                       onlyActionable
-                        ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300"
-                        : "border-neutral-700 text-white/60"
+                        ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-200"
+                        : "border-white/10 bg-white/[0.03] text-white/60"
                     }`}
                   >
                     {onlyActionable ? "Only opportunities" : "Show all symbols"}
@@ -1347,7 +1549,7 @@ Calculate yours on capys.app`
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => setEnabledFundingExchanges(ALL_FUNDING_KEYS)}
-                    className="rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-2 text-xs font-medium text-cyan-300 transition hover:bg-cyan-500/15"
+                    className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-medium text-cyan-200 transition hover:bg-cyan-300/15"
                   >
                     All
                   </button>
@@ -1378,7 +1580,7 @@ Calculate yours on capys.app`
             </div>
           </div>
 
-          <div className="rounded-2xl border border-neutral-800 bg-[#0c1220]/70 p-6 backdrop-blur-xl">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
             {fundingLoading && (
               <div className="rounded-2xl border border-neutral-800 bg-black/20 p-6 text-white/60">
                 Loading funding data...

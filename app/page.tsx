@@ -238,7 +238,7 @@ const COPY = {
       calculator: {
         badge: "Points to dollars",
         title: "Estimate your airdrop upside.",
-        body: "Model FDV, token allocation, point supply, and your full point portfolio before deciding where the next trading cycle goes.",
+        body: "Model FDV, token allocation, point supply, and your own point balance before deciding where the next trading cycle goes.",
         primary: "Open calculator",
         secondary: "Scan funding",
       },
@@ -280,15 +280,8 @@ const COPY = {
     fdv: "FDV (billions $)",
     totalPoints: "Total points",
     airdropSupply: "Airdrop % supply",
-    portfolioEyebrow: "Portfolio mode",
-    portfolioTitle: "Point portfolio estimator",
-    portfolioBody:
-      "Enter points across multiple perp programs and estimate the combined dollar value using each preset's FDV, point supply, and allocation.",
-    estimatedTotal: "Estimated total",
-    clearPortfolio: "Clear portfolio",
     pointBalance: "Point balance",
     estValue: "Est. value",
-    noPortfolio: "Add any point balance to build a portfolio estimate.",
     potentialValue: "Potential Airdrop Value",
     estimateOnly: "estimate only",
     totalSupply: "Total Supply",
@@ -344,10 +337,7 @@ const COPY = {
 } as const
 
 type LanguageOverride = Partial<
-  Record<
-    keyof typeof COPY.en,
-    string | readonly string[] | Partial<HeroText>
-  >
+  Record<string, string | readonly string[] | Partial<HeroText>>
 >
 
 const LANGUAGE_OVERRIDES: Partial<Record<LanguageCode, LanguageOverride>> = {
@@ -414,7 +404,7 @@ const LANGUAGE_OVERRIDES: Partial<Record<LanguageCode, LanguageOverride>> = {
     language: "Мова",
     hero: {
       list: { badge: "Дошка реф-бонусів", title: "Знайди найкращі умови для perp farming.", body: "Порівнюй знижки, бусти поінтів і refback-маршрути без зайвих таблиць.", primary: "Дивитись perps", secondary: "Оцінити airdrop" },
-      calculator: { badge: "Поінти в долари", title: "Оціни потенціал свого airdrop.", body: "Моделюй FDV, алокацію, supply поінтів і весь портфель поінтів.", primary: "Відкрити калькулятор", secondary: "Сканувати funding" },
+      calculator: { badge: "Поінти в долари", title: "Оціни потенціал свого airdrop.", body: "Моделюй FDV, алокацію, supply поінтів і власний баланс поінтів.", primary: "Відкрити калькулятор", secondary: "Сканувати funding" },
       funding: { badge: "Live market scanner", title: "Швидше скануй funding spreads.", body: "Дані Loris, сортування за Max Arb, OI Rank або Symbol і швидкі переходи.", primary: "Сканувати funding", secondary: "Скинути фільтри" },
     },
     portfolioTitle: "Оцінка портфеля поінтів",
@@ -427,7 +417,7 @@ const LANGUAGE_OVERRIDES: Partial<Record<LanguageCode, LanguageOverride>> = {
     language: "Язык",
     hero: {
       list: { badge: "Доска реф-бонусов", title: "Найди лучшие условия для perp farming.", body: "Сравнивай скидки, бусты поинтов и refback-маршруты без лишних таблиц.", primary: "Смотреть perps", secondary: "Оценить airdrop" },
-      calculator: { badge: "Поинты в доллары", title: "Оцени потенциал своего airdrop.", body: "Моделируй FDV, аллокацию, общий supply поинтов и весь портфель.", primary: "Открыть калькулятор", secondary: "Сканировать funding" },
+      calculator: { badge: "Поинты в доллары", title: "Оцени потенциал своего airdrop.", body: "Моделируй FDV, аллокацию, общий supply поинтов и свой баланс.", primary: "Открыть калькулятор", secondary: "Сканировать funding" },
       funding: { badge: "Live market scanner", title: "Быстрее сканируй funding spreads.", body: "Данные Loris, сортировка по Max Arb, OI Rank или Symbol и быстрые переходы.", primary: "Сканировать funding", secondary: "Сбросить фильтры" },
     },
     portfolioTitle: "Оценка портфеля поинтов",
@@ -447,10 +437,10 @@ const LANGUAGE_OVERRIDES: Partial<Record<LanguageCode, LanguageOverride>> = {
     pointBalance: "رصيد النقاط",
     estimatedTotal: "الإجمالي المقدر",
   },
-  pt: { tabs: ["Lista de Perps", "Calculadora de Airdrop", "Screener de Funding"], contact: "Contato", language: "Idioma", hero: { list: { badge: "Painel de boosts", title: "Encontre os melhores termos de perp farming.", body: "Compare descontos, boosts de pontos e rotas de refback sem traduzir nomes de protocolos.", primary: "Ver perps", secondary: "Estimar airdrop" }, calculator: { badge: "Pontos em dólares", title: "Estime o potencial do seu airdrop.", body: "Modele FDV, alocação, supply de pontos e seu portfólio completo.", primary: "Abrir calculadora", secondary: "Escanear funding" }, funding: { badge: "Scanner de mercado", title: "Escaneie funding spreads mais rápido.", body: "Dados Loris com ordenação por Max Arb, OI Rank ou Symbol e rotas diretas.", primary: "Escanear funding", secondary: "Resetar filtros" } }, portfolioTitle: "Estimador de portfólio de pontos", pointBalance: "Saldo de pontos", estimatedTotal: "Total estimado" },
-  es: { tabs: ["Lista de Perps", "Calculadora de Airdrop", "Screener de Funding"], contact: "Contacto", language: "Idioma", hero: { list: { badge: "Panel de boosts", title: "Encuentra las mejores condiciones de perp farming.", body: "Compara descuentos, boosts de puntos y rutas de refback sin tocar los nombres de protocolos.", primary: "Ver perps", secondary: "Estimar airdrop" }, calculator: { badge: "Puntos a dólares", title: "Estima el potencial de tu airdrop.", body: "Modela FDV, asignación, supply de puntos y tu portafolio completo.", primary: "Abrir calculadora", secondary: "Escanear funding" }, funding: { badge: "Scanner de mercado", title: "Escanea funding spreads más rápido.", body: "Datos de Loris con orden por Max Arb, OI Rank o Symbol y rutas directas.", primary: "Escanear funding", secondary: "Resetear filtros" } }, portfolioTitle: "Estimador de portafolio de puntos", pointBalance: "Saldo de puntos", estimatedTotal: "Total estimado" },
-  tr: { tabs: ["Perp Listesi", "Airdrop Hesaplayıcı", "Funding Tarayıcı"], contact: "İletişim", language: "Dil", hero: { list: { badge: "Ref boost paneli", title: "En iyi perp farming şartlarını bul.", body: "Ücret indirimlerini, puan boostlarını ve refback rotalarını hızlıca karşılaştır.", primary: "Perps göster", secondary: "Airdrop hesapla" }, calculator: { badge: "Puanları dolara çevir", title: "Airdrop potansiyelini tahmin et.", body: "FDV, dağıtım, toplam puan ve tüm puan portföyünü birlikte modelle.", primary: "Hesaplayıcıyı aç", secondary: "Funding tara" }, funding: { badge: "Canlı piyasa tarayıcı", title: "Funding spreadlerini daha hızlı tara.", body: "Loris verisini Max Arb, OI Rank veya Symbol ile sırala ve rotayı aç.", primary: "Funding tara", secondary: "Filtreleri sıfırla" } }, portfolioTitle: "Puan portföy tahmini", pointBalance: "Puan bakiyesi", estimatedTotal: "Tahmini toplam" },
-  vi: { tabs: ["Danh sách Perp", "Máy tính Airdrop", "Bộ lọc Funding"], contact: "Liên hệ", language: "Ngôn ngữ", hero: { list: { badge: "Bảng referral boost", title: "Tìm điều kiện perp farming tốt hơn.", body: "So sánh giảm phí, boost điểm và refback route, giữ nguyên tên protocol.", primary: "Xem perps", secondary: "Ước tính airdrop" }, calculator: { badge: "Điểm sang USD", title: "Ước tính upside airdrop.", body: "Mô phỏng FDV, allocation, tổng điểm và toàn bộ danh mục điểm.", primary: "Mở máy tính", secondary: "Quét funding" }, funding: { badge: "Quét thị trường live", title: "Quét funding spreads nhanh hơn.", body: "Dữ liệu Loris, sắp xếp theo Max Arb, OI Rank hoặc Symbol và mở route nhanh.", primary: "Quét funding", secondary: "Đặt lại lọc" } }, portfolioTitle: "Ước tính danh mục điểm", pointBalance: "Số điểm", estimatedTotal: "Tổng ước tính" },
+  pt: { tabs: ["Lista de Perps", "Calculadora de Airdrop", "Screener de Funding"], contact: "Contato", language: "Idioma", hero: { list: { badge: "Painel de boosts", title: "Encontre os melhores termos de perp farming.", body: "Compare descontos, boosts de pontos e rotas de refback sem traduzir nomes de protocolos.", primary: "Ver perps", secondary: "Estimar airdrop" }, calculator: { badge: "Pontos em dólares", title: "Estime o potencial do seu airdrop.", body: "Modele FDV, alocação, supply de pontos e seu saldo de pontos.", primary: "Abrir calculadora", secondary: "Escanear funding" }, funding: { badge: "Scanner de mercado", title: "Escaneie funding spreads mais rápido.", body: "Dados Loris com ordenação por Max Arb, OI Rank ou Symbol e rotas diretas.", primary: "Escanear funding", secondary: "Resetar filtros" } }, portfolioTitle: "Estimador de portfólio de pontos", pointBalance: "Saldo de pontos", estimatedTotal: "Total estimado" },
+  es: { tabs: ["Lista de Perps", "Calculadora de Airdrop", "Screener de Funding"], contact: "Contacto", language: "Idioma", hero: { list: { badge: "Panel de boosts", title: "Encuentra las mejores condiciones de perp farming.", body: "Compara descuentos, boosts de puntos y rutas de refback sin tocar los nombres de protocolos.", primary: "Ver perps", secondary: "Estimar airdrop" }, calculator: { badge: "Puntos a dólares", title: "Estima el potencial de tu airdrop.", body: "Modela FDV, asignación, supply de puntos y tu balance de puntos.", primary: "Abrir calculadora", secondary: "Escanear funding" }, funding: { badge: "Scanner de mercado", title: "Escanea funding spreads más rápido.", body: "Datos de Loris con orden por Max Arb, OI Rank o Symbol y rutas directas.", primary: "Escanear funding", secondary: "Resetear filtros" } }, portfolioTitle: "Estimador de portafolio de puntos", pointBalance: "Saldo de puntos", estimatedTotal: "Total estimado" },
+  tr: { tabs: ["Perp Listesi", "Airdrop Hesaplayıcı", "Funding Tarayıcı"], contact: "İletişim", language: "Dil", hero: { list: { badge: "Ref boost paneli", title: "En iyi perp farming şartlarını bul.", body: "Ücret indirimlerini, puan boostlarını ve refback rotalarını hızlıca karşılaştır.", primary: "Perps göster", secondary: "Airdrop hesapla" }, calculator: { badge: "Puanları dolara çevir", title: "Airdrop potansiyelini tahmin et.", body: "FDV, dağıtım, toplam puan ve kendi puan bakiyeni birlikte modelle.", primary: "Hesaplayıcıyı aç", secondary: "Funding tara" }, funding: { badge: "Canlı piyasa tarayıcı", title: "Funding spreadlerini daha hızlı tara.", body: "Loris verisini Max Arb, OI Rank veya Symbol ile sırala ve rotayı aç.", primary: "Funding tara", secondary: "Filtreleri sıfırla" } }, portfolioTitle: "Puan portföy tahmini", pointBalance: "Puan bakiyesi", estimatedTotal: "Tahmini toplam" },
+  vi: { tabs: ["Danh sách Perp", "Máy tính Airdrop", "Bộ lọc Funding"], contact: "Liên hệ", language: "Ngôn ngữ", hero: { list: { badge: "Bảng referral boost", title: "Tìm điều kiện perp farming tốt hơn.", body: "So sánh giảm phí, boost điểm và refback route, giữ nguyên tên protocol.", primary: "Xem perps", secondary: "Ước tính airdrop" }, calculator: { badge: "Điểm sang USD", title: "Ước tính upside airdrop.", body: "Mô phỏng FDV, allocation, tổng điểm và số điểm của bạn.", primary: "Mở máy tính", secondary: "Quét funding" }, funding: { badge: "Quét thị trường live", title: "Quét funding spreads nhanh hơn.", body: "Dữ liệu Loris, sắp xếp theo Max Arb, OI Rank hoặc Symbol và mở route nhanh.", primary: "Quét funding", secondary: "Đặt lại lọc" } }, portfolioTitle: "Ước tính danh mục điểm", pointBalance: "Số điểm", estimatedTotal: "Tổng ước tính" },
   id: { tabs: ["Daftar Perp", "Kalkulator Airdrop", "Penyaring Funding"], contact: "Kontak", language: "Bahasa", hero: { list: { badge: "Papan referral boost", title: "Temukan syarat perp farming terbaik.", body: "Bandingkan diskon fee, boost poin, dan rute refback tanpa mengubah nama protokol.", primary: "Lihat perps", secondary: "Estimasi airdrop" }, calculator: { badge: "Poin ke dolar", title: "Estimasi potensi airdrop kamu.", body: "Modelkan FDV, alokasi, total poin, dan portofolio poin penuh.", primary: "Buka kalkulator", secondary: "Pindai funding" }, funding: { badge: "Pemindai pasar live", title: "Pindai funding spreads lebih cepat.", body: "Data Loris dengan sort Max Arb, OI Rank, atau Symbol dan rute cepat.", primary: "Pindai funding", secondary: "Reset filter" } }, portfolioTitle: "Estimator portofolio poin", pointBalance: "Saldo poin", estimatedTotal: "Total estimasi" },
   hi: { tabs: ["Perp सूची", "Airdrop कैलकुलेटर", "Funding स्क्रीनर"], contact: "संपर्क", language: "भाषा", hero: { list: { badge: "Referral boost बोर्ड", title: "बेहतर perp farming terms खोजें।", body: "Fee discount, point boost और refback routes की तुलना करें; protocol names जैसे हैं वैसे रहें।", primary: "Perps देखें", secondary: "Airdrop अनुमान" }, calculator: { badge: "Points to dollars", title: "अपने airdrop upside का अनुमान लगाएँ।", body: "FDV, allocation, total points और पूरे point portfolio को साथ में मॉडल करें।", primary: "Calculator खोलें", secondary: "Funding scan" }, funding: { badge: "Live market scanner", title: "Funding spreads तेज़ी से scan करें।", body: "Loris data को Max Arb, OI Rank या Symbol से sort करें और route खोलें।", primary: "Funding scan", secondary: "Filters reset" } }, portfolioTitle: "पॉइंट पोर्टफोलियो अनुमान", pointBalance: "पॉइंट बैलेंस", estimatedTotal: "अनुमानित कुल" },
   th: { tabs: ["รายการ Perp", "เครื่องคำนวณ Airdrop", "Funding Screener"], contact: "ติดต่อ", language: "ภาษา", hero: { list: { badge: "บอร์ด referral boost", title: "หาเงื่อนไข perp farming ที่ดีที่สุด", body: "เทียบส่วนลดค่าธรรมเนียม point boost และ refback route โดยคงชื่อ protocol เดิมไว้", primary: "ดู perps", secondary: "ประเมิน airdrop" }, calculator: { badge: "แต้มเป็นดอลลาร์", title: "ประเมิน upside ของ airdrop", body: "จำลอง FDV, allocation, total points และ point portfolio ทั้งหมด", primary: "เปิดเครื่องคำนวณ", secondary: "สแกน funding" }, funding: { badge: "ตัวสแกนตลาดสด", title: "สแกน funding spreads ได้เร็วขึ้น", body: "ข้อมูล Loris พร้อมเรียงตาม Max Arb, OI Rank หรือ Symbol", primary: "สแกน funding", secondary: "รีเซ็ตฟิลเตอร์" } }, portfolioTitle: "ตัวประเมินพอร์ตคะแนน", pointBalance: "ยอดคะแนน", estimatedTotal: "ยอดประเมินรวม" },
@@ -485,14 +475,6 @@ export default function Home() {
   const [languageOpen, setLanguageOpen] = useState(false)
   const [calcPerp, setCalcPerp] = useState<CalcPerpKey>("variational")
   const [myPoints, setMyPoints] = useState(0)
-  const [portfolioPoints, setPortfolioPoints] = useState<
-    Record<CalcPerpKey, number>
-  >(() =>
-    Object.fromEntries(CALC_KEYS.map((key) => [key, 0])) as Record<
-      CalcPerpKey,
-      number
-    >
-  )
   const [templatePicker, setTemplatePicker] = useState(false)
   const [selectedTemplate, setSelectedTemplate] =
     useState<(typeof TEMPLATES)[number]>("cinema")
@@ -555,16 +537,7 @@ export default function Home() {
     if (hash === "calculator" || hash === "funding" || hash === "list") {
       setTab(hash)
     }
-
-    const savedLanguage = window.localStorage.getItem("capys-language")
-    if (LANGUAGES.some((item) => item.code === savedLanguage)) {
-      setLanguage(savedLanguage as LanguageCode)
-    }
   }, [])
-
-  useEffect(() => {
-    window.localStorage.setItem("capys-language", language)
-  }, [language])
 
   useEffect(() => {
     return () => {
@@ -681,41 +654,6 @@ export default function Home() {
       myValue: value,
     }
   }, [safeFdv, safeAirdrop, safeTotalPoints, safeMyPoints])
-
-  const portfolioRows = useMemo(
-    () =>
-      CALC_KEYS.map((key) => {
-        const preset = PERPS_CALC[key]
-        const points = Math.max(portfolioPoints[key] ?? 0, 0)
-        const presetPool = preset.fdv * 1_000_000_000 * (preset.airdrop / 100)
-        const presetPrice = presetPool / Math.max(preset.totalPoints, 1)
-
-        return {
-          key,
-          name: preset.name,
-          points,
-          price: presetPrice,
-          value: points * presetPrice,
-        }
-      }),
-    [portfolioPoints]
-  )
-
-  const portfolioTotalValue = useMemo(
-    () => portfolioRows.reduce((total, row) => total + row.value, 0),
-    [portfolioRows]
-  )
-
-  const resetPortfolio = () => {
-    setPortfolioPoints(
-      Object.fromEntries(CALC_KEYS.map((key) => [key, 0])) as Record<
-        CalcPerpKey,
-        number
-      >
-    )
-  }
-
-  
 
   const activeFundingExchanges = useMemo(
     () =>
@@ -1079,7 +1017,7 @@ Calculate yours on ${SITE_URL}`
         <div className="animation-delay-4000 absolute bottom-[-280px] left-[35%] h-[640px] w-[640px] animate-blob rounded-full bg-emerald-500/15 blur-[190px]" />
       </div>
 
-      <div className="relative z-20 mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+      <div className="relative z-[100] mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
         <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <button
             type="button"
@@ -1129,7 +1067,7 @@ Calculate yours on ${SITE_URL}`
               </button>
 
               {languageOpen && (
-                <div className="absolute right-0 top-12 z-50 max-h-[440px] w-52 overflow-y-auto rounded-2xl border border-white/10 bg-[#08111f]/98 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                <div className="absolute right-0 top-12 z-[200] max-h-[440px] w-52 overflow-y-auto rounded-2xl border border-white/10 bg-[#08111f]/98 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl">
                   {LANGUAGES.map((item) => (
                     <button
                       key={item.code}
@@ -1514,81 +1452,6 @@ Calculate yours on ${SITE_URL}`
                 onChange={(e) => setAirdrop(sanitizeNumber(e.target.value))}
                 className="w-full rounded-2xl border border-white/10 bg-[#07101d] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
               />
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.055] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl">
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div>
-                <div className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">
-                  {t.portfolioEyebrow}
-                </div>
-                <h3 className="mt-2 text-2xl font-black text-white">
-                  {t.portfolioTitle}
-                </h3>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/55">
-                  {t.portfolioBody}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/25 px-5 py-4">
-                <div className="text-xs uppercase tracking-[0.22em] text-white/40">
-                  {t.estimatedTotal}
-                </div>
-                <div className="mt-1 text-3xl font-black text-white">
-                  {formatMoney(portfolioTotalValue, 0)}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {portfolioRows.map((row) => (
-                <div
-                  key={`portfolio-${row.key}`}
-                  className="rounded-2xl border border-white/10 bg-[#07101d]/80 p-4"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="font-semibold text-white">{row.name}</div>
-                      <div className="mt-1 text-xs text-white/40">
-                        {formatMoney(row.price, 4)} / point
-                      </div>
-                    </div>
-                    <div className="text-right text-sm font-semibold text-cyan-200">
-                      {formatMoney(row.value, 0)}
-                    </div>
-                  </div>
-
-                  <label className="mt-3 block text-xs uppercase tracking-[0.2em] text-white/35">
-                    {t.pointBalance}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={portfolioPoints[row.key]}
-                    onChange={(event) =>
-                      setPortfolioPoints((prev) => ({
-                        ...prev,
-                        [row.key]: sanitizeNumber(event.target.value),
-                      }))
-                    }
-                    className="mt-2 w-full rounded-xl border border-white/10 bg-black/25 px-3 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <div className="text-xs text-white/40">
-                {portfolioTotalValue > 0 ? t.estValue : t.noPortfolio}
-              </div>
-              <button
-                type="button"
-                onClick={resetPortfolio}
-                className="rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs font-semibold text-white/60 transition hover:border-white/20 hover:text-white"
-              >
-                {t.clearPortfolio}
-              </button>
             </div>
           </div>
 

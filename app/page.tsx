@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toPng } from "html-to-image"
-import { AnimatePresence, motion } from "motion/react"
+import { motion } from "motion/react"
 
 const PERPS = [
   {
@@ -277,6 +277,10 @@ type FundingApiRow = {
   bias: FundingBias
 }
 
+type RawFundingApiRow = Partial<FundingApiRow> & {
+  [key: string]: unknown
+}
+
 type FundingMatrixRow = {
   symbol: string
   oiRank: string
@@ -425,10 +429,6 @@ function toDisplayedFundingValue(
   return actualIntervalFunding
 }
 
-function intervalLabel(hours: number) {
-  return `${hours}h`
-}
-
 const TABS = [
   { id: "list", label: "Perp DEX List" },
   { id: "calculator", label: "Perp DEX Airdrop Calculator" },
@@ -507,7 +507,7 @@ export default function Home() {
         const safeRows = Array.isArray(data?.rows)
           ? data.rows
               .filter((row: unknown) => row && typeof row === "object")
-              .map((row: any) => ({
+              .map((row: RawFundingApiRow) => ({
                 exchange: String(row.exchange ?? ""),
                 display: String(row.display ?? row.exchange ?? ""),
                 symbol: String(row.symbol ?? "").toUpperCase(),
@@ -1033,10 +1033,13 @@ Calculate yours on capys.app`
             ref={cardRef}
             className="relative mt-10 aspect-[16/9] overflow-hidden rounded-[28px] border border-cyan-400/20 bg-[#060b16] shadow-[0_0_40px_rgba(0,255,255,0.08)]"
           >
-            <img
+            <Image
               src={`/templates/${selectedTemplate}.png`}
               alt="Card template"
-              className="absolute inset-0 h-full w-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 1024px"
+              className="object-cover"
+              priority
             />
 
             <div className="absolute inset-0 bg-gradient-to-r from-[#050a14]/92 via-[#050a14]/45 to-transparent" />

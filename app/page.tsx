@@ -186,6 +186,19 @@ const TABS = [
 
 const CALC_KEYS = Object.keys(PERPS_CALC) as CalcPerpKey[]
 
+const TAB_HASH: Record<Tab, string> = {
+  list: "perps",
+  calculator: "calculator",
+  funding: "funding",
+}
+
+const HASH_TAB: Record<string, Tab> = {
+  list: "list",
+  perps: "list",
+  calculator: "calculator",
+  funding: "funding",
+}
+
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },
   { code: "zh", label: "中文", flag: "🇨🇳" },
@@ -290,7 +303,7 @@ const COPY = {
     downloadCard: "Download Card",
     downloading: "Downloading...",
     preparing: "Preparing...",
-    shareX: "Share on X + Card",
+    shareX: "Share on X",
     chooseBackground: "Choose Card Background",
     uploadTemplate: "Upload your own meme or screenshot",
     uploadNote: "PNG, JPG, GIF or WebP. It stays local in your browser.",
@@ -507,6 +520,7 @@ export default function Home() {
   const [customTemplate, setCustomTemplate] = useState<string | null>(null)
 
   const cardRef = useRef<HTMLDivElement>(null)
+  const languageButtonRef = useRef<HTMLButtonElement>(null)
   const fundingRequestInFlightRef = useRef(false)
   const listCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const tickerCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -517,9 +531,19 @@ export default function Home() {
   const activeLanguage = LANGUAGES.find((item) => item.code === language)!
   const hero = t.hero[tab]
 
-  const selectTab = (nextTab: Tab) => {
+  const scrollToTab = (nextTab: Tab) => {
+    window.setTimeout(() => {
+      document.getElementById(TAB_HASH[nextTab])?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    }, 80)
+  }
+
+  const selectTab = (nextTab: Tab, shouldScroll = true) => {
     setTab(nextTab)
-    window.history.replaceState(null, "", `#${nextTab}`)
+    window.history.replaceState(null, "", `#${TAB_HASH[nextTab]}`)
+    if (shouldScroll) scrollToTab(nextTab)
   }
 
   const [fdv, setFdv] = useState<number>(current.fdv)
@@ -534,8 +558,11 @@ export default function Home() {
 
   useEffect(() => {
     const hash = window.location.hash.replace("#", "")
-    if (hash === "calculator" || hash === "funding" || hash === "list") {
-      setTab(hash)
+    const hashTab = HASH_TAB[hash]
+
+    if (hashTab) {
+      setTab(hashTab)
+      scrollToTab(hashTab)
     }
   }, [])
 
@@ -961,50 +988,13 @@ export default function Home() {
 
 My points: ${formatNumber(safeMyPoints)}
 Est. FDV: ${formatCompactMoney(safeFdv * 1_000_000_000)}
+Point price: ${formatMoney(pricePerPoint, 4)}
 Airdrop: ${safeAirdrop}%
 
 Calculate yours on ${SITE_URL}`
 
-    try {
-      setIsDownloading(true)
-      const dataUrl = await createCardDataUrl()
-      const imageBlob = await fetch(dataUrl).then((res) => res.blob())
-      const file = new File(
-        [imageBlob],
-        `${current.name.toLowerCase()}-airdrop-card.png`,
-        { type: "image/png" }
-      )
-
-      if (
-        navigator.canShare?.({ files: [file] }) &&
-        typeof navigator.share === "function"
-      ) {
-        await navigator.share({
-          title: `${current.name} airdrop estimate`,
-          text,
-          files: [file],
-        })
-        return
-      }
-
-      const link = document.createElement("a")
-      link.download = file.name
-      link.href = dataUrl
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-
-      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        `${text}\n\nCard image downloaded. Attach it to the post.`
-      )}`
-      window.open(url, "_blank", "noopener,noreferrer")
-    } catch (error) {
-      console.error("X share failed:", error)
-      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
-      window.open(url, "_blank", "noopener,noreferrer")
-    } finally {
-      setIsDownloading(false)
-    }
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+    window.open(url, "_blank", "noopener,noreferrer")
   }
 
   return (
@@ -1041,7 +1031,7 @@ Calculate yours on ${SITE_URL}`
               <button
                 key={`nav-${item.id}`}
                 onClick={() => selectTab(item.id as Tab)}
-                className={`rounded-full px-4 py-2 transition ${
+                className={`rounded-full px-4 py-2 transition focus:outline-none focus:ring-2 focus:ring-cyan-300/40 ${
                   tab === item.id
                     ? "bg-white text-black"
                     : "text-white/55 hover:bg-white/10 hover:text-white"
@@ -1055,19 +1045,37 @@ Calculate yours on ${SITE_URL}`
           <div className="flex items-center gap-2">
             <div className="relative">
               <button
+                ref={languageButtonRef}
                 type="button"
                 onClick={() => setLanguageOpen((prev) => !prev)}
-                className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-white/75 transition hover:border-cyan-300/35 hover:text-white"
+                className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-white/75 transition hover:border-cyan-300/35 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
                 aria-expanded={languageOpen}
                 aria-label={t.language}
               >
                 <span>{activeLanguage.flag}</span>
                 <span className="hidden sm:inline">{activeLanguage.label}</span>
-                <span className="text-white/35">⌄</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  className={`text-white/45 transition-transform duration-200 ${
+                    languageOpen ? "rotate-180" : ""
+                  }`}
+                >
+                  <path
+                    d="m6 9 6 6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
 
               {languageOpen && (
-                <div className="absolute right-0 top-12 z-[200] max-h-[440px] w-52 overflow-y-auto rounded-2xl border border-white/10 bg-[#08111f]/98 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                <div className="fixed right-4 top-[76px] z-[1000] max-h-[min(520px,calc(100vh-96px))] w-56 overflow-y-auto rounded-2xl border border-cyan-300/15 bg-[#08111f]/98 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:right-6 lg:right-8">
                   {LANGUAGES.map((item) => (
                     <button
                       key={item.code}
@@ -1076,9 +1084,9 @@ Calculate yours on ${SITE_URL}`
                         setLanguage(item.code)
                         setLanguageOpen(false)
                       }}
-                      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition ${
+                      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-cyan-300/35 ${
                         language === item.code
-                          ? "bg-cyan-300 text-slate-950"
+                          ? "bg-cyan-300 text-slate-950 shadow-[0_0_24px_rgba(34,211,238,0.2)]"
                           : "text-white/70 hover:bg-white/[0.06] hover:text-white"
                       }`}
                     >
@@ -1094,12 +1102,13 @@ Calculate yours on ${SITE_URL}`
               href="https://x.com/capy_onchain"
               target="_blank"
               rel="noopener noreferrer"
-              className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/70 transition hover:border-cyan-300/40 hover:text-cyan-200"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-100 transition hover:-translate-y-0.5 hover:bg-cyan-300 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-300/40 sm:px-4"
               aria-label="Open Capy on X"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z" />
               </svg>
+              <span className="hidden sm:inline">More alpha</span>
             </a>
 
             <a
@@ -1127,23 +1136,42 @@ Calculate yours on ${SITE_URL}`
               {hero.body}
             </p>
 
+            <a
+              href="https://x.com/capy_onchain"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-xs font-bold text-cyan-100 transition hover:border-cyan-300/45 hover:bg-cyan-300/15 focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
+            >
+              <span className="text-cyan-300">Built by @capy_onchain</span>
+              <span className="text-white/38">•</span>
+              <span>follow for perp farming research</span>
+            </a>
+
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
                 onClick={() => {
-                  if (tab === "funding") void loadFunding(false)
-                  else selectTab(tab === "list" ? "list" : tab)
+                  if (tab === "funding") {
+                    selectTab("funding")
+                    void loadFunding(false)
+                  } else {
+                    selectTab(tab === "calculator" ? "calculator" : "list")
+                  }
                 }}
-                className="rounded-2xl bg-cyan-300 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_0_34px_rgba(34,211,238,0.28)] transition hover:-translate-y-0.5 hover:bg-cyan-200"
+                className="rounded-2xl bg-cyan-300 px-6 py-4 text-sm font-black uppercase tracking-[0.18em] text-slate-950 shadow-[0_0_34px_rgba(34,211,238,0.28)] transition hover:-translate-y-0.5 hover:bg-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-300/50 focus:ring-offset-2 focus:ring-offset-[#050814]"
               >
                 {hero.primary}
               </button>
 
               <button
                 onClick={() => {
-                  if (tab === "funding") resetFundingFilters()
-                  else selectTab(tab === "calculator" ? "funding" : "calculator")
+                  if (tab === "funding") {
+                    resetFundingFilters()
+                    selectTab("funding")
+                  } else {
+                    selectTab(tab === "calculator" ? "funding" : "calculator")
+                  }
                 }}
-                className="rounded-2xl border border-white/12 bg-white/[0.04] px-6 py-4 text-sm font-semibold text-white/80 transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08]"
+                className="rounded-2xl border border-white/12 bg-white/[0.04] px-6 py-4 text-sm font-semibold text-white/80 transition hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-white/25"
               >
                 {hero.secondary}
               </button>
@@ -1264,7 +1292,7 @@ Calculate yours on ${SITE_URL}`
       </div>
 
       {tab === "list" && (
-        <section className="mx-auto mt-14 max-w-6xl space-y-6 px-4 sm:px-6">
+        <section id="perps" className="scroll-mt-24 mx-auto mt-14 max-w-6xl space-y-6 px-4 sm:px-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
@@ -1352,7 +1380,7 @@ Calculate yours on ${SITE_URL}`
       )}
 
       {tab === "calculator" && (
-        <section className="mx-auto mt-14 max-w-6xl space-y-8 px-4 sm:px-6">
+        <section id="calculator" className="scroll-mt-24 mx-auto mt-14 max-w-6xl space-y-8 px-4 sm:px-6">
           <div className="text-center">
               <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
               {t.calcEyebrow}
@@ -1573,7 +1601,7 @@ Calculate yours on ${SITE_URL}`
     
 
       {tab === "funding" && (
-        <section className="mx-auto mt-14 max-w-[1750px] space-y-8 px-4 sm:px-6">
+        <section id="funding" className="scroll-mt-24 mx-auto mt-14 max-w-[1750px] space-y-8 px-4 sm:px-6">
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
             <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
               <div>
@@ -1871,8 +1899,14 @@ Calculate yours on ${SITE_URL}`
             )}
 
             {!fundingLoading && !fundingError && (
-              <div className="overflow-x-auto rounded-2xl border border-neutral-800">
-  <table className="w-full table-fixed border-separate border-spacing-0">
+              <div className="relative overflow-hidden rounded-2xl border border-neutral-800">
+                <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-50 w-8 bg-gradient-to-r from-[#0b111d] to-transparent" />
+                <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-50 w-10 bg-gradient-to-l from-[#0b111d] to-transparent" />
+                <div className="overflow-x-auto overscroll-x-contain [scrollbar-color:rgba(34,211,238,0.45)_rgba(255,255,255,0.06)] [scrollbar-width:thin]">
+  <table
+    className="min-w-full border-separate border-spacing-0"
+    style={{ minWidth: `${488 + activeFundingExchanges.length * 166}px` }}
+  >
                   <thead>
                     <tr className="text-left">
                       <th className="sticky left-0 top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
@@ -1909,13 +1943,13 @@ Calculate yours on ${SITE_URL}`
                       {activeFundingExchanges.map((exchange) => (
   <th
     key={exchange.key}
-    className="sticky top-0 z-30 border-b border-r border-neutral-800 bg-[#0b111d] px-2 py-3 text-center last:border-r-0"
+    className="sticky top-0 z-30 w-[166px] min-w-[166px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-center last:border-r-0"
   >
     <a
       href={exchange.tradeUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition hover:text-cyan-300"
+      className="block truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70 transition hover:text-cyan-300"
     >
       {exchange.label}
     </a>
@@ -1947,7 +1981,7 @@ Calculate yours on ${SITE_URL}`
                           </span>
                         </td>
 
-                        <td className="sticky left-[268px] z-20 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4">
+                        <td className="sticky left-[268px] z-20 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 shadow-[18px_0_24px_rgba(5,8,20,0.25)]">
                           {row.buyExchange && row.sellExchange ? (
                             <div className="flex flex-wrap gap-2">
                               <a
@@ -1985,7 +2019,7 @@ Calculate yours on ${SITE_URL}`
                           return (
                             <td
                               key={`${row.symbol}-${exchange.key}`}
-                              className={`border-b border-r border-neutral-800 px-2 py-4 text-center text-xs font-semibold sm:text-sm last:border-r-0 ${getFundingCellClass(
+                              className={`w-[166px] min-w-[166px] whitespace-nowrap border-b border-r border-neutral-800 px-3 py-4 text-center text-sm font-bold tabular-nums last:border-r-0 ${getFundingCellClass(
   value
 )}`}
                             >
@@ -2020,6 +2054,7 @@ Calculate yours on ${SITE_URL}`
                     )}
                   </tbody>
                 </table>
+                </div>
               </div>
             )}
 

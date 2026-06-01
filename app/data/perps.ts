@@ -85,6 +85,23 @@ export const PERPS = [
     ],
   },
   {
+    slug: "aster",
+    tier: "S",
+    name: "Aster",
+    ref: "https://www.asterdex.com/en/referral/97ad25",
+    refCode: "97ad25",
+    logo: "/aster.png",
+    boost: "+30% commission refback",
+    farm: "High volume + active perp trading",
+    seoKeywords: [
+      "aster referral code",
+      "aster dex referral",
+      "aster commission refback",
+      "aster point calculator",
+      "aster airdrop calculator",
+    ],
+  },
+  {
     slug: "ethereal",
     tier: "A",
     name: "Ethereal",
@@ -220,6 +237,12 @@ export const PERPS_CALC = {
     totalPoints: 60000000,
     airdrop: 15,
   },
+  aster: {
+    name: "Aster",
+    fdv: 0.5,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
   ethereal: {
     name: "Ethereal",
     fdv: 0.3,
@@ -276,6 +299,19 @@ export const PERPS_CALC = {
   },
 } as const
 
+export const PERP_CALC_LOGOS: Partial<Record<keyof typeof PERPS_CALC, string>> = {
+  aster: "/aster.png",
+  bullpen: "/bullpen.png",
+  decibel: "/decibel.png",
+  grvt: "/grvt.png",
+  liquid: "/liquid.png",
+  nado: "/nado.png",
+  o1: "/o1.png",
+  ostium: "/ostium.png",
+  standx: "/standx.png",
+  treadfi: "/treadfi.png",
+}
+
 export type FundingExchangeMeta = {
   key: string
   label: string
@@ -311,6 +347,13 @@ export const PERSONAL_FUNDING_EXCHANGES: Record<string, FundingExchangeMeta> = {
     label: "Hibachi",
     intervalHours: 8,
     tradeUrl: "http://hibachi.xyz/r/capy",
+    hasPersonalRef: true,
+  },
+  aster: {
+    key: "aster",
+    label: "Aster",
+    intervalHours: 8,
+    tradeUrl: "https://www.asterdex.com/en/referral/97ad25",
     hasPersonalRef: true,
   },
   hyena: {
@@ -387,6 +430,7 @@ export const PREFERRED_FUNDING_ORDER = [
   "ethereal",
   "extended",
   "hibachi",
+  "aster",
   "hyena",
   "pacifica",
   "risex",
@@ -397,7 +441,6 @@ export const PREFERRED_FUNDING_ORDER = [
   "bluefin",
   "paradex",
   "drift",
-  "aster",
   "woofi_pro",
   "binance",
   "bybit",

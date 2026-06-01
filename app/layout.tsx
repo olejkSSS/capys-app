@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: "%s | Capys.app",
   },
   description:
-    "Crypto-native perp DEX farming hub with referral boosts, airdrop calculators, tier lists, and live funding rate opportunities for Variational, RiseX, Hibachi, Extended, Ethereal, EdgeX, Pacifica, Hyena and more.",
+    "Crypto-native perp DEX farming hub with referral boosts, airdrop calculators, tier lists, and live funding rate opportunities for Variational, RiseX, Hibachi, Aster, Extended, Ethereal, EdgeX, Pacifica, Hyena and more.",
   keywords: [
     "perp dex",
     "airdrop calculator",

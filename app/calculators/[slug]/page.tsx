@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { PERPS, PERPS_CALC, SITE_URL } from "../../data/perps"
+import { PERP_CALC_LOGOS, PERPS, PERPS_CALC, SITE_URL } from "../../data/perps"
 import { CalculatorClient } from "./CalculatorClient"
 
 type Props = {
@@ -23,7 +23,10 @@ function getPerpFromCalculatorSlug(slug: string) {
     name: calc.name,
     ref: listedPerp?.ref ?? SITE_URL,
     refCode: listedPerp?.refCode ?? "N/A",
-    logo: listedPerp?.logo ?? "/icon.png",
+    logo:
+      listedPerp?.logo ??
+      PERP_CALC_LOGOS[normalized as keyof typeof PERPS_CALC] ??
+      "/icon.png",
     boost: listedPerp?.boost ?? "Editable FDV, points supply, and airdrop estimate",
     farm: listedPerp?.farm ?? "Model your points, FDV, allocation, and point supply",
     seoKeywords: listedPerp?.seoKeywords ?? [],

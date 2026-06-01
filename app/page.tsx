@@ -7,6 +7,7 @@ import { motion } from "motion/react"
 import {
   DEFAULT_FUNDING_EXCHANGES,
   type FundingExchangeMeta,
+  PERP_CALC_LOGOS,
   PERPS,
   PERPS_CALC,
   SITE_URL,
@@ -191,7 +192,7 @@ const CALCULATOR_DIRECTORY = CALC_KEYS.map((key) => {
   return {
     slug: key,
     name: PERPS_CALC[key].name,
-    logo: listedPerp?.logo ?? "/icon.png",
+    logo: listedPerp?.logo ?? PERP_CALC_LOGOS[key] ?? "/icon.png",
   }
 })
 

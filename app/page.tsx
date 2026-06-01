@@ -518,9 +518,16 @@ export default function Home() {
   const [fundingRowLimit, setFundingRowLimit] = useState<FundingRowLimit>(100)
   const [refreshCountdown, setRefreshCountdown] = useState(90)
   const [customTemplate, setCustomTemplate] = useState<string | null>(null)
+  const [languageMenuPosition, setLanguageMenuPosition] = useState({
+    left: 16,
+    top: 76,
+    width: 224,
+  })
 
   const cardRef = useRef<HTMLDivElement>(null)
   const languageButtonRef = useRef<HTMLButtonElement>(null)
+  const fundingTopScrollRef = useRef<HTMLDivElement>(null)
+  const fundingTableScrollRef = useRef<HTMLDivElement>(null)
   const fundingRequestInFlightRef = useRef(false)
   const listCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const tickerCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -546,6 +553,25 @@ export default function Home() {
     if (shouldScroll) scrollToTab(nextTab)
   }
 
+  const updateLanguageMenuPosition = () => {
+    const button = languageButtonRef.current
+    if (!button) return
+
+    const rect = button.getBoundingClientRect()
+    const width = Math.max(224, rect.width)
+    const viewportPadding = 12
+    const left = Math.min(
+      Math.max(viewportPadding, rect.right - width),
+      window.innerWidth - width - viewportPadding
+    )
+
+    setLanguageMenuPosition({
+      left,
+      top: rect.bottom + 8,
+      width,
+    })
+  }
+
   const [fdv, setFdv] = useState<number>(current.fdv)
   const [totalPoints, setTotalPoints] = useState<number>(current.totalPoints)
   const [airdrop, setAirdrop] = useState<number>(current.airdrop)
@@ -565,6 +591,19 @@ export default function Home() {
       scrollToTab(hashTab)
     }
   }, [])
+
+  useEffect(() => {
+    if (!languageOpen) return
+
+    updateLanguageMenuPosition()
+    window.addEventListener("resize", updateLanguageMenuPosition)
+    window.addEventListener("scroll", updateLanguageMenuPosition, true)
+
+    return () => {
+      window.removeEventListener("resize", updateLanguageMenuPosition)
+      window.removeEventListener("scroll", updateLanguageMenuPosition, true)
+    }
+  }, [languageOpen])
 
   useEffect(() => {
     return () => {
@@ -689,6 +728,22 @@ export default function Home() {
       ),
     [fundingExchanges, enabledFundingExchanges]
   )
+
+  const fundingTableMinWidth = 488 + activeFundingExchanges.length * 166
+
+  const syncFundingScroll = (source: "top" | "table") => {
+    const from =
+      source === "top"
+        ? fundingTopScrollRef.current
+        : fundingTableScrollRef.current
+    const to =
+      source === "top"
+        ? fundingTableScrollRef.current
+        : fundingTopScrollRef.current
+
+    if (!from || !to || to.scrollLeft === from.scrollLeft) return
+    to.scrollLeft = from.scrollLeft
+  }
 
   const fundingExchangeByKey = useMemo(
     () =>
@@ -1011,7 +1066,7 @@ Calculate yours on ${SITE_URL}`
         <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <button
             type="button"
-            onClick={() => selectTab("list")}
+            onClick={() => selectTab("list", false)}
             className="flex items-center gap-3 text-left"
             aria-label="Go to Capys app home"
           >
@@ -1030,7 +1085,7 @@ Calculate yours on ${SITE_URL}`
             {TABS.map((item, index) => (
               <button
                 key={`nav-${item.id}`}
-                onClick={() => selectTab(item.id as Tab)}
+                onClick={() => selectTab(item.id as Tab, false)}
                 className={`rounded-full px-4 py-2 transition focus:outline-none focus:ring-2 focus:ring-cyan-300/40 ${
                   tab === item.id
                     ? "bg-white text-black"
@@ -1047,7 +1102,10 @@ Calculate yours on ${SITE_URL}`
               <button
                 ref={languageButtonRef}
                 type="button"
-                onClick={() => setLanguageOpen((prev) => !prev)}
+                onClick={() => {
+                  updateLanguageMenuPosition()
+                  setLanguageOpen((prev) => !prev)
+                }}
                 className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-white/75 transition hover:border-cyan-300/35 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
                 aria-expanded={languageOpen}
                 aria-label={t.language}
@@ -1075,7 +1133,14 @@ Calculate yours on ${SITE_URL}`
               </button>
 
               {languageOpen && (
-                <div className="fixed right-4 top-[76px] z-[1000] max-h-[min(520px,calc(100vh-96px))] w-56 overflow-y-auto rounded-2xl border border-cyan-300/15 bg-[#08111f]/98 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:right-6 lg:right-8">
+                <div
+                  className="fixed z-[1000] max-h-[min(520px,calc(100vh-96px))] overflow-y-auto rounded-2xl border border-cyan-300/15 bg-[#08111f]/98 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+                  style={{
+                    left: languageMenuPosition.left,
+                    top: languageMenuPosition.top,
+                    width: languageMenuPosition.width,
+                  }}
+                >
                   {LANGUAGES.map((item) => (
                     <button
                       key={item.code}
@@ -1102,13 +1167,12 @@ Calculate yours on ${SITE_URL}`
               href="https://x.com/capy_onchain"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 text-xs font-black uppercase tracking-[0.16em] text-cyan-100 transition hover:-translate-y-0.5 hover:bg-cyan-300 hover:text-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-300/40 sm:px-4"
+              className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-white/70 transition hover:border-cyan-300/40 hover:text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
               aria-label="Open Capy on X"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18 2h3l-7 8 8 12h-6l-5-8-7 8H1l8-9L1 2h6l4 7 7-7z" />
               </svg>
-              <span className="hidden sm:inline">More alpha</span>
             </a>
 
             <a
@@ -1270,7 +1334,7 @@ Calculate yours on ${SITE_URL}`
               return (
                 <button
                   key={item.id}
-                  onClick={() => selectTab(item.id as Tab)}
+                onClick={() => selectTab(item.id as Tab, false)}
                   className={`relative flex-1 rounded-xl px-4 py-3 text-xs font-semibold transition-colors duration-300 sm:flex-none sm:px-5 sm:text-sm ${
                     isActive ? "text-slate-950" : "text-white/52 hover:text-white"
                   }`}
@@ -1902,10 +1966,22 @@ Calculate yours on ${SITE_URL}`
               <div className="relative overflow-hidden rounded-2xl border border-neutral-800">
                 <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-50 w-8 bg-gradient-to-r from-[#0b111d] to-transparent" />
                 <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-50 w-10 bg-gradient-to-l from-[#0b111d] to-transparent" />
-                <div className="overflow-x-auto overscroll-x-contain [scrollbar-color:rgba(34,211,238,0.45)_rgba(255,255,255,0.06)] [scrollbar-width:thin]">
+                <div
+                  ref={fundingTopScrollRef}
+                  onScroll={() => syncFundingScroll("top")}
+                  className="overflow-x-auto overflow-y-hidden border-b border-neutral-800 bg-[#0b111d] [scrollbar-color:rgba(34,211,238,0.7)_rgba(255,255,255,0.08)] [scrollbar-width:thin]"
+                  aria-label="Funding table horizontal scroll"
+                >
+                  <div style={{ width: fundingTableMinWidth, height: 14 }} />
+                </div>
+                <div
+                  ref={fundingTableScrollRef}
+                  onScroll={() => syncFundingScroll("table")}
+                  className="overflow-x-auto overscroll-x-contain [scrollbar-color:rgba(34,211,238,0.45)_rgba(255,255,255,0.06)] [scrollbar-width:thin]"
+                >
   <table
     className="min-w-full border-separate border-spacing-0"
-    style={{ minWidth: `${488 + activeFundingExchanges.length * 166}px` }}
+    style={{ minWidth: fundingTableMinWidth }}
   >
                   <thead>
                     <tr className="text-left">

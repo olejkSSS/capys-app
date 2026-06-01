@@ -1063,6 +1063,71 @@ Calculate yours on ${SITE_URL}`
       </div>
 
       <div className="relative z-[100] mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+        <div className="absolute right-4 top-6 z-[120] sm:right-6 lg:right-8 xl:right-[-132px]">
+          <button
+            ref={languageButtonRef}
+            type="button"
+            onClick={() => {
+              updateLanguageMenuPosition()
+              setLanguageOpen((prev) => !prev)
+            }}
+            className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-[#08111f]/88 px-3 text-xs font-semibold text-white/75 shadow-2xl shadow-black/20 backdrop-blur-xl transition hover:border-cyan-300/35 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
+            aria-expanded={languageOpen}
+            aria-label={t.language}
+          >
+            <span>{activeLanguage.flag}</span>
+            <span className="hidden sm:inline">{activeLanguage.label}</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+              className={`text-white/45 transition-transform duration-200 ${
+                languageOpen ? "rotate-180" : ""
+              }`}
+            >
+              <path
+                d="m6 9 6 6 6-6"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+
+          {languageOpen && (
+            <div
+              className="fixed z-[1000] max-h-[min(520px,calc(100vh-96px))] overflow-y-auto rounded-2xl border border-cyan-300/15 bg-[#08111f]/98 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+              style={{
+                left: languageMenuPosition.left,
+                top: languageMenuPosition.top,
+                width: languageMenuPosition.width,
+              }}
+            >
+              {LANGUAGES.map((item) => (
+                <button
+                  key={item.code}
+                  type="button"
+                  onClick={() => {
+                    setLanguage(item.code)
+                    setLanguageOpen(false)
+                  }}
+                  className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-cyan-300/35 ${
+                    language === item.code
+                      ? "bg-cyan-300 text-slate-950 shadow-[0_0_24px_rgba(34,211,238,0.2)]"
+                      : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+                  }`}
+                >
+                  <span>{item.flag}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <button
             type="button"
@@ -1125,70 +1190,6 @@ Calculate yours on ${SITE_URL}`
               {t.contact}
             </a>
 
-            <div className="relative">
-              <button
-                ref={languageButtonRef}
-                type="button"
-                onClick={() => {
-                  updateLanguageMenuPosition()
-                  setLanguageOpen((prev) => !prev)
-                }}
-                className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-3 text-xs font-semibold text-white/75 transition hover:border-cyan-300/35 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
-                aria-expanded={languageOpen}
-                aria-label={t.language}
-              >
-                <span>{activeLanguage.flag}</span>
-                <span className="hidden sm:inline">{activeLanguage.label}</span>
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                  className={`text-white/45 transition-transform duration-200 ${
-                    languageOpen ? "rotate-180" : ""
-                  }`}
-                >
-                  <path
-                    d="m6 9 6 6 6-6"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              {languageOpen && (
-                <div
-                  className="fixed z-[1000] max-h-[min(520px,calc(100vh-96px))] overflow-y-auto rounded-2xl border border-cyan-300/15 bg-[#08111f]/98 p-2 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl"
-                  style={{
-                    left: languageMenuPosition.left,
-                    top: languageMenuPosition.top,
-                    width: languageMenuPosition.width,
-                  }}
-                >
-                  {LANGUAGES.map((item) => (
-                    <button
-                      key={item.code}
-                      type="button"
-                      onClick={() => {
-                        setLanguage(item.code)
-                        setLanguageOpen(false)
-                      }}
-                      className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm transition focus:outline-none focus:ring-2 focus:ring-cyan-300/35 ${
-                        language === item.code
-                          ? "bg-cyan-300 text-slate-950 shadow-[0_0_24px_rgba(34,211,238,0.2)]"
-                          : "text-white/70 hover:bg-white/[0.06] hover:text-white"
-                      }`}
-                    >
-                      <span>{item.flag}</span>
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </header>
 
@@ -1483,60 +1484,50 @@ Calculate yours on ${SITE_URL}`
             })}
           </div>
 
-          <div className="rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.055] p-5 shadow-2xl shadow-black/15 backdrop-blur-xl">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200/55">
-                  Dedicated calculators
-                </div>
-                <h3 className="mt-2 text-2xl font-black text-white">
-                  Open a calculator built for one perp
-                </h3>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-white/52">
-                  Each page has its own URL for searches like Variational point
-                  calculator, Hibachi points calculator, and best referral terms.
-                </p>
+          <div className="grid gap-5 lg:grid-cols-[270px_1fr]">
+            <aside className="rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.055] p-5 shadow-2xl shadow-black/15 backdrop-blur-xl">
+              <div className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-200/55">
+                Dedicated calculators
               </div>
-              <a
-                href={`/calculators/${calcPerp}-point-calculator`}
-                className="rounded-2xl bg-cyan-300 px-5 py-3 text-center text-sm font-black uppercase tracking-[0.14em] text-slate-950 transition hover:bg-cyan-200"
-              >
-                Open {current.name} calculator
-              </a>
-            </div>
+              <h3 className="mt-2 text-xl font-black text-white">
+                Perp-specific pages
+              </h3>
+              <p className="mt-2 text-xs leading-5 text-white/48">
+                Open a dedicated point calculator page for any perp.
+              </p>
 
-            <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              {PERPS.map((perp) => (
-                <a
-                  key={`calc-link-${perp.slug}`}
-                  href={`/calculators/${perp.slug}-point-calculator`}
-                  className={`flex items-center gap-3 rounded-2xl border p-3 transition hover:-translate-y-0.5 ${
-                    calcPerp === perp.slug
-                      ? "border-cyan-300/35 bg-cyan-300/12"
-                      : "border-white/10 bg-white/[0.035] hover:border-cyan-300/25 hover:bg-white/[0.06]"
-                  }`}
-                >
-                  <Image
-                    src={perp.logo}
-                    alt={perp.name}
-                    width={34}
-                    height={34}
-                    className="rounded-lg"
-                  />
-                  <span>
-                    <span className="block text-sm font-bold text-white">
-                      {perp.name}
+              <div className="mt-5 space-y-2">
+                {PERPS.map((perp) => (
+                  <a
+                    key={`calc-link-${perp.slug}`}
+                    href={`/calculators/${perp.slug}-point-calculator`}
+                    className={`flex items-center gap-3 rounded-2xl border p-3 transition hover:-translate-y-0.5 ${
+                      calcPerp === perp.slug
+                        ? "border-cyan-300/35 bg-cyan-300/12"
+                        : "border-white/10 bg-white/[0.035] hover:border-cyan-300/25 hover:bg-white/[0.06]"
+                    }`}
+                  >
+                    <Image
+                      src={perp.logo}
+                      alt={perp.name}
+                      width={34}
+                      height={34}
+                      className="rounded-lg"
+                    />
+                    <span>
+                      <span className="block text-sm font-bold text-white">
+                        {perp.name}
+                      </span>
+                      <span className="block text-xs text-white/42">
+                        Point calculator
+                      </span>
                     </span>
-                    <span className="block text-xs text-white/42">
-                      Point calculator
-                    </span>
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
+                  </a>
+                ))}
+              </div>
+            </aside>
 
-          <div className="grid gap-5 rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl md:grid-cols-2">
+            <div className="grid gap-5 rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-xl md:grid-cols-2">
             <div className="md:col-span-2">
               <div className="rounded-3xl border border-cyan-300/15 bg-cyan-300/8 p-5">
                 <div className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">
@@ -1603,6 +1594,7 @@ Calculate yours on ${SITE_URL}`
                 onChange={(e) => setAirdrop(sanitizeNumber(e.target.value))}
                 className="w-full rounded-2xl border border-white/10 bg-[#07101d] p-4 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
               />
+            </div>
             </div>
           </div>
 

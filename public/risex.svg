@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="title">
+  <title id="title">RiseX</title>
+  <rect width="400" height="400" fill="#10d889"/>
+  <path
+    fill="#050814"
+    d="M91 103h62l56 119c9 20 24 30 44 30 17 0 29-7 37-20l47-75h43l-65 110c-14 23-35 35-62 35-37 0-65-18-83-55L91 103Z"
+  />
+  <path
+    fill="#050814"
+    d="M93 297 306 103h46L139 297H93Z"
+  />
+</svg>

@@ -8,7 +8,7 @@ export const PERPS = [
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     refCode: "OMNICAPY",
     logo: "/variational.png",
-    boost: "OMNICAPY: +15% points boost",
+    boost: "+15% points boost",
     farm: "Holding positions + volume on mid-OI tokens",
     seoKeywords: [
       "variational point calculator",
@@ -19,8 +19,25 @@ export const PERPS = [
     ],
   },
   {
-    slug: "extended",
+    slug: "risex",
     tier: "S+",
+    name: "RiseX",
+    ref: "https://t.me/olejk_2k",
+    refCode: "Contact",
+    logo: "/risex.svg",
+    boost: "Private invite codes via Telegram",
+    farm: "Private access + early perp farming",
+    seoKeywords: [
+      "risex invite code",
+      "risex referral code",
+      "risex perp invite",
+      "risex point calculator",
+      "rise trade invite code",
+    ],
+  },
+  {
+    slug: "extended",
+    tier: "S",
     name: "Extended",
     ref: "https://app.extended.exchange/join/CAPY",
     refCode: "CAPY",
@@ -53,7 +70,7 @@ export const PERPS = [
   },
   {
     slug: "ethereal",
-    tier: "S",
+    tier: "A",
     name: "Ethereal",
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     refCode: "UM68P2M9JZ6D",
@@ -69,7 +86,7 @@ export const PERPS = [
   },
   {
     slug: "hyena",
-    tier: "S",
+    tier: "A",
     name: "Hyena",
     ref: "https://app.hyena.trade/ref/CAPY",
     refCode: "CAPY",
@@ -85,7 +102,7 @@ export const PERPS = [
   },
   {
     slug: "pacifica",
-    tier: "A",
+    tier: "S",
     name: "Pacifica",
     ref: "https://app.pacifica.fi/?referral=Capy",
     refCode: "Capy",
@@ -190,6 +207,12 @@ export const PERPS_CALC = {
     fdv: 0.1,
     totalPoints: 6000000,
     airdrop: 12,
+  },
+  risex: {
+    name: "RiseX",
+    fdv: 0.3,
+    totalPoints: 10000000,
+    airdrop: 15,
   },
   hibachi: {
     name: "Hibachi",
@@ -304,6 +327,13 @@ export const PERSONAL_FUNDING_EXCHANGES: Record<string, FundingExchangeMeta> = {
     tradeUrl: "https://app.pacifica.fi/?referral=Capy",
     hasPersonalRef: true,
   },
+  risex: {
+    key: "risex",
+    label: "RiseX",
+    intervalHours: 8,
+    tradeUrl: "https://t.me/olejk_2k",
+    hasPersonalRef: true,
+  },
   variational: {
     key: "variational",
     label: "Variational",
@@ -359,6 +389,7 @@ export const PREFERRED_FUNDING_ORDER = [
   "hibachi",
   "hyena",
   "pacifica",
+  "risex",
   "variational",
   "hyperliquid",
   "lighter",

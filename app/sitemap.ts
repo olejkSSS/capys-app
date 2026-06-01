@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next"
-import { PERPS, SITE_URL } from "./data/perps"
+import { PERPS, PERPS_CALC, SITE_URL } from "./data/perps"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -27,8 +27,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.86,
     })),
-    ...PERPS.map((perp) => ({
-      url: `${SITE_URL}/calculators/${perp.slug}-point-calculator`,
+    ...Object.keys(PERPS_CALC).map((slug) => ({
+      url: `${SITE_URL}/calculators/${slug}-point-calculator`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.9,

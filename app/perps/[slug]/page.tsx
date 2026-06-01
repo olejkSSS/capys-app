@@ -129,7 +129,9 @@ export default async function PerpSeoPage({ params }: Props) {
               rel="noopener noreferrer"
               className="rounded-2xl bg-cyan-300 px-6 py-4 text-center text-sm font-black uppercase tracking-[0.16em] text-slate-950 shadow-[0_0_34px_rgba(34,211,238,0.22)]"
             >
-              Open {perp.name} with Capy ref
+              {perp.slug === "risex"
+                ? "Contact for RiseX codes"
+                : `Open ${perp.name} with Capy ref`}
             </a>
             <Link
               href={`/calculators/${perp.slug}-point-calculator`}

@@ -13,12 +13,27 @@ type Props = {
 
 function getPerpFromCalculatorSlug(slug: string) {
   const normalized = slug.replace(/-points?-calculator$/, "")
-  return PERPS.find((perp) => perp.slug === normalized)
+  const listedPerp = PERPS.find((perp) => perp.slug === normalized)
+  const calc = PERPS_CALC[normalized as keyof typeof PERPS_CALC]
+
+  if (!calc) return null
+
+  return {
+    slug: normalized,
+    name: calc.name,
+    ref: listedPerp?.ref ?? SITE_URL,
+    refCode: listedPerp?.refCode ?? "N/A",
+    logo: listedPerp?.logo ?? "/icon.png",
+    boost: listedPerp?.boost ?? "Editable FDV, points supply, and airdrop estimate",
+    farm: listedPerp?.farm ?? "Model your points, FDV, allocation, and point supply",
+    seoKeywords: listedPerp?.seoKeywords ?? [],
+    hasReferral: Boolean(listedPerp),
+  }
 }
 
 export function generateStaticParams() {
-  return PERPS.map((perp) => ({
-    slug: `${perp.slug}-point-calculator`,
+  return Object.keys(PERPS_CALC).map((slug) => ({
+    slug: `${slug}-point-calculator`,
   }))
 }
 
@@ -29,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!perp) return {}
 
   const title = `${perp.name} Point Calculator`
-  const description = `Estimate ${perp.name} airdrop value from points, FDV, total point supply, and token allocation. Includes ${perp.name} referral code ${perp.refCode} and Capy farming notes.`
+  const description = `Estimate ${perp.name} airdrop value from points, FDV, total point supply, and token allocation. Includes ${perp.name} farming notes${perp.hasReferral ? ` and referral code ${perp.refCode}` : ""}.`
   const canonical = `/calculators/${perp.slug}-point-calculator`
 
   return {
@@ -178,13 +193,17 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
                 rel="noopener noreferrer"
                 className="rounded-2xl bg-cyan-300 px-6 py-4 text-sm font-black uppercase tracking-[0.16em] text-slate-950 shadow-[0_0_34px_rgba(34,211,238,0.24)] transition hover:bg-cyan-200"
               >
-                Open {perp.name} with Capy ref
+                {perp.hasReferral
+                  ? perp.slug === "risex"
+                    ? "Contact for RiseX codes"
+                    : `Open ${perp.name} with Capy ref`
+                  : "Open Capys.app"}
               </a>
               <Link
-                href={`/perps/${perp.slug}`}
+                href={perp.hasReferral ? `/perps/${perp.slug}` : "/"}
                 className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-4 text-sm font-semibold text-white/75 transition hover:border-white/20 hover:text-white"
               >
-                Referral details
+                {perp.hasReferral ? "Referral details" : "Back to main dashboard"}
               </Link>
             </div>
           </div>
@@ -267,15 +286,17 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
           <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
             <h2 className="text-2xl font-black">More perp calculators</h2>
             <div className="mt-4 flex flex-wrap gap-2">
-              {PERPS.filter((item) => item.slug !== perp.slug).map((item) => (
+              {Object.entries(PERPS_CALC)
+                .filter(([slug]) => slug !== perp.slug)
+                .map(([slug, item]) => (
                 <Link
-                  key={item.slug}
-                  href={`/calculators/${item.slug}-point-calculator`}
+                  key={slug}
+                  href={`/calculators/${slug}-point-calculator`}
                   className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs text-white/60 transition hover:border-cyan-300/35 hover:text-cyan-200"
                 >
                   {item.name}
                 </Link>
-              ))}
+                ))}
             </div>
           </article>
         </section>

@@ -185,6 +185,15 @@ const TABS = [
 ] as const
 
 const CALC_KEYS = Object.keys(PERPS_CALC) as CalcPerpKey[]
+const CALCULATOR_DIRECTORY = CALC_KEYS.map((key) => {
+  const listedPerp = PERPS.find((perp) => perp.slug === key)
+
+  return {
+    slug: key,
+    name: PERPS_CALC[key].name,
+    logo: listedPerp?.logo ?? "/icon.png",
+  }
+})
 
 const TAB_HASH: Record<Tab, string> = {
   list: "perps",
@@ -558,10 +567,10 @@ export default function Home() {
     if (!button) return
 
     const rect = button.getBoundingClientRect()
-    const width = Math.max(224, rect.width)
+    const width = Math.max(210, rect.width)
     const viewportPadding = 12
     const left = Math.min(
-      Math.max(viewportPadding, rect.left),
+      Math.max(viewportPadding, rect.right - width),
       window.innerWidth - width - viewportPadding
     )
 
@@ -1063,7 +1072,7 @@ Calculate yours on ${SITE_URL}`
       </div>
 
       <div className="relative z-[100] mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-        <div className="absolute right-4 top-6 z-[120] sm:right-6 lg:right-8 xl:right-[-132px]">
+        <div className="absolute right-4 top-9 z-[120] sm:right-6 lg:right-8 xl:right-[-132px]">
           <button
             ref={languageButtonRef}
             type="button"
@@ -1071,7 +1080,7 @@ Calculate yours on ${SITE_URL}`
               updateLanguageMenuPosition()
               setLanguageOpen((prev) => !prev)
             }}
-            className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-[#08111f]/88 px-3 text-xs font-semibold text-white/75 shadow-2xl shadow-black/20 backdrop-blur-xl transition hover:border-cyan-300/35 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
+            className="inline-flex h-10 min-w-[112px] items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#08111f]/88 px-3 text-xs font-semibold text-white/75 shadow-2xl shadow-black/20 backdrop-blur-xl transition hover:border-cyan-300/35 hover:bg-white/[0.07] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300/40"
             aria-expanded={languageOpen}
             aria-label={t.language}
           >
@@ -1389,7 +1398,10 @@ Calculate yours on ${SITE_URL}`
             <div />
           </div>
 
-          {PERPS.map((perp) => (
+          {PERPS.map((perp) => {
+            const isContactOnly = perp.slug === "risex"
+
+            return (
             <div
               key={perp.name}
               className="group relative flex flex-col items-start gap-4 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-xl shadow-black/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-white/[0.055] hover:shadow-[0_0_36px_rgba(34,211,238,0.12)] md:grid md:grid-cols-[88px_1fr_260px_auto] md:items-center md:p-5"
@@ -1429,10 +1441,20 @@ Calculate yours on ${SITE_URL}`
                   onClick={() => copyRefCode(perp.name, perp.refCode)}
                   className="group/boost relative rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-center text-xs font-semibold text-emerald-200 transition hover:bg-emerald-300/15 sm:text-sm"
                 >
-                  {copiedRefName === perp.name ? t.copiedCode : perp.boost}
+                  {copiedRefName === perp.name
+                    ? t.copiedCode
+                    : isContactOnly
+                      ? "Contact for private invite codes"
+                      : perp.boost}
 
                   <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max -translate-x-1/2 rounded-xl border border-white/10 bg-[#07101d] px-3 py-2 text-[11px] text-white opacity-0 shadow-lg transition group-hover/boost:opacity-100">
-                    {t.code}: <span className="text-cyan-300">{perp.refCode}</span> • {t.clickToCopy}
+                    {isContactOnly ? (
+                      <span>DM @olejk_2k on Telegram for RiseX access codes</span>
+                    ) : (
+                      <>
+                        {t.code}: <span className="text-cyan-300">{perp.refCode}</span> • {t.clickToCopy}
+                      </>
+                    )}
                   </span>
                 </button>
               </div>
@@ -1443,10 +1465,11 @@ Calculate yours on ${SITE_URL}`
                 rel="noopener noreferrer"
                 className="mt-2 w-full rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-3 text-center text-sm font-black uppercase tracking-[0.16em] text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950 md:ml-4 md:mt-0 md:w-auto"
               >
-                {t.trade} →
+                {isContactOnly ? "Contact for codes" : t.trade} →
               </a>
             </div>
-          ))}
+            )
+          })}
         </section>
       )}
 
@@ -1496,8 +1519,8 @@ Calculate yours on ${SITE_URL}`
                 Open a dedicated point calculator page for any perp.
               </p>
 
-              <div className="mt-5 space-y-2">
-                {PERPS.map((perp) => (
+              <div className="mt-5 max-h-[520px] space-y-2 overflow-y-auto pr-1">
+                {CALCULATOR_DIRECTORY.map((perp) => (
                   <a
                     key={`calc-link-${perp.slug}`}
                     href={`/calculators/${perp.slug}-point-calculator`}

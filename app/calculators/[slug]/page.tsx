@@ -114,8 +114,14 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
       <div className="mx-auto max-w-6xl">
         <nav className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <Link href="/" className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl border border-cyan-300/25 bg-cyan-300/10 text-sm font-black text-cyan-200">
-              C
+            <span className="relative h-10 w-10 overflow-hidden rounded-xl border border-cyan-300/25 bg-cyan-300/10">
+              <Image
+                src="/icon.png"
+                alt="Capys.app"
+                fill
+                sizes="40px"
+                className="object-cover"
+              />
             </span>
             <span>
               <span className="block text-sm font-semibold tracking-[0.24em]">

@@ -41,7 +41,7 @@ export default function PerpAirdropCalculatorPage() {
           {PERPS.map((perp) => (
             <Link
               key={perp.slug}
-              href={`/perps/${perp.slug}`}
+              href={`/calculators/${perp.slug}-point-calculator`}
               className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-cyan-300/35 hover:bg-white/[0.07]"
             >
               <div className="font-bold">{perp.name}</div>

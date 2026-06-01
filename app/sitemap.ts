@@ -27,5 +27,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly" as const,
       priority: 0.86,
     })),
+    ...PERPS.map((perp) => ({
+      url: `${SITE_URL}/calculators/${perp.slug}-point-calculator`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.9,
+    })),
   ]
 }

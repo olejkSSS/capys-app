@@ -132,10 +132,10 @@ export default async function PerpSeoPage({ params }: Props) {
               Open {perp.name} with Capy ref
             </a>
             <Link
-              href="/#calculator"
+              href={`/calculators/${perp.slug}-point-calculator`}
               className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-4 text-center text-sm font-semibold text-white/75 transition hover:text-white"
             >
-              Use airdrop calculator
+              Open {perp.name} point calculator
             </Link>
           </div>
         </section>

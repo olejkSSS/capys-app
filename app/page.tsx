@@ -561,7 +561,7 @@ export default function Home() {
     const width = Math.max(224, rect.width)
     const viewportPadding = 12
     const left = Math.min(
-      Math.max(viewportPadding, rect.right - width),
+      Math.max(viewportPadding, rect.left),
       window.innerWidth - width - viewportPadding
     )
 

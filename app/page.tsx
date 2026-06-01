@@ -1439,12 +1439,12 @@ Calculate yours on ${SITE_URL}`
                 <button
                   type="button"
                   onClick={() => copyRefCode(perp.name, perp.refCode)}
-                  className="group/boost relative rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-center text-xs font-semibold text-emerald-200 transition hover:bg-emerald-300/15 sm:text-sm"
+                  className="group/boost relative w-[190px] rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-center text-xs font-semibold text-emerald-200 transition hover:bg-emerald-300/15 sm:text-sm"
                 >
                   {copiedRefName === perp.name
                     ? t.copiedCode
                     : isContactOnly
-                      ? "Contact for private invite codes"
+                      ? "Contact for codes"
                       : perp.boost}
 
                   <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 w-max -translate-x-1/2 rounded-xl border border-white/10 bg-[#07101d] px-3 py-2 text-[11px] text-white opacity-0 shadow-lg transition group-hover/boost:opacity-100">
@@ -1463,7 +1463,7 @@ Calculate yours on ${SITE_URL}`
                 href={perp.ref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-2 w-full rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-3 text-center text-sm font-black uppercase tracking-[0.16em] text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950 md:ml-4 md:mt-0 md:w-auto"
+                className="mt-2 w-full rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-6 py-3 text-center text-sm font-black uppercase tracking-[0.16em] text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950 md:ml-4 md:mt-0 md:w-[130px]"
               >
                 {isContactOnly ? "Contact for codes" : t.trade} →
               </a>

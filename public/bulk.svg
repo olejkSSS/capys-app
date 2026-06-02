@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="title">
+  <title id="title">Bulk</title>
+  <rect width="400" height="400" fill="#171711"/>
+  <path
+    fill="#fffdf0"
+    d="M200 53 222 169 301 99 231 178 347 200 231 222 301 301 222 231 200 347 178 231 99 301 169 222 53 200 169 178 99 99 178 169 200 53Z"
+  />
+</svg>

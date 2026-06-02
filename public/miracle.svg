@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="title">
+  <title id="title">Miracle</title>
+  <rect width="400" height="400" rx="24" fill="#88c9e8"/>
+  <path
+    fill="#fffdf0"
+    d="M322 58 231 171c-16 20-15 59 3 80l35 41-45-34c-23-17-68-14-89 8L77 326l56-89c15-24 13-68-5-90L88 98l50 38c22 17 66 22 92 10L322 58Z"
+  />
+</svg>

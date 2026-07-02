@@ -19,6 +19,23 @@ export const PERPS = [
     ],
   },
   {
+    slug: "txflow",
+    tier: "S+",
+    name: "TxFlow",
+    ref: "https://app.txflow.com/r/TXCAPY",
+    refCode: "TXCAPY",
+    logo: "/txflow.png",
+    boost: "5% fee discount",
+    farm: "Trading activity with reduced fees",
+    seoKeywords: [
+      "txflow referral code",
+      "txflow fee discount",
+      "txflow referral",
+      "txflow trading",
+      "txflow perp dex",
+    ],
+  },
+  {
     slug: "risex",
     tier: "S+",
     name: "RiseX",
@@ -89,25 +106,6 @@ export const PERPS = [
     ],
   },
   {
-    slug: "miracle",
-    tier: "S",
-    name: "Miracle",
-    ref: "https://www.miracletrade.com/?ref=olejk",
-    refCode: "olejk",
-    logo: "/miracle.svg",
-    boost: "+5 bonus points",
-    farm: "Referral bonus points + early trading activity",
-    seoKeywords: [
-      "miracle trade referral code",
-      "miracle referral",
-      "miracle bonus points",
-      "miracle point calculator",
-      "miracle points calculator",
-      "miracle airdrop calculator",
-      "miracle trade ref",
-    ],
-  },
-  {
     slug: "pacifica",
     tier: "S",
     name: "Pacifica",
@@ -124,83 +122,38 @@ export const PERPS = [
     ],
   },
   {
-    slug: "aster",
+    slug: "meridian",
     tier: "A",
-    name: "Aster",
-    ref: "https://www.asterdex.com/en/referral/97ad25",
-    refCode: "97ad25",
-    logo: "/aster.png",
-    boost: "+30% commission refback",
-    farm: "High volume + active perp trading",
-    seoKeywords: [
-      "aster referral code",
-      "aster dex referral",
-      "aster commission refback",
-      "aster point calculator",
-      "aster airdrop calculator",
-    ],
-  },
-  {
-    slug: "ethereal",
-    tier: "A",
-    name: "Ethereal",
+    name: "Meridian",
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     refCode: "UM68P2M9JZ6D",
     logo: "/ethereal.png",
     boost: "+15% points boost",
     farm: "Boost farming + low OI tokens",
     seoKeywords: [
+      "meridian referral code",
+      "meridian points boost",
+      "meridian airdrop calculator",
+      "meridian perp dex",
       "ethereal trade referral code",
-      "ethereal points boost",
-      "ethereal airdrop calculator",
-      "ethereal trade ref",
+      "ethereal is now meridian",
     ],
   },
   {
-    slug: "hyena",
+    slug: "reya",
     tier: "A",
-    name: "Hyena",
-    ref: "https://app.hyena.trade/ref/CAPY",
-    refCode: "CAPY",
-    logo: "/hyena.png",
-    boost: "+10% points boost",
-    farm: "Activity + steady volume",
+    name: "Reya",
+    ref: "https://app.reya.xyz/trade?referredBy=btllw3ot",
+    refCode: "btllw3ot",
+    logo: "/reya.png",
+    boost: "Referral access",
+    farm: "Perp trading + active market participation",
     seoKeywords: [
-      "hyena referral code",
-      "hyena points boost",
-      "hyena airdrop calculator",
-      "hyena trade ref",
-    ],
-  },
-  {
-    slug: "edgex",
-    tier: "A",
-    name: "EdgeX",
-    ref: "https://pro.edgex.exchange/referral/OLEJK",
-    refCode: "OLEJK",
-    logo: "/edgex.png",
-    boost: "-10% fees + 10% points boost + VIP1",
-    farm: "High volume + hold positions",
-    seoKeywords: [
-      "edgex referral code",
-      "edgex fee discount",
-      "edgex points boost",
-      "edgex airdrop calculator",
-    ],
-  },
-  {
-    slug: "dreamcash",
-    tier: "A",
-    name: "Dreamcash",
-    ref: "https://dreamcash.xyz/share?code=CAPYCR",
-    refCode: "CAPYCR",
-    logo: "/dreamcash.png",
-    boost: "boost from 10K to 1M points",
-    farm: "Low OI tokens + active trading",
-    seoKeywords: [
-      "dreamcash referral code",
-      "dreamcash points boost",
-      "dreamcash airdrop calculator",
+      "reya referral code",
+      "reya referred by",
+      "reya trading referral",
+      "reya perp dex",
+      "reya trade",
     ],
   },
 ] as const
@@ -234,12 +187,6 @@ export const PERPS_CALC = {
     totalPoints: 50000000,
     airdrop: 30,
   },
-  miracle: {
-    name: "Miracle",
-    fdv: 0.3,
-    totalPoints: 10000000,
-    airdrop: 15,
-  },
   bulk: {
     name: "Bulk",
     fdv: 0.4,
@@ -270,12 +217,6 @@ export const PERPS_CALC = {
     totalPoints: 2800000,
     airdrop: 20,
   },
-  dreamcash: {
-    name: "Dreamcash",
-    fdv: 0.1,
-    totalPoints: 6000000,
-    airdrop: 12,
-  },
   risex: {
     name: "RiseX",
     fdv: 0.3,
@@ -288,14 +229,8 @@ export const PERPS_CALC = {
     totalPoints: 60000000,
     airdrop: 15,
   },
-  aster: {
-    name: "Aster",
-    fdv: 0.5,
-    totalPoints: 10000000,
-    airdrop: 15,
-  },
-  ethereal: {
-    name: "Ethereal",
+  meridian: {
+    name: "Meridian",
     fdv: 0.3,
     totalPoints: 8000000000,
     airdrop: 15,
@@ -318,29 +253,11 @@ export const PERPS_CALC = {
     totalPoints: 69900000,
     airdrop: 15,
   },
-  edgex: {
-    name: "EdgeX",
-    fdv: 1,
-    totalPoints: 10000000,
-    airdrop: 30,
-  },
   standx: {
     name: "StandX",
     fdv: 0.2,
     totalPoints: 50000000,
     airdrop: 20,
-  },
-  hyena: {
-    name: "Hyena",
-    fdv: 0,
-    totalPoints: 1,
-    airdrop: 15,
-  },
-  liquid: {
-    name: "Liquid",
-    fdv: 0,
-    totalPoints: 1,
-    airdrop: 15,
   },
   decibel: {
     name: "Decibel",
@@ -351,11 +268,9 @@ export const PERPS_CALC = {
 } as const
 
 export const PERP_CALC_LOGOS: Partial<Record<keyof typeof PERPS_CALC, string>> = {
-  aster: "/aster.png",
   bullpen: "/bullpen.png",
   decibel: "/decibel.png",
   grvt: "/grvt.png",
-  liquid: "/liquid.png",
   nado: "/nado.png",
   o1: "/o1.png",
   ostium: "/ostium.png",
@@ -372,18 +287,18 @@ export type FundingExchangeMeta = {
 }
 
 export const PERSONAL_FUNDING_EXCHANGES: Record<string, FundingExchangeMeta> = {
-  edgex: {
-    key: "edgex",
-    label: "EdgeX",
-    intervalHours: 8,
-    tradeUrl: "https://pro.edgex.exchange/referral/OLEJK",
-    hasPersonalRef: true,
-  },
   ethereal: {
     key: "ethereal",
-    label: "Ethereal",
+    label: "Meridian",
     intervalHours: 8,
     tradeUrl: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
+    hasPersonalRef: true,
+  },
+  txflow: {
+    key: "txflow",
+    label: "TxFlow",
+    intervalHours: 8,
+    tradeUrl: "https://app.txflow.com/r/TXCAPY",
     hasPersonalRef: true,
   },
   extended: {
@@ -391,13 +306,6 @@ export const PERSONAL_FUNDING_EXCHANGES: Record<string, FundingExchangeMeta> = {
     label: "Extended",
     intervalHours: 1,
     tradeUrl: "https://app.extended.exchange/join/CAPY",
-    hasPersonalRef: true,
-  },
-  miracle: {
-    key: "miracle",
-    label: "Miracle",
-    intervalHours: 8,
-    tradeUrl: "https://www.miracletrade.com/?ref=olejk",
     hasPersonalRef: true,
   },
   bulk: {
@@ -414,18 +322,11 @@ export const PERSONAL_FUNDING_EXCHANGES: Record<string, FundingExchangeMeta> = {
     tradeUrl: "http://hibachi.xyz/r/capy",
     hasPersonalRef: true,
   },
-  aster: {
-    key: "aster",
-    label: "Aster",
+  reya: {
+    key: "reya",
+    label: "Reya",
     intervalHours: 8,
-    tradeUrl: "https://www.asterdex.com/en/referral/97ad25",
-    hasPersonalRef: true,
-  },
-  hyena: {
-    key: "hyena",
-    label: "Hyena",
-    intervalHours: 8,
-    tradeUrl: "https://app.hyena.trade/ref/CAPY",
+    tradeUrl: "https://app.reya.xyz/trade?referredBy=btllw3ot",
     hasPersonalRef: true,
   },
   pacifica: {
@@ -466,6 +367,7 @@ export const GENERIC_EXCHANGE_URLS: Record<string, string> = {
   deribit: "https://www.deribit.com/",
   drift: "https://app.drift.trade/",
   dydx: "https://dydx.trade/",
+  edgex: "https://pro.edgex.exchange/",
   gate: "https://www.gate.com/futures",
   gateio: "https://www.gate.com/futures",
   htx: "https://www.htx.com/futures/",
@@ -473,7 +375,6 @@ export const GENERIC_EXCHANGE_URLS: Record<string, string> = {
   kucoin: "https://www.kucoin.com/futures",
   lighter: "https://app.lighter.xyz/",
   mexc: "https://www.mexc.com/futures",
-  miracle: "https://www.miracletrade.com/",
   okx: "https://www.okx.com/trade-swap",
   paradex: "https://app.paradex.trade/",
   phemex: "https://phemex.com/futures",
@@ -492,15 +393,17 @@ export const ONE_HOUR_FUNDING_EXCHANGES = new Set([
 ])
 
 export const PREFERRED_FUNDING_ORDER = [
-  "edgex",
   "ethereal",
+  "meridian",
+  "txflow",
   "risex",
   "hibachi",
   "bulk",
   "extended",
-  "miracle",
   "pacifica",
+  "reya",
   "variational",
+  "edgex",
   "aster",
   "hyena",
   "hyperliquid",
@@ -552,6 +455,13 @@ export function getFundingExchangeMeta(
   display?: string
 ): FundingExchangeMeta {
   const normalizedKey = normalizeExchangeKey(key)
+  if (normalizedKey === "meridian") {
+    return {
+      ...PERSONAL_FUNDING_EXCHANGES.ethereal,
+      key: "meridian",
+    }
+  }
+
   const personal = PERSONAL_FUNDING_EXCHANGES[normalizedKey]
 
   if (personal) return personal
@@ -577,9 +487,13 @@ export const SEO_PROTOCOL_KEYWORDS = Array.from(
       `${perp.name} ref code`,
       `${perp.name} best referral`,
       `${perp.name} max referral bonus`,
-      `${perp.name} point calculator`,
-      `${perp.name} points calculator`,
-      `${perp.name} airdrop estimate`,
+      ...(perp.slug in PERPS_CALC
+        ? [
+            `${perp.name} point calculator`,
+            `${perp.name} points calculator`,
+            `${perp.name} airdrop estimate`,
+          ]
+        : []),
     ])
   )
 )

@@ -20,19 +20,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!perp) return {}
 
-  const title = `${perp.name} Referral Code, Points Boost & Airdrop Calculator`
-  const description = `Use Capys.app for the ${perp.name} referral code (${perp.refCode}), ${perp.boost}, farming notes, and a perp points airdrop calculator.`
+  const hasCalculator = perp.slug in PERPS_CALC
+  const title = `${perp.name} Referral Code & Farming Terms${hasCalculator ? " + Point Calculator" : ""}`
+  const description = `Use Capys.app for the ${perp.name} referral code (${perp.refCode}), ${perp.boost}, and current farming notes${hasCalculator ? " with a perp points airdrop calculator" : ""}.`
 
   return {
     title,
     description,
     keywords: [
       ...perp.seoKeywords,
-      `${perp.name} point calculator`,
-      `${perp.name} points calculator`,
       `${perp.name} referral code`,
       `${perp.name} max referral`,
-      `${perp.name} airdrop calculator`,
+      ...(hasCalculator
+        ? [
+            `${perp.name} point calculator`,
+            `${perp.name} points calculator`,
+            `${perp.name} airdrop calculator`,
+          ]
+        : []),
       "perp dex referral code",
       "best perp dex referral bonus",
     ],
@@ -133,12 +138,14 @@ export default async function PerpSeoPage({ params }: Props) {
                 ? "Contact for RiseX codes"
                 : `Open ${perp.name} with Capy ref`}
             </a>
-            <Link
-              href={`/calculators/${perp.slug}-point-calculator`}
-              className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-4 text-center text-sm font-semibold text-white/75 transition hover:text-white"
-            >
-              Open {perp.name} point calculator
-            </Link>
+            {calc && (
+              <Link
+                href={`/calculators/${perp.slug}-point-calculator`}
+                className="rounded-2xl border border-white/10 bg-white/[0.04] px-6 py-4 text-center text-sm font-semibold text-white/75 transition hover:text-white"
+              >
+                Open {perp.name} point calculator
+              </Link>
+            )}
           </div>
         </section>
 

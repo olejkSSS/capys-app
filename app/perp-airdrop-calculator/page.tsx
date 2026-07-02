@@ -1,18 +1,18 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { PERPS, SITE_URL } from "../data/perps"
+import { PERPS, PERPS_CALC, SITE_URL } from "../data/perps"
 
 export const metadata: Metadata = {
   title: "Perp Points Airdrop Calculator",
   description:
-    "Estimate perp DEX airdrop value from points, FDV, total points supply, and token allocation across Variational, Extended, Hibachi, Ethereal, EdgeX, Pacifica, Hyena and more.",
+    "Estimate perp DEX airdrop value from points, FDV, total points supply, and token allocation across Variational, Bulk, Extended, Hibachi, Pacifica, Meridian and more.",
   keywords: [
     "perp points calculator",
     "perp airdrop calculator",
     "variational point calculator",
     "hibachi points calculator",
     "extended points calculator",
-    "ethereal airdrop calculator",
+    "meridian airdrop calculator",
     "perp dex airdrop estimate",
   ],
   alternates: {
@@ -38,7 +38,7 @@ export default function PerpAirdropCalculatorPage() {
         </p>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {PERPS.map((perp) => (
+          {PERPS.filter((perp) => perp.slug in PERPS_CALC).map((perp) => (
             <Link
               key={perp.slug}
               href={`/calculators/${perp.slug}-point-calculator`}

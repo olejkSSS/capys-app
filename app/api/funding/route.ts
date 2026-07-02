@@ -8,7 +8,9 @@ import {
 } from "../../data/perps"
 
 const LORIS_FUNDING_URL = "https://api.loris.tools/funding"
-const CACHE_TTL_MS = 65_000
+const CACHE_TTL_MS = 90_000
+const UPSTREAM_TIMEOUT_MS = 12_000
+const MAX_FETCH_ATTEMPTS = 3
 
 type LorisExchangeName = {
   name: string
@@ -36,6 +38,62 @@ let cachedPayload: FundingPayload | null = null
 let cachedAt = 0
 let inFlightRequest: Promise<FundingPayload> | null = null
 
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function getRetryDelay(response: Response, attempt: number) {
+  const retryAfter = response.headers.get("retry-after")
+  const retryAfterSeconds = retryAfter ? Number(retryAfter) : Number.NaN
+
+  if (Number.isFinite(retryAfterSeconds)) {
+    return Math.min(Math.max(retryAfterSeconds * 1000, 500), 5_000)
+  }
+
+  return 600 * 2 ** attempt
+}
+
+async function fetchLorisResponse() {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt < MAX_FETCH_ATTEMPTS; attempt += 1) {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS)
+
+    try {
+      const response = await fetch(LORIS_FUNDING_URL, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "capys.app funding screener",
+        },
+        next: { revalidate: 90 },
+        signal: controller.signal,
+      })
+
+      if (response.ok) return response
+
+      lastError = new Error(`Loris API error: ${response.status}`)
+      const retryable = response.status === 429 || response.status >= 500
+
+      if (!retryable || attempt === MAX_FETCH_ATTEMPTS - 1) {
+        throw lastError
+      }
+
+      await wait(getRetryDelay(response, attempt))
+    } catch (error) {
+      lastError =
+        error instanceof Error ? error : new Error("Loris API request failed")
+
+      if (attempt === MAX_FETCH_ATTEMPTS - 1) throw lastError
+      await wait(600 * 2 ** attempt)
+    } finally {
+      clearTimeout(timeout)
+    }
+  }
+
+  throw lastError ?? new Error("Loris API request failed")
+}
+
 function sortExchanges(exchanges: FundingExchangeMeta[]) {
   return [...exchanges].sort((a, b) => {
     const aPreferred = PREFERRED_FUNDING_ORDER.indexOf(a.key)
@@ -52,20 +110,10 @@ function sortExchanges(exchanges: FundingExchangeMeta[]) {
 }
 
 async function fetchFundingPayload(): Promise<FundingPayload> {
-  const res = await fetch(LORIS_FUNDING_URL, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": "capys.app funding screener",
-    },
-    cache: "no-store",
-  })
-
-  if (!res.ok) {
-    throw new Error(`Loris API error: ${res.status}`)
-  }
-
+  const res = await fetchLorisResponse()
   const rawData = await res.json()
-  const data = typeof rawData === "string" ? JSON.parse(rawData) : rawData
+  const parsedData = typeof rawData === "string" ? JSON.parse(rawData) : rawData
+  const data = parsedData?.data ?? parsedData
 
   const parsedExchangeNames: LorisExchangeName[] = Array.isArray(
     data?.exchanges?.exchange_names
@@ -75,6 +123,14 @@ async function fetchFundingPayload(): Promise<FundingPayload> {
 
   const fundingRates: Record<string, Record<string, number>> =
     data?.funding_rates ?? {}
+
+  if (
+    !fundingRates ||
+    typeof fundingRates !== "object" ||
+    !Object.keys(fundingRates).length
+  ) {
+    throw new Error("Loris API returned no funding rates")
+  }
 
   const oiRankings: Record<string, string> = data?.oi_rankings ?? {}
   const defaultOiRank: string = data?.default_oi_rank ?? "500+"
@@ -92,7 +148,11 @@ async function fetchFundingPayload(): Promise<FundingPayload> {
   }))
 
   const exchanges = sortExchanges(
-    exchangePairs.map((exchange) => exchange.meta)
+    Array.from(
+      new Map(
+        exchangePairs.map((exchange) => [exchange.meta.key, exchange.meta])
+      ).values()
+    )
   )
 
   const rows: FundingRow[] = exchangePairs.flatMap(({ originalName, meta }) => {
@@ -102,8 +162,11 @@ async function fetchFundingPayload(): Promise<FundingPayload> {
       fundingRates[normalizeExchangeKey(originalName)] ??
       {}
 
-    return Object.entries(rawExchangeFunding).map(([symbol, rawFunding]) => {
+    return Object.entries(rawExchangeFunding).flatMap(([symbol, rawFunding]) => {
       const funding = Number(rawFunding) / 100
+      const normalizedSymbol = String(symbol).trim().toUpperCase()
+
+      if (!normalizedSymbol || !Number.isFinite(funding)) return []
 
       let bias: FundingRow["bias"] = "neutral"
       if (funding > 0) bias = "longs_pay_shorts"
@@ -112,9 +175,12 @@ async function fetchFundingPayload(): Promise<FundingPayload> {
       return {
         exchange: meta.key,
         display: meta.label,
-        symbol: String(symbol).toUpperCase(),
+        symbol: normalizedSymbol,
         funding,
-        oiRank: oiRankings[symbol] ?? defaultOiRank,
+        oiRank:
+          oiRankings[symbol] ??
+          oiRankings[normalizedSymbol] ??
+          defaultOiRank,
         bias,
       }
     })
@@ -136,6 +202,7 @@ export async function GET() {
     return NextResponse.json(cachedPayload, {
       headers: {
         "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
+        "CDN-Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
       },
     })
   }
@@ -149,7 +216,7 @@ export async function GET() {
 
     return NextResponse.json(payload, {
       headers: {
-        "Cache-Control": "public, max-age=30, stale-while-revalidate=120",
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
       },
     })
   } catch (error) {
@@ -163,7 +230,7 @@ export async function GET() {
         },
         {
           headers: {
-            "Cache-Control": "public, max-age=15, stale-while-revalidate=120",
+            "Cache-Control": "public, s-maxage=30, stale-while-revalidate=300",
           },
         }
       )

@@ -629,9 +629,14 @@ export default function Home() {
       try {
         fundingRequestInFlightRef.current = true
         if (!silent) setFundingLoading(true)
-        setFundingError(null)
+        if (!silent) setFundingError(null)
 
-        const res = await fetch("/api/funding")
+        const controller = new AbortController()
+        const timeout = window.setTimeout(() => controller.abort(), 20_000)
+        const res = await fetch("/api/funding", {
+          cache: "no-store",
+          signal: controller.signal,
+        }).finally(() => window.clearTimeout(timeout))
 
         const data = await res.json()
 
@@ -646,9 +651,7 @@ export default function Home() {
                 exchange: String(row.exchange ?? ""),
                 display: String(row.display ?? row.exchange ?? ""),
                 symbol: String(row.symbol ?? "").toUpperCase(),
-                funding: Number.isFinite(Number(row.funding))
-                  ? Number(row.funding)
-                  : 0,
+                funding: Number(row.funding),
                 oiRank: String(row.oiRank ?? "500+"),
                 bias:
                   row.bias === "longs_pay_shorts" ||
@@ -657,6 +660,11 @@ export default function Home() {
                     ? row.bias
                     : "neutral",
               }))
+              .filter(
+                (row: FundingApiRow) =>
+                  Boolean(row.exchange && row.symbol) &&
+                  Number.isFinite(row.funding)
+              )
           : []
 
         const safeExchanges: FundingApiExchange[] = Array.isArray(data?.exchanges)
@@ -672,6 +680,10 @@ export default function Home() {
               .filter((exchange: FundingApiExchange) => exchange.key && exchange.label)
           : DEFAULT_FUNDING_EXCHANGES
 
+        if (data?.error && !safeRows.length) {
+          throw new Error(String(data.error))
+        }
+
         setFundingExchanges(safeExchanges)
         setEnabledFundingExchanges((prev) => {
           const availableKeys = safeExchanges.map((exchange) => exchange.key)
@@ -681,11 +693,16 @@ export default function Home() {
         setFundingRows(safeRows)
         setFundingUpdatedAt(data?.updatedAt ? String(data.updatedAt) : null)
         setFundingStale(Boolean(data?.stale))
+        setFundingError(null)
         setRefreshCountdown(90)
       } catch (error) {
-        setFundingError(
-          error instanceof Error ? error.message : "Failed to load funding data"
-        )
+        if (silent) {
+          setFundingStale(true)
+        } else {
+          setFundingError(
+            error instanceof Error ? error.message : "Failed to load funding data"
+          )
+        }
       } finally {
         fundingRequestInFlightRef.current = false
         if (!silent) setFundingLoading(false)
@@ -1261,7 +1278,7 @@ Calculate yours on ${SITE_URL}`
             <div className="mt-10 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 ["40+", t.stats[0]],
-                ["17", t.stats[1]],
+                [String(CALC_KEYS.length), t.stats[1]],
                 ["90s", t.stats[2]],
                 ["100%", t.stats[3]],
               ].map(([value, label]) => (

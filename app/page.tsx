@@ -525,6 +525,8 @@ export default function Home() {
   const [fundingMetricMode, setFundingMetricMode] =
     useState<FundingMetricMode>("interval")
   const [onlyActionable, setOnlyActionable] = useState(true)
+  const [minimumFundingSpread, setMinimumFundingSpread] = useState(0)
+  const [showExchangePicker, setShowExchangePicker] = useState(false)
   const [fundingRowLimit, setFundingRowLimit] = useState<FundingRowLimit>(100)
   const [refreshCountdown, setRefreshCountdown] = useState(90)
   const [customTemplate, setCustomTemplate] = useState<string | null>(null)
@@ -890,9 +892,11 @@ export default function Home() {
         } satisfies FundingMatrixRow
       })
 
-      const filtered = onlyActionable
-        ? matrix.filter((row) => row.activeCount >= 2 && row.maxArb > 0)
-        : matrix
+      const filtered = matrix.filter(
+        (row) =>
+          (!onlyActionable || (row.activeCount >= 2 && row.maxArb > 0)) &&
+          row.maxArb >= minimumFundingSpread
+      )
 
       return filtered.sort((a, b) => {
         let comparison = 0
@@ -921,6 +925,7 @@ export default function Home() {
     fundingExchanges,
     fundingSort,
     onlyActionable,
+    minimumFundingSpread,
   ])
 
   const topFundingPositive = useMemo(() => {
@@ -1009,6 +1014,7 @@ export default function Home() {
     setEnabledFundingExchanges(fundingExchanges.map((exchange) => exchange.key))
     setSearchTicker("")
     setOnlyActionable(true)
+    setMinimumFundingSpread(0)
     setFundingMetricMode("interval")
     setFundingSort({ key: "maxArb", direction: "desc" })
     setFundingRowLimit(100)
@@ -1799,9 +1805,10 @@ Calculate yours on ${SITE_URL}`
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => void loadFunding(false)}
-                  className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950"
+                  disabled={fundingLoading}
+                  className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950 disabled:cursor-wait disabled:opacity-50"
                 >
-                  {t.refreshNow}
+                  {fundingLoading ? t.loadingFunding : t.refreshNow}
                 </button>
 
                 <button
@@ -1881,12 +1888,24 @@ Calculate yours on ${SITE_URL}`
                   <label className="mb-2 block text-xs uppercase tracking-[0.22em] text-white/40">
                     {t.searchTicker}
                   </label>
-                  <input
-                    value={searchTicker}
-                    onChange={(e) => setSearchTicker(e.target.value.toUpperCase())}
-                    placeholder="BTC, ETH, SOL, ICP..."
-                    className="w-full rounded-2xl border border-white/10 bg-[#07101d] px-4 py-3 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
-                  />
+                  <div className="relative">
+                    <input
+                      value={searchTicker}
+                      onChange={(e) => setSearchTicker(e.target.value.toUpperCase())}
+                      placeholder="BTC, ETH, SOL, ICP..."
+                      className="w-full rounded-2xl border border-white/10 bg-[#07101d] px-4 py-3 pr-11 text-white outline-none transition placeholder:text-white/25 focus:border-cyan-300"
+                    />
+                    {searchTicker && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchTicker("")}
+                        className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-lg text-white/35 transition hover:bg-white/[0.06] hover:text-white"
+                        aria-label="Clear ticker search"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div>
@@ -1956,12 +1975,28 @@ Calculate yours on ${SITE_URL}`
                 </div>
               </div>
 
-              <div>
-                <div className="mb-2 text-xs uppercase tracking-[0.22em] text-white/40">
-                  {t.exchanges}
+              <div className="rounded-2xl border border-white/8 bg-black/15 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="text-xs uppercase tracking-[0.22em] text-white/40">
+                      {t.exchanges}
+                    </div>
+                    <div className="mt-1 text-sm text-white/65">
+                      {activeFundingExchanges.length} of {fundingExchanges.length} selected
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowExchangePicker((current) => !current)}
+                    className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-cyan-300/30 hover:text-cyan-100"
+                    aria-expanded={showExchangePicker}
+                  >
+                    {showExchangePicker ? "Hide exchange list" : "Choose exchanges"}
+                  </button>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <button
                     onClick={() =>
                       setEnabledFundingExchanges(
@@ -1987,29 +2022,82 @@ Calculate yours on ${SITE_URL}`
                   </button>
 
                   <button
-                    onClick={() => setEnabledFundingExchanges([])}
+                    onClick={() => {
+                      setEnabledFundingExchanges([])
+                      setShowExchangePicker(true)
+                    }}
                     className="rounded-full border border-red-300/25 bg-red-300/10 px-3 py-2 text-xs font-medium text-red-200 transition hover:bg-red-300/15"
                   >
                     {t.clearAll}
                   </button>
 
-                  {fundingExchanges.map((exchange) => {
-  const enabled = enabledFundingExchanges.includes(exchange.key)
+                  {!showExchangePicker &&
+                    activeFundingExchanges.slice(0, 6).map((exchange) => (
+                      <span
+                        key={`selected-${exchange.key}`}
+                        className="rounded-full border border-white/10 bg-white/[0.035] px-3 py-2 text-xs text-white/55"
+                      >
+                        {exchange.label}
+                      </span>
+                    ))}
 
-  return (
-    <button
-      key={exchange.key}
-      onClick={() => toggleFundingExchange(exchange.key)}
-      className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
-        enabled
-          ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
-          : "border-neutral-700 text-white/50"
-      }`}
-    >
-      {exchange.label}
-    </button>
-  )
-})}
+                  {!showExchangePicker && activeFundingExchanges.length > 6 && (
+                    <span className="rounded-full border border-white/10 px-3 py-2 text-xs text-white/40">
+                      +{activeFundingExchanges.length - 6} more
+                    </span>
+                  )}
+                </div>
+
+                {showExchangePicker && (
+                  <div className="mt-4 max-h-44 overflow-y-auto rounded-xl border border-white/8 bg-[#07101d]/80 p-3 [scrollbar-color:rgba(34,211,238,0.45)_rgba(255,255,255,0.06)] [scrollbar-width:thin]">
+                    <div className="flex flex-wrap gap-2">
+                      {fundingExchanges.map((exchange) => {
+                        const enabled = enabledFundingExchanges.includes(exchange.key)
+
+                        return (
+                          <button
+                            key={exchange.key}
+                            onClick={() => toggleFundingExchange(exchange.key)}
+                            className={`rounded-full border px-3 py-2 text-xs font-medium transition ${
+                              enabled
+                                ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-300"
+                                : "border-neutral-700 text-white/50 hover:border-white/20 hover:text-white/70"
+                            }`}
+                          >
+                            {exchange.label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-3 rounded-2xl border border-white/8 bg-black/15 p-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <div className="text-xs uppercase tracking-[0.22em] text-white/40">
+                    Minimum spread
+                  </div>
+                  <div className="mt-1 text-sm text-white/55">
+                    Hide low-signal opportunities before rendering the table.
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {[0, 0.01, 0.05, 0.1, 0.5].map((spread) => (
+                    <button
+                      key={spread}
+                      type="button"
+                      onClick={() => setMinimumFundingSpread(spread)}
+                      className={`rounded-xl border px-3 py-2 text-xs font-semibold tabular-nums transition ${
+                        minimumFundingSpread === spread
+                          ? "border-cyan-300 bg-cyan-300 text-slate-950"
+                          : "border-white/10 bg-white/[0.03] text-white/55 hover:border-white/20 hover:text-white"
+                      }`}
+                    >
+                      {spread === 0 ? "Any" : `≥ ${spread}%`}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -2042,6 +2130,27 @@ Calculate yours on ${SITE_URL}`
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
+            {!fundingLoading && !fundingError && (
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-semibold text-white">
+                    {fundingMatrixRows.length} opportunities
+                  </div>
+                  <div className="mt-1 text-xs text-white/40">
+                    {activeFundingExchanges.length} exchanges
+                    {minimumFundingSpread > 0
+                      ? ` · spread ≥ ${minimumFundingSpread}%`
+                      : ""}
+                    {searchTicker ? ` · ticker: ${searchTicker}` : ""}
+                  </div>
+                </div>
+
+                <div className="text-xs text-white/35">
+                  Click a ticker to copy · click a rate to open the venue
+                </div>
+              </div>
+            )}
+
             {fundingLoading && (
               <div className="rounded-2xl border border-neutral-800 bg-black/20 p-6 text-white/60">
                 {t.loadingFunding}
@@ -2069,7 +2178,7 @@ Calculate yours on ${SITE_URL}`
                 <div
                   ref={fundingTableScrollRef}
                   onScroll={() => syncFundingScroll("table")}
-                  className="overflow-x-auto overscroll-x-contain [scrollbar-color:rgba(34,211,238,0.45)_rgba(255,255,255,0.06)] [scrollbar-width:thin]"
+                  className="max-h-[72vh] overflow-auto overscroll-contain [scrollbar-color:rgba(34,211,238,0.45)_rgba(255,255,255,0.06)] [scrollbar-width:thin]"
                 >
   <table
     className="min-w-full border-separate border-spacing-0"
@@ -2086,7 +2195,7 @@ Calculate yours on ${SITE_URL}`
   </button>
 </th>
 
-<th className="sticky left-[96px] top-0 z-40 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+<th className="sticky top-0 z-30 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40 md:left-[96px] md:z-40">
   <button
     onClick={() => setFundingSortKey("oiRank")}
     className="text-left transition hover:text-cyan-200"
@@ -2095,7 +2204,7 @@ Calculate yours on ${SITE_URL}`
   </button>
 </th>
 
-<th className="sticky left-[172px] top-0 z-40 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+<th className="sticky top-0 z-30 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40 md:left-[172px] md:z-40">
   <button
     onClick={() => setFundingSortKey("maxArb")}
     className="text-left transition hover:text-cyan-200"
@@ -2104,7 +2213,7 @@ Calculate yours on ${SITE_URL}`
   </button>
 </th>
 
-<th className="sticky left-[268px] top-0 z-40 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40">
+<th className="sticky top-0 z-30 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-3 text-xs uppercase tracking-[0.18em] text-white/40 md:left-[268px] md:z-40">
   {t.action}
 </th>
 
@@ -2139,17 +2248,17 @@ Calculate yours on ${SITE_URL}`
                           </button>
                         </td>
 
-                        <td className="sticky left-[96px] z-20 w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm text-white/80">
+                        <td className="w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm text-white/80 md:sticky md:left-[96px] md:z-20">
                           {row.oiRank}
                         </td>
 
-                        <td className="sticky left-[172px] z-20 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm">
+                        <td className="w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm md:sticky md:left-[172px] md:z-20">
                           <span className="inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
                             {formatSpreadValue(row.maxArb)}
                           </span>
                         </td>
 
-                        <td className="sticky left-[268px] z-20 w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 shadow-[18px_0_24px_rgba(5,8,20,0.25)]">
+                        <td className="w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 md:sticky md:left-[268px] md:z-20 md:shadow-[18px_0_24px_rgba(5,8,20,0.25)]">
                           {row.buyExchange && row.sellExchange ? (
                             <div className="flex flex-wrap gap-2">
                               <a

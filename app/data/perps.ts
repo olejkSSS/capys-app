@@ -127,7 +127,7 @@ export const PERPS = [
     name: "Meridian",
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     refCode: "UM68P2M9JZ6D",
-    logo: "/ethereal.png",
+    logo: "/meridian.png",
     boost: "+15% points boost",
     farm: "Boost farming + low OI tokens",
     seoKeywords: [

@@ -8,6 +8,7 @@ import {
 } from "../../data/perps"
 
 const LORIS_FUNDING_URL = "https://api.loris.tools/funding"
+const LORIS_PUBLIC_URL = "https://loris.tools/"
 const CACHE_TTL_MS = 90_000
 const UPSTREAM_TIMEOUT_MS = 12_000
 const MAX_FETCH_ATTEMPTS = 3
@@ -65,6 +66,9 @@ async function fetchLorisResponse() {
         headers: {
           Accept: "application/json",
           "User-Agent": "capys.app funding screener",
+          ...(process.env.LORIS_API_KEY
+            ? { "X-Api-Key": process.env.LORIS_API_KEY }
+            : {}),
         },
         next: { revalidate: 90 },
         signal: controller.signal,
@@ -94,6 +98,90 @@ async function fetchLorisResponse() {
   throw lastError ?? new Error("Loris API request failed")
 }
 
+function decodeEscapedJson<T>(fragment: string): T {
+  const decoded = JSON.parse(`"${fragment}"`)
+  return JSON.parse(decoded) as T
+}
+
+function extractSnapshotField<T>(
+  html: string,
+  field: string,
+  nextField: string
+): T {
+  const startMarker = `\\"${field}\\":`
+  const endMarker = `,\\"${nextField}\\":`
+  const start = html.indexOf(startMarker)
+
+  if (start === -1) {
+    throw new Error(`Loris public snapshot is missing ${field}`)
+  }
+
+  const valueStart = start + startMarker.length
+  const end = html.indexOf(endMarker, valueStart)
+
+  if (end === -1) {
+    throw new Error(`Loris public snapshot has invalid ${field}`)
+  }
+
+  return decodeEscapedJson<T>(html.slice(valueStart, end))
+}
+
+async function fetchPublicFundingSnapshot() {
+  const response = await fetch(LORIS_PUBLIC_URL, {
+    headers: {
+      Accept: "text/html",
+      "User-Agent": "capys.app funding screener",
+    },
+    next: { revalidate: 90 },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Loris public snapshot error: ${response.status}`)
+  }
+
+  const html = await response.text()
+  const exchangeNames = extractSnapshotField<LorisExchangeName[]>(
+    html,
+    "exchange_names",
+    "exchanges"
+  )
+  const fundingRates = extractSnapshotField<
+    Record<string, Record<string, number>>
+  >(html, "funding_rates", "funding_rates_raw")
+  const oiRankings = extractSnapshotField<Record<string, string>>(
+    html,
+    "oi_rankings",
+    "default_oi_rank"
+  )
+  const defaultOiRankMatch = html.match(
+    /\\"default_oi_rank\\":\\"([^"]+)\\"/
+  )
+  const timestampMatch = html.match(/\\"timestamp\\":\\"([^"]+)\\"/)
+
+  return {
+    exchanges: {
+      exchange_names: exchangeNames,
+    },
+    funding_rates: fundingRates,
+    oi_rankings: oiRankings,
+    default_oi_rank: defaultOiRankMatch?.[1] ?? "500+",
+    timestamp: timestampMatch?.[1] ?? null,
+  }
+}
+
+async function fetchLorisData() {
+  if (!process.env.LORIS_API_KEY) {
+    return fetchPublicFundingSnapshot()
+  }
+
+  try {
+    const response = await fetchLorisResponse()
+    return await response.json()
+  } catch {
+    return fetchPublicFundingSnapshot()
+  }
+}
+
 function sortExchanges(exchanges: FundingExchangeMeta[]) {
   return [...exchanges].sort((a, b) => {
     const aPreferred = PREFERRED_FUNDING_ORDER.indexOf(a.key)
@@ -110,8 +198,7 @@ function sortExchanges(exchanges: FundingExchangeMeta[]) {
 }
 
 async function fetchFundingPayload(): Promise<FundingPayload> {
-  const res = await fetchLorisResponse()
-  const rawData = await res.json()
+  const rawData = await fetchLorisData()
   const parsedData = typeof rawData === "string" ? JSON.parse(rawData) : rawData
   const data = parsedData?.data ?? parsedData
 

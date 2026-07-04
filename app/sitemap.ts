@@ -22,6 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
     {
+      url: `${SITE_URL}/airdrops`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.96,
+    },
+    {
       url: `${SITE_URL}/funding-rates`,
       lastModified: new Date(),
       changeFrequency: "daily",

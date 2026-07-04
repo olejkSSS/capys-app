@@ -1,0 +1,38 @@
+import { PERPS_CALC, SITE_URL } from "../data/perps"
+
+export const dynamic = "force-static"
+
+export function GET() {
+  const calculatorNames = Object.values(PERPS_CALC)
+    .map((calculator) => calculator.name)
+    .join(", ")
+
+  const content = `# Capys.app
+
+> Capys.app is a perp DEX farming research hub with referral terms, editable point-value calculators, a live funding-rate screener, and a curated airdrop campaign board.
+
+## Primary pages
+- Home and referral tier list: ${SITE_URL}
+- Perp point calculator directory: ${SITE_URL}/calculators
+- Perp airdrop and points campaigns: ${SITE_URL}/airdrops
+- Funding-rate screener: ${SITE_URL}/funding-rates
+
+## Structured data
+- Perp DEX directory JSON: ${SITE_URL}/perp-dexes.json
+- Calculator directory JSON: ${SITE_URL}/calculators.json
+- XML sitemap: ${SITE_URL}/sitemap.xml
+
+## Calculator coverage
+${calculatorNames}
+
+## Important
+Calculator defaults are editable research assumptions. Funding rates, point programs, eligibility rules, referral terms, and token allocations can change. Capys.app does not provide financial advice.
+`
+
+  return new Response(content, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
+  })
+}

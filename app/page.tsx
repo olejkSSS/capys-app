@@ -43,6 +43,8 @@ type FundingMatrixRow = {
   symbol: string
   oiRank: string
   maxArb: number
+  estimatedNetUsd: number | null
+  netReturnPct: number | null
   activeCount: number
   buyExchange: { key: FundingExchangeKey; label: string } | null
   sellExchange: { key: FundingExchangeKey; label: string } | null
@@ -528,6 +530,12 @@ export default function Home() {
   const [onlyActionable, setOnlyActionable] = useState(true)
   const [minimumFundingSpread, setMinimumFundingSpread] = useState(0)
   const [showExchangePicker, setShowExchangePicker] = useState(false)
+  const [watchedFundingSymbols, setWatchedFundingSymbols] = useState<string[]>([])
+  const [watchlistOnly, setWatchlistOnly] = useState(false)
+  const [fundingCapital, setFundingCapital] = useState(10000)
+  const [fundingHoldingPeriods, setFundingHoldingPeriods] = useState(8)
+  const [fundingFeePercent, setFundingFeePercent] = useState(0.2)
+  const [fundingShareCopied, setFundingShareCopied] = useState(false)
   const [fundingRowLimit, setFundingRowLimit] = useState<FundingRowLimit>(100)
   const [refreshCountdown, setRefreshCountdown] = useState(90)
   const [customTemplate, setCustomTemplate] = useState<string | null>(null)
@@ -542,6 +550,8 @@ export default function Home() {
   const fundingTopScrollRef = useRef<HTMLDivElement>(null)
   const fundingTableScrollRef = useRef<HTMLDivElement>(null)
   const fundingRequestInFlightRef = useRef(false)
+  const fundingParamsInitializedRef = useRef(false)
+  const fundingShareTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const listCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const tickerCopyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -622,6 +632,60 @@ export default function Home() {
     return () => {
       if (listCopyTimeoutRef.current) clearTimeout(listCopyTimeoutRef.current)
       if (tickerCopyTimeoutRef.current) clearTimeout(tickerCopyTimeoutRef.current)
+      if (fundingShareTimeoutRef.current) {
+        clearTimeout(fundingShareTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("capys:funding-watchlist")
+      const parsed = stored ? JSON.parse(stored) : []
+
+      if (Array.isArray(parsed)) {
+        setWatchedFundingSymbols(
+          parsed
+            .map((symbol) => String(symbol).trim().toUpperCase())
+            .filter(Boolean)
+        )
+      }
+    } catch {
+      setWatchedFundingSymbols([])
+    }
+  }, [])
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      "capys:funding-watchlist",
+      JSON.stringify(watchedFundingSymbols)
+    )
+  }, [watchedFundingSymbols])
+
+  useEffect(() => {
+    if (fundingParamsInitializedRef.current) return
+    fundingParamsInitializedRef.current = true
+
+    const params = new URLSearchParams(window.location.search)
+    const ticker = params.get("ticker")
+    const exchanges = params.get("exchanges")
+    const minSpread = Number(params.get("minSpread"))
+    const mode = params.get("mode")
+
+    if (ticker) setSearchTicker(ticker.toUpperCase())
+    if (exchanges) {
+      setEnabledFundingExchanges(
+        exchanges
+          .split(",")
+          .map((exchange) => exchange.trim())
+          .filter(Boolean)
+      )
+    }
+    if (Number.isFinite(minSpread) && minSpread >= 0) {
+      setMinimumFundingSpread(minSpread)
+    }
+    if (mode === "annualized" || mode === "interval") {
+      setFundingMetricMode(mode)
     }
   }, [])
 
@@ -855,6 +919,15 @@ export default function Home() {
         const maxFunding = values.length ? Math.max(...values) : 0
         const minFunding = values.length ? Math.min(...values) : 0
         const maxArb = maxFunding - minFunding
+        const netReturnPct =
+          fundingMetricMode === "interval"
+            ? maxArb * Math.max(fundingHoldingPeriods, 1) -
+              Math.max(fundingFeePercent, 0)
+            : null
+        const estimatedNetUsd =
+          netReturnPct === null
+            ? null
+            : (Math.max(fundingCapital, 0) * netReturnPct) / 100
 
         const highestEntry =
   activeFundingExchanges
@@ -880,6 +953,8 @@ export default function Home() {
           symbol: group.symbol,
           oiRank: group.oiRank,
           maxArb,
+          estimatedNetUsd,
+          netReturnPct,
           activeCount: values.length,
           buyExchange:
             lowestEntry && highestEntry && lowestEntry.key !== highestEntry.key
@@ -896,7 +971,8 @@ export default function Home() {
       const filtered = matrix.filter(
         (row) =>
           (!onlyActionable || (row.activeCount >= 2 && row.maxArb > 0)) &&
-          row.maxArb >= minimumFundingSpread
+          row.maxArb >= minimumFundingSpread &&
+          (!watchlistOnly || watchedFundingSymbols.includes(row.symbol))
       )
 
       return filtered.sort((a, b) => {
@@ -927,6 +1003,12 @@ export default function Home() {
     fundingSort,
     onlyActionable,
     minimumFundingSpread,
+    fundingMetricMode,
+    fundingHoldingPeriods,
+    fundingFeePercent,
+    fundingCapital,
+    watchlistOnly,
+    watchedFundingSymbols,
   ])
 
   const topFundingPositive = useMemo(() => {
@@ -1011,11 +1093,64 @@ export default function Home() {
     })
   }
 
+  const toggleFundingWatch = (symbol: string) => {
+    setWatchedFundingSymbols((current) =>
+      current.includes(symbol)
+        ? current.filter((item) => item !== symbol)
+        : [...current, symbol]
+    )
+  }
+
+  const shareFundingView = async () => {
+    const url = new URL(window.location.href)
+    url.hash = "funding"
+
+    if (searchTicker) url.searchParams.set("ticker", searchTicker)
+    else url.searchParams.delete("ticker")
+
+    if (
+      enabledFundingExchanges.length &&
+      enabledFundingExchanges.length !== fundingExchanges.length
+    ) {
+      url.searchParams.set("exchanges", enabledFundingExchanges.join(","))
+    } else {
+      url.searchParams.delete("exchanges")
+    }
+
+    if (minimumFundingSpread > 0) {
+      url.searchParams.set("minSpread", String(minimumFundingSpread))
+    } else {
+      url.searchParams.delete("minSpread")
+    }
+
+    if (fundingMetricMode !== "interval") {
+      url.searchParams.set("mode", fundingMetricMode)
+    } else {
+      url.searchParams.delete("mode")
+    }
+
+    try {
+      await navigator.clipboard.writeText(url.toString())
+      setFundingShareCopied(true)
+
+      if (fundingShareTimeoutRef.current) {
+        clearTimeout(fundingShareTimeoutRef.current)
+      }
+      fundingShareTimeoutRef.current = setTimeout(
+        () => setFundingShareCopied(false),
+        1600
+      )
+    } catch (error) {
+      console.error("Failed to copy funding view:", error)
+    }
+  }
+
   const resetFundingFilters = () => {
     setEnabledFundingExchanges(fundingExchanges.map((exchange) => exchange.key))
     setSearchTicker("")
     setOnlyActionable(true)
     setMinimumFundingSpread(0)
+    setWatchlistOnly(false)
     setFundingMetricMode("interval")
     setFundingSort({ key: "maxArb", direction: "desc" })
     setFundingRowLimit(100)
@@ -1203,6 +1338,12 @@ Calculate yours on ${SITE_URL}`
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              href="/airdrops"
+              className="hidden rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white/65 transition hover:border-cyan-300/25 hover:text-cyan-100 xl:inline-flex"
+            >
+              Airdrops
+            </Link>
             <a
               href="https://x.com/capy_onchain"
               target="_blank"
@@ -1811,6 +1952,13 @@ Calculate yours on ${SITE_URL}`
 
               <div className="flex flex-wrap gap-2">
                 <button
+                  onClick={() => void shareFundingView()}
+                  className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-white/70 transition hover:border-cyan-300/30 hover:text-cyan-100"
+                >
+                  {fundingShareCopied ? "Copied view" : "Share view"}
+                </button>
+
+                <button
                   onClick={() => void loadFunding(false)}
                   disabled={fundingLoading}
                   className="rounded-2xl border border-cyan-300/30 bg-cyan-300/10 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300 hover:text-slate-950 disabled:cursor-wait disabled:opacity-50"
@@ -1968,7 +2116,7 @@ Calculate yours on ${SITE_URL}`
                   </div>
                 </div>
 
-                <div className="flex items-end">
+                <div className="flex items-end gap-2">
                   <button
                     onClick={() => setOnlyActionable((prev) => !prev)}
                     className={`w-full rounded-xl border px-4 py-3 text-sm font-medium transition ${
@@ -1978,6 +2126,17 @@ Calculate yours on ${SITE_URL}`
                     }`}
                   >
                     {onlyActionable ? t.onlyOpps : t.showAllSymbols}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setWatchlistOnly((current) => !current)}
+                    className={`w-full rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                      watchlistOnly
+                        ? "border-yellow-300/30 bg-yellow-300/10 text-yellow-100"
+                        : "border-white/10 bg-white/[0.03] text-white/60"
+                    }`}
+                  >
+                    Watchlist ({watchedFundingSymbols.length})
                   </button>
                 </div>
               </div>
@@ -2080,7 +2239,7 @@ Calculate yours on ${SITE_URL}`
                 )}
               </div>
 
-              <div className="flex flex-col gap-3 rounded-2xl border border-white/8 bg-black/15 p-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="rounded-2xl border border-white/8 bg-black/15 p-4">
                 <div>
                   <div className="text-xs uppercase tracking-[0.22em] text-white/40">
                     Minimum spread
@@ -2090,7 +2249,7 @@ Calculate yours on ${SITE_URL}`
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {[0, 0.01, 0.05, 0.1, 0.5].map((spread) => (
                     <button
                       key={spread}
@@ -2106,6 +2265,65 @@ Calculate yours on ${SITE_URL}`
                     </button>
                   ))}
                 </div>
+
+                <div className="mt-4 grid gap-3 border-t border-white/8 pt-4 sm:grid-cols-3">
+                  <label>
+                    <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-white/35">
+                      Capital ($)
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={fundingCapital}
+                      onChange={(event) =>
+                        setFundingCapital(Math.max(Number(event.target.value), 0))
+                      }
+                      className="w-full rounded-xl border border-white/10 bg-[#07101d] px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"
+                    />
+                  </label>
+                  <label>
+                    <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-white/35">
+                      Funding intervals
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={fundingHoldingPeriods}
+                      onChange={(event) =>
+                        setFundingHoldingPeriods(
+                          Math.min(Math.max(Number(event.target.value), 1), 365)
+                        )
+                      }
+                      className="w-full rounded-xl border border-white/10 bg-[#07101d] px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"
+                    />
+                  </label>
+                  <label>
+                    <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-white/35">
+                      Total trading fees (%)
+                    </span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={fundingFeePercent}
+                      onChange={(event) =>
+                        setFundingFeePercent(
+                          Math.max(Number(event.target.value), 0)
+                        )
+                      }
+                      className="w-full rounded-xl border border-white/10 bg-[#07101d] px-3 py-2 text-sm text-white outline-none focus:border-cyan-300"
+                    />
+                  </label>
+                </div>
+
+                <p className="mt-3 text-xs leading-5 text-white/30">
+                  Net estimate = capital × (spread × intervals − total fees).
+                  Slippage, borrow costs, execution risk, and changing rates are
+                  not included.
+                  {fundingMetricMode === "annualized" &&
+                    " Switch to Per interval to display net estimates."}
+                </p>
               </div>
 
               <div>
@@ -2246,13 +2464,38 @@ Calculate yours on ${SITE_URL}`
                     {renderedFundingRows.map((row) => (
                       <tr key={row.symbol} className="hover:bg-white/[0.02]">
                         <td className="sticky left-0 z-20 w-[96px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm font-semibold text-white">
-                          <button
-                            onClick={() => void copyTickerValue(row.symbol)}
-                            className="transition hover:text-cyan-300"
-                            title="Click to copy ticker"
-                          >
-                            {copiedTicker === row.symbol ? "Copied" : row.symbol}
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => toggleFundingWatch(row.symbol)}
+                              className={`text-sm transition ${
+                                watchedFundingSymbols.includes(row.symbol)
+                                  ? "text-yellow-300"
+                                  : "text-white/25 hover:text-yellow-200"
+                              }`}
+                              title={
+                                watchedFundingSymbols.includes(row.symbol)
+                                  ? "Remove from watchlist"
+                                  : "Add to watchlist"
+                              }
+                              aria-label={
+                                watchedFundingSymbols.includes(row.symbol)
+                                  ? `Remove ${row.symbol} from watchlist`
+                                  : `Add ${row.symbol} to watchlist`
+                              }
+                            >
+                              {watchedFundingSymbols.includes(row.symbol)
+                                ? "★"
+                                : "☆"}
+                            </button>
+                            <button
+                              onClick={() => void copyTickerValue(row.symbol)}
+                              className="min-w-0 truncate transition hover:text-cyan-300"
+                              title="Click to copy ticker"
+                            >
+                              {copiedTicker === row.symbol ? "Copied" : row.symbol}
+                            </button>
+                          </div>
                         </td>
 
                         <td className="w-[76px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 text-sm text-white/80 md:sticky md:left-[96px] md:z-20">
@@ -2263,6 +2506,18 @@ Calculate yours on ${SITE_URL}`
                           <span className="inline-flex rounded-full border border-cyan-400/25 bg-cyan-500/10 px-3 py-1 text-xs font-semibold text-cyan-300">
                             {formatSpreadValue(row.maxArb)}
                           </span>
+                          {row.estimatedNetUsd !== null && (
+                            <div
+                              className={`mt-2 text-[10px] font-semibold tabular-nums ${
+                                row.estimatedNetUsd >= 0
+                                  ? "text-emerald-300"
+                                  : "text-red-300"
+                              }`}
+                              title={`${row.netReturnPct?.toFixed(4)}% estimated net return`}
+                            >
+                              ~{formatMoney(row.estimatedNetUsd, 0)} net
+                            </div>
+                          )}
                         </td>
 
                         <td className="w-[220px] border-b border-r border-neutral-800 bg-[#0b111d] px-3 py-4 md:sticky md:left-[268px] md:z-20 md:shadow-[18px_0_24px_rgba(5,8,20,0.25)]">

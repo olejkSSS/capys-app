@@ -49,6 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${perp.name} Point Calculator: Estimate Airdrop Value`
   const description = `Estimate ${perp.name} points value using editable FDV, total points supply, token allocation, and personal balance assumptions.`
   const canonical = `/calculators/${perp.slug}-point-calculator`
+  const socialImage = `${canonical}/opengraph-image`
 
   return {
     title,
@@ -78,14 +79,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `${SITE_URL}${canonical}`,
       siteName: "Capys.app",
       type: "website",
-      images: ["/opengraph-image"],
+      images: [socialImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
       creator: "@capy_onchain",
-      images: ["/opengraph-image"],
+      images: [socialImage],
     },
     robots: {
       index: true,

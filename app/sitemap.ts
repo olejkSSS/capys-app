@@ -16,6 +16,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.92,
     },
     {
+      url: `${SITE_URL}/calculators`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.95,
+    },
+    {
       url: `${SITE_URL}/funding-rates`,
       lastModified: new Date(),
       changeFrequency: "daily",

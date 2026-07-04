@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import Link from "next/link"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { toPng } from "html-to-image"
 import { motion } from "motion/react"
@@ -1542,6 +1543,12 @@ Calculate yours on ${SITE_URL}`
               <p className="mt-2 text-xs leading-5 text-white/48">
                 Open a dedicated point calculator page for any perp.
               </p>
+              <Link
+                href="/calculators"
+                className="mt-3 inline-flex text-xs font-semibold text-cyan-200 transition hover:text-cyan-100"
+              >
+                Browse all calculators →
+              </Link>
 
               <div className="mt-5 max-h-[520px] space-y-2 overflow-y-auto pr-1">
                 {CALCULATOR_DIRECTORY.map((perp) => (

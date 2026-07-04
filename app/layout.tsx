@@ -5,6 +5,8 @@ import { SEO_PROTOCOL_KEYWORDS } from "./data/perps";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://capys.app"),
+  applicationName: "Capys.app",
+  category: "finance",
   title: {
     default: "Capys.app | Perp DEX Farming Hub",
     template: "%s | Capys.app",
@@ -72,9 +74,37 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://capys.app/#organization",
+        name: "Capys.app",
+        url: "https://capys.app",
+        logo: "https://capys.app/icon.png",
+        sameAs: ["https://x.com/capy_onchain"],
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://capys.app/#website",
+        name: "Capys.app",
+        url: "https://capys.app",
+        publisher: {
+          "@id": "https://capys.app/#organization",
+        },
+        inLanguage: "en",
+      },
+    ],
+  }
+
   return (
     <html lang="en">
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         {children}
         <Analytics />
       </body>

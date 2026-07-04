@@ -46,8 +46,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!perp) return {}
 
-  const title = `${perp.name} Point Calculator`
-  const description = `Estimate ${perp.name} airdrop value from points, FDV, total point supply, and token allocation. Includes ${perp.name} farming notes${perp.hasReferral ? ` and referral code ${perp.refCode}` : ""}.`
+  const title = `${perp.name} Point Calculator: Estimate Airdrop Value`
+  const description = `Estimate ${perp.name} points value using editable FDV, total points supply, token allocation, and personal balance assumptions.`
   const canonical = `/calculators/${perp.slug}-point-calculator`
 
   return {
@@ -60,9 +60,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `${perp.name} points value`,
       `${perp.name} point price`,
       `${perp.name} FDV calculator`,
-      `${perp.name} referral code`,
-      `${perp.name} best referral`,
-      `${perp.name} max referral bonus`,
+      ...(perp.hasReferral
+        ? [
+            `${perp.name} referral code`,
+            `${perp.name} best referral`,
+            `${perp.name} max referral bonus`,
+          ]
+        : []),
       ...perp.seoKeywords,
     ],
     alternates: {
@@ -83,6 +87,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       creator: "@capy_onchain",
       images: ["/opengraph-image"],
     },
+    robots: {
+      index: true,
+      follow: true,
+    },
   }
 }
 
@@ -97,25 +105,79 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
   if (!calc) notFound()
 
   const calculatorUrl = `${SITE_URL}/calculators/${perp.slug}-point-calculator`
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: `${perp.name} Point Calculator`,
-    applicationCategory: "FinanceApplication",
-    operatingSystem: "Web",
-    url: calculatorUrl,
-    description: `Estimate ${perp.name} point value and potential airdrop value with Capys.app.`,
-    creator: {
-      "@type": "Person",
-      name: "CapyOnchain",
-      url: "https://x.com/capy_onchain",
+  const faq = [
+    {
+      question: `How does the ${perp.name} point calculator work?`,
+      answer: `It estimates a scenario value by multiplying FDV by the assumed airdrop allocation and dividing the result by total ${perp.name} points.`,
     },
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
+    {
+      question: `Are the ${perp.name} defaults official?`,
+      answer:
+        "No. Every default is an editable research assumption, not official tokenomics, a guaranteed valuation, or financial advice.",
     },
-  }
+    {
+      question: `Can I calculate the value of my own ${perp.name} points?`,
+      answer:
+        "Yes. Enter your points balance, then adjust FDV, total points, and airdrop allocation to compare multiple scenarios.",
+    },
+  ]
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: `${perp.name} Point Calculator`,
+      applicationCategory: "FinanceApplication",
+      operatingSystem: "Web",
+      url: calculatorUrl,
+      description: `Estimate ${perp.name} point value and potential airdrop value with editable assumptions.`,
+      creator: {
+        "@type": "Person",
+        name: "CapyOnchain",
+        url: "https://x.com/capy_onchain",
+      },
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Capys.app",
+          item: SITE_URL,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Perp Point Calculators",
+          item: `${SITE_URL}/calculators`,
+        },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: `${perp.name} Point Calculator`,
+          item: calculatorUrl,
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faq.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    },
+  ]
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#050814] px-4 py-10 text-white sm:px-6 lg:px-8">
@@ -164,8 +226,14 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
               </svg>
             </a>
             <Link
+              href="/calculators"
+              className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-semibold text-white/70 transition hover:border-white/20 hover:text-white"
+            >
+              All calculators
+            </Link>
+            <Link
               href="/#calculator"
-              className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15"
+              className="hidden rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15 sm:inline-flex"
             >
               Main calculator
             </Link>
@@ -184,9 +252,9 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
 
             <p className="mt-5 max-w-2xl text-base leading-7 text-white/62">
               Estimate your potential {perp.name} airdrop value from points,
-              FDV, total points supply, and token allocation. This page also
-              keeps the current Capy referral route nearby for users searching
-              for the best {perp.name} farming terms.
+              FDV, total points supply, and token allocation. All inputs are
+              editable, so you can compare conservative and aggressive
+              scenarios without treating the defaults as official tokenomics.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -225,7 +293,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
                 />
                 <div>
                   <div className="text-xs uppercase tracking-[0.24em] text-white/38">
-                    Referral terms
+                    {perp.hasReferral ? "Referral terms" : "Calculator scenario"}
                   </div>
                   <div className="mt-1 text-2xl font-black">{perp.name}</div>
                 </div>
@@ -234,13 +302,15 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-4">
                   <div className="text-xs uppercase tracking-[0.2em] text-emerald-100/60">
-                    Code
+                    {perp.hasReferral ? "Code" : "Status"}
                   </div>
-                  <div className="mt-2 font-black">{perp.refCode}</div>
+                  <div className="mt-2 font-black">
+                    {perp.hasReferral ? perp.refCode : "Editable"}
+                  </div>
                 </div>
                 <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 sm:col-span-2">
                   <div className="text-xs uppercase tracking-[0.2em] text-cyan-100/60">
-                    Boost
+                    {perp.hasReferral ? "Boost" : "Defaults"}
                   </div>
                   <div className="mt-2 font-bold">{perp.boost}</div>
                 </div>
@@ -277,12 +347,14 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
 
           <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
             <h2 className="text-2xl font-black">
-              Best {perp.name} referral route
+              {perp.hasReferral
+                ? `Best ${perp.name} referral route`
+                : `Editable ${perp.name} scenarios`}
             </h2>
             <p className="mt-3 text-sm leading-6 text-white/58">
-              Capys.app tracks referral codes, fee discounts, points boosts,
-              refback terms, and farming notes for perp DEX users looking for
-              stronger conditions.
+              {perp.hasReferral
+                ? "Capys.app tracks referral codes, fee discounts, points boosts, refback terms, and farming notes for perp DEX users looking for stronger conditions."
+                : "Use the calculator as a scenario model. Change every assumption and compare outcomes instead of relying on a single headline estimate."}
             </p>
           </article>
 
@@ -291,6 +363,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
             <div className="mt-4 flex flex-wrap gap-2">
               {Object.entries(PERPS_CALC)
                 .filter(([slug]) => slug !== perp.slug)
+                .slice(0, 12)
                 .map(([slug, item]) => (
                 <Link
                   key={slug}
@@ -301,7 +374,37 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
                 </Link>
                 ))}
             </div>
+            <Link
+              href="/calculators"
+              className="mt-4 inline-flex text-sm font-semibold text-cyan-200 transition hover:text-cyan-100"
+            >
+              View all calculators →
+            </Link>
           </article>
+        </section>
+
+        <section className="mt-8 rounded-3xl border border-yellow-300/15 bg-yellow-300/[0.055] p-6">
+          <h2 className="text-xl font-black">Scenario methodology</h2>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-white/58">
+            The estimate uses: FDV × airdrop allocation ÷ total points supply ×
+            your points. Defaults are editable research assumptions and may not
+            reflect official tokenomics, future prices, eligibility rules, or
+            final allocations.
+          </p>
+        </section>
+
+        <section className="mt-8 grid gap-4 lg:grid-cols-3">
+          {faq.map((item) => (
+            <article
+              key={item.question}
+              className="rounded-3xl border border-white/10 bg-white/[0.035] p-6"
+            >
+              <h2 className="text-lg font-black">{item.question}</h2>
+              <p className="mt-3 text-sm leading-6 text-white/58">
+                {item.answer}
+              </p>
+            </article>
+          ))}
         </section>
       </div>
     </main>

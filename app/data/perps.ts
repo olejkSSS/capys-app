@@ -8,7 +8,7 @@ export const PERPS = [
     ref: "https://omni.variational.io/?ref=OMNICAPY",
     refCode: "OMNICAPY",
     logo: "/variational.png",
-    boost: "+15% points boost",
+    boost: "15% points boost",
     farm: "Holding positions + volume on mid-OI tokens",
     seoKeywords: [
       "variational point calculator",
@@ -59,7 +59,7 @@ export const PERPS = [
     ref: "http://hibachi.xyz/r/capy",
     refCode: "capy",
     logo: "/hibachi.png",
-    boost: "-15% fees + 15% points boost",
+    boost: "15% points boost + 15% fee discount",
     farm: "Volume + holding positions",
     seoKeywords: [
       "hibachi referral code",
@@ -96,7 +96,7 @@ export const PERPS = [
     ref: "https://app.extended.exchange/join/CAPY",
     refCode: "CAPY",
     logo: "/extended.png",
-    boost: "-10% fees + 5% points boost + 30% refback",
+    boost: "5% points boost + 10% fee discount + 30% refback",
     farm: "Volume + holding positions",
     seoKeywords: [
       "extended exchange referral code",
@@ -112,7 +112,7 @@ export const PERPS = [
     ref: "https://app.pacifica.fi/?referral=Capy",
     refCode: "Capy",
     logo: "/pacifica.png",
-    boost: "+15% points boost",
+    boost: "15% points boost",
     farm: "High volume + active trading",
     seoKeywords: [
       "pacifica referral code",
@@ -128,7 +128,7 @@ export const PERPS = [
     ref: "https://app.ethereal.trade/?ref=UM68P2M9JZ6D",
     refCode: "UM68P2M9JZ6D",
     logo: "/meridian.png",
-    boost: "+15% points boost",
+    boost: "15% points boost",
     farm: "Boost farming + low OI tokens",
     seoKeywords: [
       "meridian referral code",
@@ -146,7 +146,7 @@ export const PERPS = [
     ref: "https://app.reya.xyz/trade?referredBy=btllw3ot",
     refCode: "btllw3ot",
     logo: "/reya.png",
-    boost: "Referral access",
+    boost: "15% points boost",
     farm: "Perp trading + active market participation",
     seoKeywords: [
       "reya referral code",
@@ -265,6 +265,72 @@ export const PERPS_CALC = {
     totalPoints: 1,
     airdrop: 15,
   },
+  evedex: {
+    name: "Evedex",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  gmtrade: {
+    name: "GMTrade",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  turboflow: {
+    name: "TurboFlow",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  txflow: {
+    name: "TxFlow",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  dango: {
+    name: "Dango",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  hotstuff: {
+    name: "HotStuff",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  carbon: {
+    name: "Carbon",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  katana: {
+    name: "Katana",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  peprl: {
+    name: "Peprl",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  pear: {
+    name: "Pear",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
+  neony: {
+    name: "Neony",
+    fdv: 0.2,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
 } as const
 
 export const PERP_CALC_LOGOS: Partial<Record<keyof typeof PERPS_CALC, string>> = {
@@ -276,6 +342,17 @@ export const PERP_CALC_LOGOS: Partial<Record<keyof typeof PERPS_CALC, string>> =
   ostium: "/ostium.png",
   standx: "/standx.png",
   treadfi: "/treadfi.png",
+  evedex: "/evedex.png",
+  gmtrade: "/gmtrade.png",
+  turboflow: "/turboflow.png",
+  txflow: "/txflow.png",
+  dango: "/dango.png",
+  hotstuff: "/hotstuff.png",
+  carbon: "/carbon.png",
+  katana: "/katana.png",
+  peprl: "/peprl.png",
+  pear: "/pear.png",
+  neony: "/neony.png",
 }
 
 export type FundingExchangeMeta = {

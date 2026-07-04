@@ -16,6 +16,8 @@ export function GET() {
 - Perp point calculator directory: ${SITE_URL}/calculators
 - Perp airdrop and points campaigns: ${SITE_URL}/airdrops
 - Funding-rate screener: ${SITE_URL}/funding-rates
+- Research methodology and data sources: ${SITE_URL}/methodology
+- Project listings and campaign updates: ${SITE_URL}/partners
 
 ## Structured data
 - Perp DEX directory JSON: ${SITE_URL}/perp-dexes.json

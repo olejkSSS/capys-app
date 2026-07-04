@@ -337,12 +337,12 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
         <section className="mt-8 grid gap-5 lg:grid-cols-3">
           <article className="rounded-3xl border border-white/10 bg-white/[0.035] p-6">
             <h2 className="text-2xl font-black">
-              {perp.name} airdrop calculator
+              Model several {perp.name} outcomes
             </h2>
             <p className="mt-3 text-sm leading-6 text-white/58">
-              Use this page for searches like {perp.name} point calculator,{" "}
-              {perp.name} points value, {perp.name} airdrop estimate, and{" "}
-              {perp.name} FDV calculator.
+              Change the FDV, allocation, total points, and your balance instead
+              of relying on one headline estimate. Conservative, base, and
+              optimistic scenarios make the uncertainty visible.
             </p>
           </article>
 

@@ -7,6 +7,8 @@ import { toPng } from "html-to-image"
 import { motion } from "motion/react"
 import {
   DEFAULT_FUNDING_EXCHANGES,
+  CONTENT_REVIEWED_AT,
+  FARMING_ROUTES,
   type FundingExchangeMeta,
   PERP_CALC_LOGOS,
   PERPS,
@@ -256,8 +258,8 @@ const COPY = {
     hero: {
       list: {
         badge: "Referral boost board",
-        title: "Find the best perp farming terms.",
-        body: "Compare fee discounts, point boosts, and refback routes across the perp DEXs that matter. Built for fast decisions, clean links, and less spreadsheet pain.",
+        title: "Compare perp DEX boosts, points and farming routes.",
+        body: "Find a route that fits how you farm, compare referral terms, estimate airdrop scenarios, and scan live funding without digging through 20 docs and Discords.",
         primary: "Explore perps",
         secondary: "Estimate airdrop",
       },
@@ -1539,6 +1541,48 @@ Calculate yours on ${SITE_URL}`
 
       {tab === "list" && (
         <section id="perps" className="scroll-mt-24 mx-auto mt-14 max-w-6xl space-y-6 px-4 sm:px-6">
+          <div className="mb-12">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200/65">
+                  Choose your farming route
+                </div>
+                <h2 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">
+                  Start with your strategy, not a tier
+                </h2>
+              </div>
+              <Link
+                href="/methodology"
+                className="text-sm font-semibold text-cyan-200 transition hover:text-cyan-100"
+              >
+                How Capys evaluates routes →
+              </Link>
+            </div>
+
+            <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+              {FARMING_ROUTES.map((route) => (
+                <Link
+                  key={route.slug}
+                  href={`/perps/${route.slug}`}
+                  className="group rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-white/[0.06]"
+                >
+                  <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/55">
+                    {route.label}
+                  </div>
+                  <div className="mt-3 text-xl font-black text-white">
+                    {route.title}
+                  </div>
+                  <p className="mt-2 text-sm leading-6 text-white/50">
+                    {route.description}
+                  </p>
+                  <div className="mt-4 text-sm font-semibold text-cyan-200 transition group-hover:text-cyan-100">
+                    View farming guide →
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
@@ -2646,6 +2690,38 @@ Calculate yours on ${SITE_URL}`
           </div>
         </section>
       )}
+
+      <footer className="mx-auto mt-16 max-w-6xl px-4 pb-10 sm:px-6">
+        <div className="grid gap-6 rounded-3xl border border-white/10 bg-white/[0.035] p-6 md:grid-cols-[1.2fr_0.8fr] md:p-8">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/55">
+              Data and trust
+            </div>
+            <h2 className="mt-3 text-2xl font-black text-white">
+              Clear assumptions. Visible referral terms.
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50">
+              Referral and campaign notes were last reviewed on {CONTENT_REVIEWED_AT}.
+              Funding data comes from Loris Tools and calculator defaults are editable
+              research scenarios, not official token prices or financial advice.
+            </p>
+          </div>
+          <nav className="grid grid-cols-2 gap-2 self-end text-sm">
+            <Link href="/methodology" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+              Methodology
+            </Link>
+            <Link href="/partners" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+              List or update a perp
+            </Link>
+            <Link href="/airdrops" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+              Airdrop campaigns
+            </Link>
+            <Link href="/calculators" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+              All calculators
+            </Link>
+          </nav>
+        </div>
+      </footer>
 
       {templatePicker && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur">

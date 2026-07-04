@@ -33,6 +33,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.92,
     },
+    {
+      url: `${SITE_URL}/methodology`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.72,
+    },
+    {
+      url: `${SITE_URL}/partners`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.68,
+    },
     ...PERPS.map((perp) => ({
       url: `${SITE_URL}/perps/${perp.slug}`,
       lastModified: new Date(),

@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server"
-import { PERPS, PERPS_CALC, SITE_URL } from "../data/perps"
+import {
+  CONTENT_REVIEWED_AT,
+  PERP_GUIDES,
+  PERPS,
+  PERPS_CALC,
+  SITE_URL,
+} from "../data/perps"
 
 export const dynamic = "force-static"
 
@@ -9,6 +15,8 @@ export function GET() {
       name: "Capys.app Perp DEX Directory",
       url: SITE_URL,
       generatedAt: new Date().toISOString(),
+      contentReviewedAt: CONTENT_REVIEWED_AT,
+      methodologyUrl: `${SITE_URL}/methodology`,
       venues: PERPS.map((perp) => ({
         slug: perp.slug,
         name: perp.name,
@@ -18,6 +26,9 @@ export function GET() {
         logo: `${SITE_URL}${perp.logo}`,
         referralUrl: perp.ref,
         referralCode: perp.refCode,
+        stage: PERP_GUIDES[perp.slug].stage,
+        bestFor: PERP_GUIDES[perp.slug].bestFor,
+        effort: PERP_GUIDES[perp.slug].effort,
         detailsUrl: `${SITE_URL}/perps/${perp.slug}`,
         calculatorUrl:
           perp.slug in PERPS_CALC

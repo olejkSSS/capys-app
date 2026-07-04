@@ -1,7 +1,13 @@
 import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { PERPS, PERPS_CALC, SITE_URL } from "../data/perps"
+import {
+  CONTENT_REVIEWED_AT,
+  PERP_GUIDES,
+  PERPS,
+  PERPS_CALC,
+  SITE_URL,
+} from "../data/perps"
 
 export const metadata: Metadata = {
   title: "Perp Airdrop & Points Campaigns",
@@ -79,6 +85,12 @@ export default function AirdropsPage() {
 
           <div className="flex gap-2">
             <Link
+              href="/methodology"
+              className="hidden rounded-xl border border-white/10 px-4 py-2 text-sm text-white/65 transition hover:text-white sm:inline-flex"
+            >
+              Methodology
+            </Link>
+            <Link
               href="/calculators"
               className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/65 transition hover:text-white"
             >
@@ -132,7 +144,9 @@ export default function AirdropsPage() {
                       {getCampaignType(perp.slug)}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-white/48">{perp.farm}</p>
+                  <p className="mt-2 text-sm text-white/48">
+                    Best for {PERP_GUIDES[perp.slug].bestFor.toLowerCase()} · {perp.farm}
+                  </p>
                 </div>
 
                 <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-sm font-semibold text-emerald-200">
@@ -163,9 +177,10 @@ export default function AirdropsPage() {
         </section>
 
         <aside className="mt-10 rounded-2xl border border-yellow-300/15 bg-yellow-300/[0.055] p-5 text-sm leading-6 text-white/55">
-          Capys.app provides research tools and referral routing, not financial
-          advice. Points, eligibility, token allocations, and referral terms
-          may change without notice.
+          Campaign notes last reviewed {CONTENT_REVIEWED_AT}. Capys.app provides
+          research tools and referral routing, not financial advice. Points,
+          eligibility, token allocations, and referral terms may change without
+          notice.
         </aside>
       </div>
     </main>

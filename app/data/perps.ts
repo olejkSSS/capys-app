@@ -1,4 +1,5 @@
 export const SITE_URL = "https://capys.app"
+export const CONTENT_REVIEWED_AT = "July 4, 2026"
 
 export const PERPS = [
   {
@@ -155,6 +156,189 @@ export const PERPS = [
       "reya perp dex",
       "reya trade",
     ],
+  },
+] as const
+
+export const PERP_GUIDES = {
+  variational: {
+    stage: "Points farming",
+    bestFor: "Position and volume farmers",
+    effort: "Active",
+    costProfile: "Trading costs vary",
+    summary:
+      "A points-focused route for users who can manage positions and consistent volume instead of relying on one-off activity.",
+    actions: [
+      "Use the referral route before starting activity.",
+      "Plan position holding and volume together.",
+      "Track your points and test several FDV outcomes in the calculator.",
+    ],
+    avoid: [
+      "Do not treat an estimated point price as guaranteed value.",
+      "Avoid adding leverage only to chase points.",
+    ],
+  },
+  txflow: {
+    stage: "Trading rewards",
+    bestFor: "Fee-sensitive active traders",
+    effort: "Active",
+    costProfile: "5% fee discount",
+    summary:
+      "A trading-led route where the referral value is easier to understand: lower fees reduce the cost of activity.",
+    actions: [
+      "Activate the fee discount before trading.",
+      "Estimate total fees before choosing a volume target.",
+      "Compare the discount with the expected value of any points earned.",
+    ],
+    avoid: [
+      "Do not manufacture volume without a defined fee budget.",
+      "Remember that a fee discount does not remove trading risk.",
+    ],
+  },
+  risex: {
+    stage: "Private access",
+    bestFor: "Users seeking an invite",
+    effort: "Access required",
+    costProfile: "Terms depend on access",
+    summary:
+      "A private-access route. Capys.app sends users to Telegram because invite availability can change.",
+    actions: [
+      "Contact Capy to check whether an invite code is available.",
+      "Confirm current campaign rules after gaining access.",
+      "Start with a small test before committing meaningful capital.",
+    ],
+    avoid: [
+      "Do not assume an old invite remains valid.",
+      "Never send funds to anyone offering an unofficial code.",
+    ],
+  },
+  hibachi: {
+    stage: "Points farming",
+    bestFor: "Active points farmers",
+    effort: "Active",
+    costProfile: "15% fee discount",
+    summary:
+      "A combined points-boost and fee-discount route for users already comfortable with active perp trading.",
+    actions: [
+      "Open the venue through the referral route.",
+      "Set a fee and risk budget before generating volume.",
+      "Use the dedicated calculator to stress-test point value assumptions.",
+    ],
+    avoid: [
+      "Do not confuse points growth with realised profit.",
+      "Avoid trading illiquid pairs only for campaign activity.",
+    ],
+  },
+  bulk: {
+    stage: "Deposit campaign",
+    bestFor: "Deposit-led participation",
+    effort: "Lower touch",
+    costProfile: "Capital lock-up risk",
+    summary:
+      "A deposit-led campaign route for users who prefer participation that is not based entirely on trading volume.",
+    actions: [
+      "Review the current deposit rules on the project page.",
+      "Check withdrawal conditions before depositing.",
+      "Keep a record of campaign deposits and points earned.",
+    ],
+    avoid: [
+      "Do not treat deposited capital as risk-free.",
+      "Check whether campaign terms changed before adding more funds.",
+    ],
+  },
+  extended: {
+    stage: "Points farming",
+    bestFor: "Consistent volume farmers",
+    effort: "Active",
+    costProfile: "Discount plus refback",
+    summary:
+      "A volume-oriented route with a points boost, fee discount, and refback for users planning sustained activity.",
+    actions: [
+      "Activate the referral terms before the first trading cycle.",
+      "Estimate net fees after discount and refback.",
+      "Track points per dollar of fees rather than volume alone.",
+    ],
+    avoid: [
+      "Do not overtrade just to reach a volume target.",
+      "Recheck the displayed referral terms before starting.",
+    ],
+  },
+  pacifica: {
+    stage: "Points farming",
+    bestFor: "High-volume active traders",
+    effort: "Active",
+    costProfile: "Trading costs vary",
+    summary:
+      "A high-activity points route with a referral boost for users whose normal strategy already produces meaningful volume.",
+    actions: [
+      "Use the referral route before generating activity.",
+      "Compare your points pace with actual fees paid.",
+      "Model conservative and optimistic outcomes separately.",
+    ],
+    avoid: [
+      "Do not use the boost as a reason to exceed your risk limits.",
+      "Avoid relying on one FDV assumption.",
+    ],
+  },
+  meridian: {
+    stage: "Points farming",
+    bestFor: "Position and low-OI farmers",
+    effort: "Active",
+    costProfile: "Trading costs vary",
+    summary:
+      "A points route for users researching position-based activity and less crowded markets, with a published referral boost.",
+    actions: [
+      "Confirm the current eligible markets and campaign rules.",
+      "Balance point efficiency against liquidity and spread.",
+      "Use the calculator as a scenario model, not a price forecast.",
+    ],
+    avoid: [
+      "Do not assume lower OI automatically means better returns.",
+      "Account for slippage before using smaller markets.",
+    ],
+  },
+  reya: {
+    stage: "Trading rewards",
+    bestFor: "Active market participants",
+    effort: "Active",
+    costProfile: "Trading costs vary",
+    summary:
+      "A referral-boosted route for users who want to combine normal perp activity with a points campaign.",
+    actions: [
+      "Open the trading app with the referral attached.",
+      "Confirm which activity currently earns points.",
+      "Measure rewards against fees and spread costs.",
+    ],
+    avoid: [
+      "Do not assume every market or action is eligible.",
+      "Avoid increasing turnover without a net-cost estimate.",
+    ],
+  },
+} as const
+
+export const FARMING_ROUTES = [
+  {
+    label: "Published points boost",
+    title: "Variational",
+    description: "For position and volume farmers who want a clear +15% points route.",
+    slug: "variational",
+  },
+  {
+    label: "Lower trading fees",
+    title: "TxFlow",
+    description: "For active traders who value a direct 5% fee discount.",
+    slug: "txflow",
+  },
+  {
+    label: "Deposit-led campaign",
+    title: "Bulk",
+    description: "For users who prefer deposit participation over pure volume farming.",
+    slug: "bulk",
+  },
+  {
+    label: "Volume farming",
+    title: "Extended",
+    description: "For sustained activity with points, fee discount, and refback terms.",
+    slug: "extended",
   },
 ] as const
 

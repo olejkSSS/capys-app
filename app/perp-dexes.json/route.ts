@@ -17,6 +17,9 @@ export function GET() {
       generatedAt: new Date().toISOString(),
       contentReviewedAt: CONTENT_REVIEWED_AT,
       methodologyUrl: `${SITE_URL}/methodology`,
+      marketTerminalUrl: `${SITE_URL}/markets`,
+      farmingToolsUrl: `${SITE_URL}/tools`,
+      marketDataUrl: `${SITE_URL}/api/perp-market`,
       venues: PERPS.map((perp) => ({
         slug: perp.slug,
         name: perp.name,

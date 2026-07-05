@@ -16,12 +16,19 @@ export function GET() {
 - Perp point calculator directory: ${SITE_URL}/calculators
 - Perp airdrop and points campaigns: ${SITE_URL}/airdrops
 - Funding-rate screener: ${SITE_URL}/funding-rates
+- Perp DEX volume and open-interest rankings: ${SITE_URL}/markets
+- Perp farming tool directory: ${SITE_URL}/tools
+- Farming cost and break-even calculator: ${SITE_URL}/tools/farming-cost-calculator
+- Personalized perp route finder: ${SITE_URL}/tools/route-finder
+- Side-by-side perp comparison: ${SITE_URL}/compare
+- Research updates and changelog: ${SITE_URL}/updates
 - Research methodology and data sources: ${SITE_URL}/methodology
 - Project listings and campaign updates: ${SITE_URL}/partners
 
 ## Structured data
 - Perp DEX directory JSON: ${SITE_URL}/perp-dexes.json
 - Calculator directory JSON: ${SITE_URL}/calculators.json
+- Perp market data JSON: ${SITE_URL}/api/perp-market
 - XML sitemap: ${SITE_URL}/sitemap.xml
 
 ## Calculator coverage

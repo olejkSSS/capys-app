@@ -278,7 +278,7 @@ const COPY = {
         secondary: "Reset filters",
       },
     },
-    stats: ["tracked venues", "calc presets", "safe refresh", "ref links kept"],
+    stats: ["funding venues", "calc presets", "safe refresh", "ref links kept"],
     commandEyebrow: "Opportunity snapshot",
     commandTitle: "Perp command center",
     online: "Online",
@@ -1337,6 +1337,18 @@ Calculate yours on ${SITE_URL}`
                 {t.tabs[index]}
               </button>
             ))}
+            <Link
+              href="/markets"
+              className="rounded-full px-4 py-2 text-white/55 transition hover:bg-white/10 hover:text-white"
+            >
+              Markets
+            </Link>
+            <Link
+              href="/tools"
+              className="rounded-full px-4 py-2 text-white/55 transition hover:bg-white/10 hover:text-white"
+            >
+              Tools
+            </Link>
           </div>
 
           <div className="flex items-center gap-2">
@@ -1369,6 +1381,35 @@ Calculate yours on ${SITE_URL}`
 
           </div>
         </header>
+
+        <nav className="mt-3 grid grid-cols-5 gap-1 rounded-2xl border border-white/10 bg-[#07101d]/88 p-1 text-[10px] font-semibold text-white/55 backdrop-blur-xl md:hidden">
+          {TABS.map((item, index) => (
+            <button
+              key={`mobile-nav-${item.id}`}
+              type="button"
+              onClick={() => selectTab(item.id as Tab, false)}
+              className={`rounded-xl px-2 py-3 transition ${
+                tab === item.id
+                  ? "bg-cyan-300 text-slate-950"
+                  : "hover:bg-white/[0.06] hover:text-white"
+              }`}
+            >
+              {index === 0 ? "Perps" : index === 1 ? "Calc" : "Funding"}
+            </button>
+          ))}
+          <Link
+            href="/markets"
+            className="rounded-xl px-2 py-3 text-center transition hover:bg-white/[0.06] hover:text-white"
+          >
+            Markets
+          </Link>
+          <Link
+            href="/tools"
+            className="rounded-xl px-2 py-3 text-center transition hover:bg-white/[0.06] hover:text-white"
+          >
+            Tools
+          </Link>
+        </nav>
 
         <section className="grid min-h-[680px] items-center gap-10 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-20">
           <div>
@@ -2707,6 +2748,12 @@ Calculate yours on ${SITE_URL}`
             </p>
           </div>
           <nav className="grid grid-cols-2 gap-2 self-end text-sm">
+            <Link href="/markets" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
+              Market terminal
+            </Link>
+            <Link href="/tools" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
+              Farming tools
+            </Link>
             <Link href="/methodology" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
               Methodology
             </Link>
@@ -2718,6 +2765,12 @@ Calculate yours on ${SITE_URL}`
             </Link>
             <Link href="/calculators" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
               All calculators
+            </Link>
+            <Link href="/compare" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+              Compare perps
+            </Link>
+            <Link href="/updates" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+              Research updates
             </Link>
           </nav>
         </div>

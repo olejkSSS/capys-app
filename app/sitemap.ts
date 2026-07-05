@@ -34,6 +34,68 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.92,
     },
     {
+      url: `${SITE_URL}/markets`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.98,
+    },
+    {
+      url: `${SITE_URL}/tools`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.92,
+    },
+    {
+      url: `${SITE_URL}/tools/farming-cost-calculator`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.93,
+    },
+    {
+      url: `${SITE_URL}/tools/route-finder`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/compare`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/updates`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.82,
+    },
+    {
+      url: `${SITE_URL}/ru`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+      alternates: {
+        languages: {
+          en: SITE_URL,
+          ru: `${SITE_URL}/ru`,
+          zh: `${SITE_URL}/zh`,
+        },
+      },
+    },
+    {
+      url: `${SITE_URL}/zh`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+      alternates: {
+        languages: {
+          en: SITE_URL,
+          ru: `${SITE_URL}/ru`,
+          zh: `${SITE_URL}/zh`,
+        },
+      },
+    },
+    {
       url: `${SITE_URL}/methodology`,
       lastModified: new Date(),
       changeFrequency: "monthly",

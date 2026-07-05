@@ -19,6 +19,12 @@ export const metadata: Metadata = {
     "perp points calculator",
     "funding rates",
     "funding rate arbitrage",
+    "perp dex rankings",
+    "perp dex volume",
+    "perp dex open interest",
+    "perp farming cost calculator",
+    "best perp dex to farm",
+    "compare perp dexes",
     "crypto referrals",
     "referral code",
     "best perp referral",
@@ -60,6 +66,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
+    languages: {
+      "en-US": "/",
+      "ru-RU": "/ru",
+      "zh-CN": "/zh",
+    },
   },
 };
 

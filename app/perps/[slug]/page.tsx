@@ -171,6 +171,12 @@ export default async function PerpGuidePage({ params }: Props) {
 
           <div className="flex flex-wrap gap-2">
             <Link
+              href="/markets"
+              className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/65 transition hover:text-white"
+            >
+              Markets
+            </Link>
+            <Link
               href="/airdrops"
               className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/65 transition hover:text-white"
             >

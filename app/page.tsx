@@ -2751,6 +2751,9 @@ Calculate yours on ${SITE_URL}`
             <Link href="/markets" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
               Market terminal
             </Link>
+            <Link href="/perp-dex-list" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
+              Perp DEX list
+            </Link>
             <Link href="/tools" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
               Farming tools
             </Link>

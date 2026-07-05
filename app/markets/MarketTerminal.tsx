@@ -204,6 +204,19 @@ export default function MarketTerminal() {
     return sortDirection === "desc" ? " ↓" : " ↑"
   }
 
+  const hasActiveFilters =
+    query.trim() !== "" ||
+    chain !== "all" ||
+    capyOnly ||
+    watchlistOnly
+
+  function clearFilters() {
+    setQuery("")
+    setChain("all")
+    setCapyOnly(false)
+    setWatchlistOnly(false)
+  }
+
   function toggleWatch(slug: string) {
     setWatchlist((current) => {
       const next = current.includes(slug)
@@ -293,10 +306,23 @@ export default function MarketTerminal() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-white/38">
-          <span>
-            Showing <strong className="text-white/65">{rows.length}</strong>{" "}
-            protocols
-          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <span>
+              Showing <strong className="text-white/65">{rows.length}</strong>{" "}
+              of{" "}
+              <strong className="text-white/65">{data?.rows.length ?? 0}</strong>{" "}
+              protocols with live OI coverage
+            </span>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-lg border border-white/10 px-3 py-1.5 font-semibold text-white/60 transition hover:border-cyan-300/30 hover:text-white"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
           <span>
             OI: live DefiLlama · Volume:{" "}
             <strong
@@ -339,9 +365,9 @@ export default function MarketTerminal() {
 
       {!loading && data && (
         <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025]">
-          <div className="overflow-x-auto">
+          <div className="max-h-[72vh] overflow-auto">
             <table className="w-full min-w-[1180px] border-collapse text-left">
-              <thead className="bg-[#070d18] text-[11px] uppercase tracking-[0.16em] text-white/40">
+              <thead className="sticky top-0 z-10 bg-[#070d18] text-[11px] uppercase tracking-[0.16em] text-white/40 shadow-[0_1px_0_rgba(255,255,255,0.08)]">
                 <tr>
                   <th className="w-12 px-4 py-4" />
                   <th className="px-4 py-4">
@@ -397,6 +423,17 @@ export default function MarketTerminal() {
                 </tr>
               </thead>
               <tbody>
+                {rows.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan={10}
+                      className="px-6 py-16 text-center text-sm text-white/45"
+                    >
+                      No protocols match these filters. Clear filters or try a
+                      broader search.
+                    </td>
+                  </tr>
+                )}
                 {rows.map((row, index) => (
                   <tr
                     key={row.slug}
@@ -510,7 +547,11 @@ export default function MarketTerminal() {
 
       <div className="flex flex-col gap-2 text-xs leading-5 text-white/35 sm:flex-row sm:items-center sm:justify-between">
         <p>
-          Open interest data provided by{" "}
+          The free live open-interest feed currently covers{" "}
+          <strong className="text-white/60">{data?.rows.length ?? 0}</strong>{" "}
+          protocols. DefiLlama&apos;s Perps page can show a larger count because
+          its volume-adapter catalog is a separate dataset. Open interest data
+          is provided by{" "}
           <a
             href="https://defillama.com/perps"
             target="_blank"

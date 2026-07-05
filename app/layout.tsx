@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SEO_PROTOCOL_KEYWORDS } from "./data/perps";
+import BackHomeDock from "./components/BackHomeDock";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://capys.app"),
@@ -20,6 +21,10 @@ export const metadata: Metadata = {
     "funding rates",
     "funding rate arbitrage",
     "perp dex rankings",
+    "perp dex list",
+    "perpetual dex list",
+    "perp dex by volume",
+    "perp dex volume rankings",
     "perp dex volume",
     "perp dex open interest",
     "perp farming cost calculator",
@@ -117,6 +122,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
+        <BackHomeDock />
         <Analytics />
       </body>
     </html>

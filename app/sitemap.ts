@@ -40,6 +40,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.98,
     },
     {
+      url: `${SITE_URL}/perp-dex-list`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.97,
+    },
+    {
       url: `${SITE_URL}/tools`,
       lastModified: new Date(),
       changeFrequency: "weekly",

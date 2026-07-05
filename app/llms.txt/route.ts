@@ -17,6 +17,7 @@ export function GET() {
 - Perp airdrop and points campaigns: ${SITE_URL}/airdrops
 - Funding-rate screener: ${SITE_URL}/funding-rates
 - Perp DEX volume and open-interest rankings: ${SITE_URL}/markets
+- Curated perp DEX list and research directory: ${SITE_URL}/perp-dex-list
 - Perp farming tool directory: ${SITE_URL}/tools
 - Farming cost and break-even calculator: ${SITE_URL}/tools/farming-cost-calculator
 - Personalized perp route finder: ${SITE_URL}/tools/route-finder

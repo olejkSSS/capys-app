@@ -308,7 +308,18 @@ export default function MarketTerminal() {
             >
               {data?.volumeMode === "live"
                 ? "live Pro feed"
-                : "public table snapshot"}
+                : `public table snapshot${
+                    data?.volumeUpdatedAt
+                      ? ` · ${new Date(data.volumeUpdatedAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}`
+                      : ""
+                  }`}
             </strong>
           </span>
         </div>
@@ -513,7 +524,7 @@ export default function MarketTerminal() {
         </p>
         {data?.updatedAt && (
           <span className="shrink-0">
-            Updated {new Date(data.updatedAt).toLocaleString("en-US")}
+            OI updated {new Date(data.updatedAt).toLocaleString("en-US")}
           </span>
         )}
       </div>

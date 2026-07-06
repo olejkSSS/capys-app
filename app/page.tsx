@@ -1274,7 +1274,7 @@ Calculate yours on ${SITE_URL}`
   return (
     <main className="capys-page relative z-10 min-h-screen overflow-x-hidden pb-20 text-white">
       <div className="relative z-[100] mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-        <div className="absolute right-4 top-9 z-[120] sm:right-6 lg:right-8 xl:right-[-132px]">
+        <div className="absolute right-4 top-[84px] z-[120] sm:right-6 lg:right-8 2xl:right-[-132px] 2xl:top-9">
           <button
             ref={languageButtonRef}
             type="button"

@@ -1273,14 +1273,6 @@ Calculate yours on ${SITE_URL}`
 
   return (
     <main className="capys-page relative z-10 min-h-screen overflow-x-hidden pb-20 text-white">
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_32%),linear-gradient(135deg,#030610_0%,#07111f_44%,#050814_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
-        <div className="absolute left-[-260px] top-[-260px] h-[680px] w-[680px] animate-blob rounded-full bg-cyan-500/20 blur-[170px]" />
-        <div className="animation-delay-2000 absolute right-[-260px] top-[18%] h-[620px] w-[620px] animate-blob rounded-full bg-indigo-500/20 blur-[180px]" />
-        <div className="animation-delay-4000 absolute bottom-[-280px] left-[35%] h-[640px] w-[640px] animate-blob rounded-full bg-emerald-500/15 blur-[190px]" />
-      </div>
-
       <div className="relative z-[100] mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
         <div className="absolute right-4 top-9 z-[120] sm:right-6 lg:right-8 xl:right-[-132px]">
           <button
@@ -1347,7 +1339,7 @@ Calculate yours on ${SITE_URL}`
           )}
         </div>
 
-        <header className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <header className="capys-nav flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <button
             type="button"
             onClick={() => selectTab("list", false)}
@@ -1459,13 +1451,13 @@ Calculate yours on ${SITE_URL}`
           </Link>
         </nav>
 
-        <section className="grid min-h-[680px] items-center gap-10 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:py-20">
+        <section className="grid min-h-[680px] items-center gap-10 py-14 lg:grid-cols-[1.08fr_0.92fr] lg:py-20">
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-emerald-200">
               {hero.badge}
             </div>
 
-            <h1 className="max-w-4xl text-5xl font-black leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.92] tracking-tight text-white sm:text-6xl lg:text-[4.75rem]">
               {hero.title}
             </h1>
 
@@ -1536,7 +1528,7 @@ Calculate yours on ${SITE_URL}`
 
           <div className="relative">
             <div className="absolute inset-6 rounded-[2rem] bg-cyan-300/10 blur-3xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#08111f]/88 p-5 shadow-2xl shadow-black/40 backdrop-blur-xl">
+            <div className="capys-terminal relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#08111f]/88 p-5 shadow-2xl shadow-black/40 backdrop-blur-xl">
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <div className="text-xs uppercase tracking-[0.28em] text-white/35">
@@ -1653,7 +1645,7 @@ Calculate yours on ${SITE_URL}`
                 <Link
                   key={route.slug}
                   href={`/perps/${route.slug}`}
-                  className="group rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-white/[0.06]"
+                  className="capys-card group rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-white/[0.06]"
                 >
                   <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/55">
                     {route.label}
@@ -1703,7 +1695,7 @@ Calculate yours on ${SITE_URL}`
             return (
             <div
               key={perp.name}
-              className="group relative flex flex-col items-start gap-4 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-xl shadow-black/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-white/[0.055] hover:shadow-[0_0_36px_rgba(34,211,238,0.12)] md:grid md:grid-cols-[88px_1fr_260px_auto] md:items-center md:p-5"
+              className="capys-card group relative flex flex-col items-start gap-4 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-xl shadow-black/10 backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-white/[0.055] hover:shadow-[0_0_36px_rgba(34,211,238,0.12)] md:grid md:grid-cols-[88px_1fr_260px_auto] md:items-center md:p-5"
             >
               <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-cyan-300/0 via-cyan-300/55 to-emerald-300/0 opacity-0 transition group-hover:opacity-100" />
 
@@ -2525,7 +2517,7 @@ Calculate yours on ${SITE_URL}`
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
+          <div className="capys-card rounded-3xl border border-white/10 bg-white/[0.035] p-4 shadow-2xl shadow-black/20 backdrop-blur-xl sm:p-6">
             {!fundingLoading && !fundingError && (
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
@@ -2560,7 +2552,7 @@ Calculate yours on ${SITE_URL}`
             )}
 
             {!fundingLoading && !fundingError && (
-              <div className="relative overflow-hidden rounded-2xl border border-neutral-800">
+              <div className="capys-table relative overflow-hidden rounded-2xl border border-neutral-800">
                 <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-50 w-8 bg-gradient-to-r from-[#0b111d] to-transparent" />
                 <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-50 w-10 bg-gradient-to-l from-[#0b111d] to-transparent" />
                 <div

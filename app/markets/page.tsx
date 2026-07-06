@@ -87,7 +87,7 @@ export default function MarketsPage() {
       />
 
       <div className="mx-auto max-w-[1600px]">
-        <nav className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
+        <nav className="capys-nav flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative h-10 w-10 overflow-hidden rounded-xl border border-cyan-300/25">
               <Image src="/icon.png" alt="Capys.app" fill sizes="40px" />
@@ -131,7 +131,7 @@ export default function MarketsPage() {
         </nav>
 
         <header className="py-12 sm:py-16">
-          <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/60">
+          <div className="capys-kicker text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/60">
             Perp market intelligence
           </div>
           <h1 className="mt-4 max-w-5xl text-5xl font-black leading-[0.96] tracking-tight sm:text-7xl">

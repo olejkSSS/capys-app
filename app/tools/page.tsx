@@ -75,7 +75,7 @@ export default function ToolsPage() {
         <ToolHeader label="Perp farming toolbox" />
 
         <header className="py-14 sm:py-20">
-          <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/60">
+          <div className="capys-kicker text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/60">
             Perp farming toolbox
           </div>
           <div className="grid gap-8 lg:grid-cols-[1fr_340px] lg:items-end">
@@ -119,7 +119,7 @@ export default function ToolsPage() {
             <Link
               key={tool.href}
               href={tool.href}
-              className="group relative overflow-hidden rounded-3xl border border-white/10 bg-[#08111f]/72 p-6 shadow-2xl shadow-black/15 transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-[#0b1726]/88"
+              className="capys-card group relative overflow-hidden rounded-3xl border border-white/10 bg-[#08111f]/72 p-6 shadow-2xl shadow-black/15 transition hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-[#0b1726]/88"
             >
               <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/60 to-transparent opacity-0 transition group-hover:opacity-100" />
               <div className="mb-8 flex items-start justify-between gap-4">

@@ -264,7 +264,7 @@ export default function MarketTerminal() {
         ].map(([label, value]) => (
           <div
             key={label}
-            className="rounded-2xl border border-white/10 bg-white/[0.035] p-5"
+            className="capys-card rounded-2xl border border-white/10 bg-white/[0.035] p-5"
           >
             <div className="text-xs uppercase tracking-[0.2em] text-white/35">
               {label}
@@ -274,7 +274,7 @@ export default function MarketTerminal() {
         ))}
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-4 sm:p-6">
+      <section className="capys-card rounded-3xl border border-white/10 bg-white/[0.035] p-4 sm:p-6">
         <div className="grid gap-3 lg:grid-cols-[1fr_220px_auto_auto]">
           <label>
             <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-white/35">
@@ -390,7 +390,7 @@ export default function MarketTerminal() {
       )}
 
       {!loading && data && (
-        <section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025]">
+        <section className="capys-table overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025]">
           <div className="max-h-[72vh] overflow-auto">
             <table className="w-full min-w-[1180px] border-collapse text-left">
               <thead className="sticky top-0 z-10 bg-[#070d18] text-[11px] uppercase tracking-[0.16em] text-white/40 shadow-[0_1px_0_rgba(255,255,255,0.08)]">

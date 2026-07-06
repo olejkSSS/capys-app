@@ -69,7 +69,7 @@ export default function MethodologyPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="mx-auto max-w-5xl">
-        <nav className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
+        <nav className="capys-nav flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative h-10 w-10 overflow-hidden rounded-xl border border-cyan-300/25">
               <Image src="/icon.png" alt="Capys.app" fill sizes="40px" />

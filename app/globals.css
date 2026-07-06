@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #050814;
-  --foreground: #eef6ff;
+  --background: #070a09;
+  --foreground: #f2f7f4;
+  --capys-accent: #79f7d0;
+  --capys-accent-strong: #a4ffe2;
+  --capys-panel: rgba(13, 18, 16, 0.9);
+  --capys-panel-strong: #0b100e;
+  --capys-border: rgba(226, 255, 245, 0.1);
+  --capys-muted: rgba(231, 244, 238, 0.52);
   --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", sans-serif;
   --font-code: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
@@ -17,7 +23,7 @@
 
 body {
   min-height: 100vh;
-  background: var(--background);
+  background: #070a09;
   color: var(--foreground);
   font-family: var(--font-body);
   text-rendering: optimizeLegibility;
@@ -47,25 +53,21 @@ body {
 body::before {
   content: "";
   position: fixed;
-  inset: -200px;
+  inset: 0;
   z-index: -1;
-
   background:
-    radial-gradient(circle at 18% 16%, rgba(34, 211, 238, 0.16), transparent 34%),
-    radial-gradient(circle at 82% 24%, rgba(99, 102, 241, 0.18), transparent 36%),
-    radial-gradient(circle at 50% 84%, rgba(16, 185, 129, 0.12), transparent 35%);
-
-  filter: blur(120px);
+    radial-gradient(circle at 12% 0%, rgba(70, 239, 188, 0.12), transparent 27%),
+    linear-gradient(180deg, #080b0a 0%, #070a09 100%);
+  pointer-events: none;
 }
 
 .capys-page {
   position: relative;
   isolation: isolate;
   background:
-    radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.16), transparent 30%),
-    radial-gradient(circle at 84% 20%, rgba(99, 102, 241, 0.15), transparent 34%),
-    radial-gradient(circle at 44% 92%, rgba(16, 185, 129, 0.12), transparent 32%),
-    linear-gradient(135deg, #04101b 0%, #050814 44%, #070822 100%);
+    radial-gradient(circle at 14% -8%, rgba(79, 246, 193, 0.13), transparent 31%),
+    radial-gradient(circle at 92% 10%, rgba(79, 246, 193, 0.045), transparent 24%),
+    linear-gradient(180deg, #080b0a 0%, #070a09 56%, #060807 100%);
 }
 
 .capys-page::before {
@@ -75,30 +77,188 @@ body::before {
   z-index: -2;
   pointer-events: none;
   background:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(to bottom, black 0%, black 68%, transparent 100%);
+    linear-gradient(rgba(184, 255, 232, 0.026) 1px, transparent 1px),
+    linear-gradient(to right, rgba(184, 255, 232, 0.026) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, black 0%, black 72%, transparent 100%);
 }
 
 .capys-page::after {
   content: "";
   position: fixed;
-  inset: -160px;
+  inset: 0;
   z-index: -3;
   pointer-events: none;
   background:
-    radial-gradient(circle at 16% 20%, rgba(34, 211, 238, 0.24), transparent 34%),
-    radial-gradient(circle at 78% 28%, rgba(124, 58, 237, 0.18), transparent 36%),
-    radial-gradient(circle at 46% 82%, rgba(20, 184, 166, 0.16), transparent 32%);
-  filter: blur(90px);
+    radial-gradient(ellipse at 48% -18%, rgba(117, 255, 211, 0.1), transparent 46%);
 }
 
 .capys-surface {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.035);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--capys-border);
+  background: var(--capys-panel);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(16px);
+}
+
+/* Capys Terminal visual system */
+.capys-page {
+  --tw-ring-color: rgba(121, 247, 208, 0.35);
+}
+
+.capys-page h1,
+.capys-page h2,
+.capys-page h3 {
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.capys-page p {
+  text-wrap: pretty;
+}
+
+.capys-page [class*="rounded-3xl"],
+.capys-page [class*="rounded-[2rem]"],
+.capys-page [class*="rounded-[28px]"] {
+  border-radius: 16px !important;
+}
+
+.capys-page [class*="rounded-2xl"] {
+  border-radius: 12px !important;
+}
+
+.capys-page [class*="bg-white/[0.0"],
+.capys-page [class*="bg-[#08111f]"],
+.capys-page [class*="bg-[#07101d]"],
+.capys-page [class*="bg-[#0b111d]"],
+.capys-page [class*="bg-[#070d18]"] {
+  background-color: var(--capys-panel) !important;
+}
+
+.capys-page [class*="border-white/10"],
+.capys-page [class*="border-white/8"],
+.capys-page [class*="border-neutral-800"] {
+  border-color: var(--capys-border) !important;
+}
+
+.capys-page [class*="text-cyan-"] {
+  color: var(--capys-accent) !important;
+}
+
+.capys-page [class*="border-cyan-"] {
+  border-color: rgba(121, 247, 208, 0.28) !important;
+}
+
+.capys-page [class*="bg-cyan-300"] {
+  background-color: var(--capys-accent) !important;
+}
+
+.capys-page [class*="bg-cyan-300/"],
+.capys-page [class*="bg-cyan-500/"] {
+  background-color: rgba(121, 247, 208, 0.09) !important;
+}
+
+.capys-page [class*="shadow-2xl"],
+.capys-page [class*="shadow-xl"] {
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.24) !important;
+}
+
+.capys-nav {
+  position: relative;
+  border-color: var(--capys-border) !important;
+  background: rgba(9, 13, 11, 0.9) !important;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.28) !important;
   backdrop-filter: blur(18px);
+}
+
+.capys-nav::after {
+  content: "";
+  position: absolute;
+  inset: auto 18px -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(121, 247, 208, 0.5), transparent);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.capys-card {
+  position: relative;
+  border-color: var(--capys-border) !important;
+  background:
+    linear-gradient(145deg, rgba(17, 24, 21, 0.96), rgba(9, 13, 11, 0.96)) !important;
+  box-shadow: 0 18px 54px rgba(0, 0, 0, 0.2) !important;
+}
+
+.capys-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  border-radius: inherit;
+  background: linear-gradient(180deg, transparent, rgba(121, 247, 208, 0.72), transparent);
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+
+.capys-card:hover::before {
+  opacity: 1;
+}
+
+.capys-terminal {
+  border-color: rgba(121, 247, 208, 0.15) !important;
+  background:
+    linear-gradient(180deg, rgba(13, 19, 16, 0.98), rgba(8, 12, 10, 0.98)) !important;
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+}
+
+.capys-table {
+  border-radius: 14px !important;
+  background: rgba(8, 12, 10, 0.97) !important;
+}
+
+.capys-table table {
+  font-variant-numeric: tabular-nums;
+}
+
+.capys-table thead,
+.capys-table th {
+  background: #0a0f0d !important;
+}
+
+.capys-table tbody tr {
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.capys-table tbody tr:hover {
+  background: rgba(121, 247, 208, 0.04) !important;
+  box-shadow: inset 2px 0 0 rgba(121, 247, 208, 0.62);
+}
+
+.capys-page input,
+.capys-page select,
+.capys-page textarea {
+  border-color: var(--capys-border) !important;
+  background: #080d0b !important;
+  color: var(--foreground);
+}
+
+.capys-page input:focus,
+.capys-page select:focus,
+.capys-page textarea:focus {
+  border-color: rgba(121, 247, 208, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(121, 247, 208, 0.08);
+}
+
+.capys-page button,
+.capys-page a {
+  transition-duration: 180ms;
+}
+
+.capys-kicker {
+  color: var(--capys-accent) !important;
+  letter-spacing: 0.24em;
 }
 
 * {

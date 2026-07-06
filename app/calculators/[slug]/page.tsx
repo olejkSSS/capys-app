@@ -193,7 +193,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
       />
 
       <div className="mx-auto max-w-6xl">
-        <nav className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <nav className="capys-nav flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative h-10 w-10 overflow-hidden rounded-xl border border-cyan-300/25 bg-cyan-300/10">
               <Image
@@ -282,7 +282,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
 
           <div className="relative">
             <div className="absolute inset-6 rounded-[2rem] bg-cyan-300/10 blur-3xl" />
-            <div className="relative rounded-[2rem] border border-white/10 bg-[#08111f]/88 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl">
+            <div className="capys-terminal relative rounded-[2rem] border border-white/10 bg-[#08111f]/88 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl">
               <div className="flex items-center gap-4">
                 <Image
                   src={perp.logo}

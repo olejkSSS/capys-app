@@ -1,5 +1,7 @@
 export const SITE_URL = "https://capys.app"
-export const CONTENT_REVIEWED_AT = "July 4, 2026"
+export const CONTENT_REVIEWED_AT = "July 6, 2026"
+export const LIVE_DATA_REFRESH_COPY =
+  "Live funding and market data refresh automatically; static referral notes stay source-linked and editable when terms change."
 
 export const PERPS = [
   {

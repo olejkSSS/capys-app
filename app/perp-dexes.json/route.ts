@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import {
   CONTENT_REVIEWED_AT,
+  LIVE_DATA_REFRESH_COPY,
   PERP_GUIDES,
   PERPS,
   PERPS_CALC,
@@ -16,6 +17,7 @@ export function GET() {
       url: SITE_URL,
       generatedAt: new Date().toISOString(),
       contentReviewedAt: CONTENT_REVIEWED_AT,
+      freshness: LIVE_DATA_REFRESH_COPY,
       methodologyUrl: `${SITE_URL}/methodology`,
       marketTerminalUrl: `${SITE_URL}/markets`,
       farmingToolsUrl: `${SITE_URL}/tools`,

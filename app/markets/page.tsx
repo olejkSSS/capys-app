@@ -1,8 +1,10 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { SITE_URL } from "../data/perps"
 import MarketTerminal from "./MarketTerminal"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp DEX Rankings: Volume & Open Interest",
@@ -78,7 +80,7 @@ export default function MarketsPage() {
   ]
 
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-6 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -101,12 +103,6 @@ export default function MarketsPage() {
           </Link>
 
           <div className="flex flex-wrap gap-2">
-            <Link
-              href="/"
-              className="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white/70 transition hover:text-white"
-            >
-              &larr; Home
-            </Link>
             <Link
               href="/airdrops"
               className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 transition hover:text-white"

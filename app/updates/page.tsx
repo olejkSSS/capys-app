@@ -1,7 +1,9 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import ToolHeader from "../components/ToolHeader"
-import { CONTENT_REVIEWED_AT, PERPS, SITE_URL } from "../data/perps"
+import { LIVE_DATA_REFRESH_COPY, PERPS, SITE_URL } from "../data/perps"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp Research Updates & Changelog",
@@ -54,7 +56,7 @@ const updates = [
 
 export default function UpdatesPage() {
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-6 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <ToolHeader label="Research updates" />
         <header className="py-14 sm:py-20">
@@ -66,7 +68,7 @@ export default function UpdatesPage() {
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/60 sm:text-lg">
             Product improvements, research reviews, and new market coverage.
-            Current referral content was last reviewed {CONTENT_REVIEWED_AT}.
+            {LIVE_DATA_REFRESH_COPY}
           </p>
         </header>
 
@@ -94,7 +96,7 @@ export default function UpdatesPage() {
                 href={update.href}
                 className="rounded-xl border border-white/10 px-4 py-3 text-center text-sm font-semibold text-white/65 transition hover:text-white"
               >
-                Open →
+                Open в†’
               </Link>
             </article>
           ))}

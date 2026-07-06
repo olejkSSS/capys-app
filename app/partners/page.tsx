@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { SITE_URL } from "../data/perps"
@@ -42,7 +42,7 @@ const formats = [
 
 export default function PartnersPage() {
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <nav className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
           <Link href="/" className="flex items-center gap-3">
@@ -118,7 +118,7 @@ export default function PartnersPage() {
                 key={item}
                 className="flex gap-3 rounded-2xl border border-white/8 bg-black/15 p-4 text-sm text-white/60"
               >
-                <span className="text-cyan-300">✓</span>
+                <span className="text-cyan-300">вњ“</span>
                 <span>{item}</span>
               </div>
             ))}

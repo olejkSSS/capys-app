@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { PERPS, SITE_URL } from "../data/perps"
@@ -52,7 +52,7 @@ const sections = [
 
 export default function ChineseLandingPage() {
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <nav className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3">
           <Link href="/" className="flex items-center gap-3">

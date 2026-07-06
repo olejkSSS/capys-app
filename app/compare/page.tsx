@@ -1,7 +1,9 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import ToolHeader from "../components/ToolHeader"
 import { PERPS, SITE_URL } from "../data/perps"
 import CompareClient from "./CompareClient"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Compare Perp DEX Farming Routes",
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function ComparePage() {
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-6 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <ToolHeader label="Perp comparison" />
         <header className="py-12 sm:py-16">

@@ -1,7 +1,9 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { CONTENT_REVIEWED_AT, SITE_URL } from "../data/perps"
+import { CONTENT_REVIEWED_AT, LIVE_DATA_REFRESH_COPY, SITE_URL } from "../data/perps"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp Farming Methodology & Data Sources",
@@ -51,7 +53,7 @@ export default function MethodologyPage() {
     headline: "Capys.app perp farming research methodology",
     description:
       "How Capys.app reviews referral terms, farming routes, calculator assumptions, and funding data.",
-    dateModified: "2026-07-04",
+    dateModified: "2026-07-06",
     url: `${SITE_URL}/methodology`,
     author: {
       "@type": "Person",
@@ -61,7 +63,7 @@ export default function MethodologyPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -113,9 +115,12 @@ export default function MethodologyPage() {
           <div className="grid gap-6 sm:grid-cols-3">
             <div>
               <div className="text-xs uppercase tracking-[0.18em] text-white/35">
-                Content review
+                Freshness model
               </div>
               <div className="mt-2 font-bold">{CONTENT_REVIEWED_AT}</div>
+              <p className="mt-2 text-xs leading-5 text-white/45">
+                {LIVE_DATA_REFRESH_COPY}
+              </p>
             </div>
             <div>
               <div className="text-xs uppercase tracking-[0.18em] text-white/35">
@@ -127,7 +132,7 @@ export default function MethodologyPage() {
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex font-bold text-cyan-200"
               >
-                Loris Tools →
+                Loris Tools в†’
               </a>
             </div>
             <div>
@@ -140,7 +145,7 @@ export default function MethodologyPage() {
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex font-bold text-cyan-200"
               >
-                Message Capy →
+                Message Capy в†’
               </a>
             </div>
           </div>

@@ -1,7 +1,9 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import ToolHeader from "../components/ToolHeader"
 import { SITE_URL } from "../data/perps"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp DEX Farming Tools",
@@ -62,7 +64,7 @@ const tools = [
 
 export default function ToolsPage() {
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-6 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <ToolHeader label="Perp farming toolbox" />
 
@@ -92,7 +94,7 @@ export default function ToolsPage() {
               <h2 className="mt-4 text-2xl font-black">{tool.title}</h2>
               <p className="mt-3 text-sm leading-6 text-white/52">{tool.body}</p>
               <div className="mt-6 text-sm font-semibold text-cyan-200">
-                Open tool →
+                Open tool в†’
               </div>
             </Link>
           ))}

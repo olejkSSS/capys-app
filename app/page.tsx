@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Image from "next/image"
 import Link from "next/link"
@@ -7,7 +7,6 @@ import { toPng } from "html-to-image"
 import { motion } from "motion/react"
 import {
   DEFAULT_FUNDING_EXCHANGES,
-  CONTENT_REVIEWED_AT,
   FARMING_ROUTES,
   type FundingExchangeMeta,
   PERP_CALC_LOGOS,
@@ -1158,6 +1157,55 @@ export default function Home() {
     setFundingRowLimit(100)
   }
 
+  const setFundingQuickView = (
+    view: "best" | "capy" | "majors" | "all"
+  ) => {
+    const allKeys = fundingExchanges.map((exchange) => exchange.key)
+
+    if (view === "capy") {
+      setEnabledFundingExchanges(
+        fundingExchanges
+          .filter((exchange) => exchange.hasPersonalRef)
+          .map((exchange) => exchange.key)
+      )
+      setOnlyActionable(true)
+      setMinimumFundingSpread(0)
+      setFundingSort({ key: "maxArb", direction: "desc" })
+      setFundingRowLimit(100)
+      return
+    }
+
+    if (view === "majors") {
+      const preferred = new Set([
+        "hyperliquid",
+        "binance",
+        "bybit",
+        "okx",
+        "bitget",
+        "kucoin",
+        "extended",
+        "hibachi",
+        "pacifica",
+        "variational",
+      ])
+      const next = fundingExchanges
+        .filter((exchange) => preferred.has(exchange.key))
+        .map((exchange) => exchange.key)
+      setEnabledFundingExchanges(next.length ? next : allKeys)
+      setOnlyActionable(true)
+      setMinimumFundingSpread(0.01)
+      setFundingSort({ key: "maxArb", direction: "desc" })
+      setFundingRowLimit(100)
+      return
+    }
+
+    setEnabledFundingExchanges(allKeys)
+    setOnlyActionable(view !== "all")
+    setMinimumFundingSpread(view === "best" ? 0.05 : 0)
+    setFundingSort({ key: "maxArb", direction: "desc" })
+    setFundingRowLimit(view === "all" ? "all" : 100)
+  }
+
   const uploadCustomTemplate = (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return
 
@@ -1224,7 +1272,7 @@ Calculate yours on ${SITE_URL}`
   }
 
   return (
-    <main className="relative z-10 min-h-screen overflow-x-hidden bg-[#050814] pb-20 text-white">
+    <main className="capys-page relative z-10 min-h-screen overflow-x-hidden pb-20 text-white">
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_32%),linear-gradient(135deg,#030610_0%,#07111f_44%,#050814_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
@@ -2061,6 +2109,44 @@ Calculate yours on ${SITE_URL}`
             </div>
           </div>
 
+          <div className="rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.045] p-4 shadow-xl shadow-black/10 backdrop-blur-xl sm:p-5">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-100/60">
+                  Quick funding views
+                </div>
+                <p className="mt-1 text-sm leading-6 text-white/48">
+                  Start with a clean preset, then tweak exchanges, spread,
+                  watchlist, and row count if you want deeper control.
+                </p>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-4 lg:min-w-[620px]">
+                {[
+                  ["best", "Best arbs", "Spread >= 0.05%"],
+                  ["capy", "Capy routes", "Only venues with your routes"],
+                  ["majors", "Majors", "Liquid venues first"],
+                  ["all", "All data", "Full Loris dataset"],
+                ].map(([view, title, note]) => (
+                  <button
+                    key={view}
+                    type="button"
+                    onClick={() =>
+                      setFundingQuickView(view as "best" | "capy" | "majors" | "all")
+                    }
+                    className="rounded-2xl border border-white/10 bg-[#07101d]/70 p-3 text-left transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08]"
+                  >
+                    <span className="block text-sm font-black text-white">
+                      {title}
+                    </span>
+                    <span className="mt-1 block text-xs text-white/40">
+                      {note}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           <div className="grid gap-4 xl:grid-cols-[1.2fr_1.2fr_1fr]">
             <div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl shadow-black/10 backdrop-blur-xl">
               <div className="text-xs uppercase tracking-[0.22em] text-white/40">
@@ -2742,37 +2828,37 @@ Calculate yours on ${SITE_URL}`
               Clear assumptions. Visible referral terms.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-white/50">
-              Referral and campaign notes were last reviewed on {CONTENT_REVIEWED_AT}.
-              Funding data comes from Loris Tools and calculator defaults are editable
+              Funding and market data refresh from live sources. Referral terms
+              are displayed openly, and calculator defaults stay editable
               research scenarios, not official token prices or financial advice.
             </p>
           </div>
           <nav className="grid grid-cols-2 gap-2 self-end text-sm">
-            <Link href="/markets" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
+            <Link href="/markets" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               Market terminal
             </Link>
-            <Link href="/perp-dex-list" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
+            <Link href="/perp-dex-list" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               Perp DEX list
             </Link>
-            <Link href="/tools" className="rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 text-cyan-100 transition hover:bg-cyan-300/10">
+            <Link href="/tools" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               Farming tools
             </Link>
-            <Link href="/methodology" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+            <Link href="/methodology" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               Methodology
             </Link>
-            <Link href="/partners" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+            <Link href="/partners" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               List or update a perp
             </Link>
-            <Link href="/airdrops" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+            <Link href="/airdrops" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               Airdrop campaigns
             </Link>
-            <Link href="/calculators" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+            <Link href="/calculators" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               All calculators
             </Link>
-            <Link href="/compare" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+            <Link href="/compare" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               Compare perps
             </Link>
-            <Link href="/updates" className="rounded-xl border border-white/10 px-4 py-3 text-white/65 transition hover:text-white">
+            <Link href="/updates" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-white/70 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.08] hover:text-cyan-100">
               Research updates
             </Link>
           </nav>

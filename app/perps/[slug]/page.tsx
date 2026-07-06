@@ -1,9 +1,10 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import {
   CONTENT_REVIEWED_AT,
+  LIVE_DATA_REFRESH_COPY,
   PERP_GUIDES,
   PERPS,
   PERPS_CALC,
@@ -98,7 +99,7 @@ export default async function PerpGuidePage({ params }: Props) {
       headline: `${perp.name} referral code and farming guide`,
       description: guide.summary,
       url: pageUrl,
-      dateModified: "2026-07-04",
+      dateModified: "2026-07-06",
       author: {
         "@type": "Person",
         name: "Capy",
@@ -149,7 +150,7 @@ export default async function PerpGuidePage({ params }: Props) {
   ]
 
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -302,6 +303,81 @@ export default async function PerpGuidePage({ params }: Props) {
             </div>
           </section>
 
+          <section className="mt-8 rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.045] p-6 sm:p-8">
+            <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200/60">
+                  Advanced playbook
+                </div>
+                <h2 className="mt-3 text-3xl font-black">
+                  How to farm {perp.name} without flying blind
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-white/55">
+                  Use this as a checklist before size. The exact campaign rules
+                  still need to be verified on the project route, but the
+                  workflow keeps the expensive mistakes visible.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <a
+                    href={perp.ref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-300/15"
+                  >
+                    Project route
+                  </a>
+                  <a
+                    href="https://x.com/capy_onchain"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2 text-sm text-white/65 transition hover:text-white"
+                  >
+                    Capy on X
+                  </a>
+                  <a
+                    href="https://t.me/capycryptos"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2 text-sm text-white/65 transition hover:text-white"
+                  >
+                    Capy Telegram
+                  </a>
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[
+                  [
+                    "1. Confirm eligibility",
+                    `${guide.stage} rules can change. Check which markets, deposits, positions, volume, or holding windows currently count before adding capital.`,
+                  ],
+                  [
+                    "2. Price the activity",
+                    `Use the calculator and fee tools to compare ${perp.boost} against fees, spread, slippage, and the time your capital is locked.`,
+                  ],
+                  [
+                    "3. Start with a test loop",
+                    "Run a small route first, confirm tracking, then scale only if points, fills, and costs behave as expected.",
+                  ],
+                  [
+                    "4. Keep an exit rule",
+                    "Decide when to stop if campaign terms change, liquidity worsens, or expected point value no longer covers the cost.",
+                  ],
+                ].map(([title, body]) => (
+                  <article
+                    key={title}
+                    className="rounded-2xl border border-white/10 bg-black/15 p-5"
+                  >
+                    <h3 className="font-black text-white">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-white/52">
+                      {body}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </section>
+
           {calc && (
             <section className="mt-8 rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.055] p-6 sm:p-8">
               <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
@@ -322,7 +398,7 @@ export default async function PerpGuidePage({ params }: Props) {
                   href={`/calculators/${perp.slug}-point-calculator`}
                   className="rounded-2xl bg-cyan-300 px-6 py-4 text-center text-sm font-black text-slate-950"
                 >
-                  Run calculator →
+                  Run calculator в†’
                 </Link>
               </div>
             </section>
@@ -340,15 +416,15 @@ export default async function PerpGuidePage({ params }: Props) {
                 href="/methodology"
                 className="text-sm font-semibold text-cyan-200 transition hover:text-cyan-100"
               >
-                Read the methodology →
+                Read the methodology в†’
               </Link>
             </div>
             <div className="mt-6 grid gap-3 md:grid-cols-3">
               <div className="rounded-2xl border border-white/8 bg-black/15 p-4">
                 <div className="text-xs uppercase tracking-[0.18em] text-white/35">
-                  Content reviewed
+                  Source status
                 </div>
-                <div className="mt-2 font-bold">{CONTENT_REVIEWED_AT}</div>
+                <div className="mt-2 font-bold">Source-linked terms</div>
               </div>
               <div className="rounded-2xl border border-white/8 bg-black/15 p-4">
                 <div className="text-xs uppercase tracking-[0.18em] text-white/35">
@@ -365,13 +441,11 @@ export default async function PerpGuidePage({ params }: Props) {
                 <div className="text-xs uppercase tracking-[0.18em] text-white/35">
                   Project route
                 </div>
-                <div className="mt-2 font-bold text-cyan-200">Verify current terms →</div>
+                <div className="mt-2 font-bold text-cyan-200">Verify current terms в†’</div>
               </a>
             </div>
             <p className="mt-5 text-xs leading-5 text-white/38">
-              Review date means Capys.app checked this page content on that date.
-              Campaign rules, eligibility, and referral benefits can still change
-              without notice.
+              Last static guide pass: {CONTENT_REVIEWED_AT}. {LIVE_DATA_REFRESH_COPY}
             </p>
           </section>
 
@@ -384,7 +458,7 @@ export default async function PerpGuidePage({ params }: Props) {
                 <h2 className="mt-3 text-2xl font-black">Other farming routes</h2>
               </div>
               <Link href="/airdrops" className="text-sm font-semibold text-cyan-200">
-                View all →
+                View all в†’
               </Link>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-3">

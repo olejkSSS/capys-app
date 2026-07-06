@@ -58,6 +58,49 @@ body::before {
   filter: blur(120px);
 }
 
+.capys-page {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(34, 211, 238, 0.16), transparent 30%),
+    radial-gradient(circle at 84% 20%, rgba(99, 102, 241, 0.15), transparent 34%),
+    radial-gradient(circle at 44% 92%, rgba(16, 185, 129, 0.12), transparent 32%),
+    linear-gradient(135deg, #04101b 0%, #050814 44%, #070822 100%);
+}
+
+.capys-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, black 0%, black 68%, transparent 100%);
+}
+
+.capys-page::after {
+  content: "";
+  position: fixed;
+  inset: -160px;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 16% 20%, rgba(34, 211, 238, 0.24), transparent 34%),
+    radial-gradient(circle at 78% 28%, rgba(124, 58, 237, 0.18), transparent 36%),
+    radial-gradient(circle at 46% 82%, rgba(20, 184, 166, 0.16), transparent 32%);
+  filter: blur(90px);
+}
+
+.capys-surface {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(18px);
+}
+
 * {
   box-sizing: border-box;
 }

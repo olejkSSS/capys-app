@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -181,7 +181,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
   ]
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#050814] px-4 py-10 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen overflow-hidden px-4 py-10 text-white sm:px-6 lg:px-8">
       <div className="fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_32%),linear-gradient(135deg,#030610_0%,#07111f_44%,#050814_100%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
@@ -379,7 +379,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
               href="/calculators"
               className="mt-4 inline-flex text-sm font-semibold text-cyan-200 transition hover:text-cyan-100"
             >
-              View all calculators →
+              View all calculators в†’
             </Link>
           </article>
         </section>
@@ -387,7 +387,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
         <section className="mt-8 rounded-3xl border border-yellow-300/15 bg-yellow-300/[0.055] p-6">
           <h2 className="text-xl font-black">Scenario methodology</h2>
           <p className="mt-3 max-w-4xl text-sm leading-6 text-white/58">
-            The estimate uses: FDV × airdrop allocation ÷ total points supply ×
+            The estimate uses: FDV Г— airdrop allocation Г· total points supply Г—
             your points. Defaults are editable research assumptions and may not
             reflect official tokenomics, future prices, eligibility rules, or
             final allocations.

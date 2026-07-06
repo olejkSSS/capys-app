@@ -71,6 +71,31 @@ function changeClass(value: number | null) {
   return "text-white/50"
 }
 
+function ProtocolLogo({ name, src }: { name: string; src: string | null }) {
+  const [failed, setFailed] = useState(false)
+  const initial = name.slice(0, 1).toUpperCase()
+
+  if (!src || failed) {
+    return (
+      <span className="grid h-full place-items-center bg-gradient-to-br from-cyan-300/18 to-emerald-300/10 text-sm font-black text-cyan-100/80">
+        {initial}
+      </span>
+    )
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={`${name} logo`}
+      fill
+      sizes="40px"
+      className="object-cover"
+      unoptimized
+      onError={() => setFailed(true)}
+    />
+  )
+}
+
 export default function MarketTerminal() {
   const [data, setData] = useState<MarketResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -463,20 +488,7 @@ export default function MarketTerminal() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
                         <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-white/10 bg-white/[0.04]">
-                          {row.logo ? (
-                            <Image
-                              src={row.logo}
-                              alt={`${row.name} logo`}
-                              fill
-                              sizes="40px"
-                              className="object-cover"
-                              unoptimized
-                            />
-                          ) : (
-                            <span className="grid h-full place-items-center text-sm font-black text-white/45">
-                              {row.name.slice(0, 1)}
-                            </span>
-                          )}
+                          <ProtocolLogo name={row.name} src={row.logo} />
                         </span>
                         <div>
                           <div className="font-bold text-white">{row.name}</div>

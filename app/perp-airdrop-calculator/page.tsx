@@ -1,4 +1,4 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Link from "next/link"
 import { PERPS, PERPS_CALC, SITE_URL } from "../data/perps"
 
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function PerpAirdropCalculatorPage() {
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-10 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-10 text-white sm:px-6 lg:px-8">
       <section className="mx-auto max-w-5xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-10">
         <div className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/55">
           Perp points calculator

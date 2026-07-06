@@ -19,6 +19,73 @@ function percent(value: number) {
   return `${Number.isFinite(value) ? value.toFixed(1) : "0.0"}%`
 }
 
+const FEE_PRESETS = [
+  {
+    name: "Extended",
+    note: "5% points boost, 10% fee discount, 30% refback",
+    makerFee: "0.02",
+    takerFee: "0.05",
+    feeDiscount: "10",
+    refback: "30",
+  },
+  {
+    name: "Hibachi",
+    note: "15% points boost, 15% fee discount",
+    makerFee: "0.02",
+    takerFee: "0.05",
+    feeDiscount: "15",
+    refback: "0",
+  },
+  {
+    name: "TxFlow",
+    note: "5% fee discount",
+    makerFee: "0.02",
+    takerFee: "0.05",
+    feeDiscount: "5",
+    refback: "0",
+  },
+  {
+    name: "Variational",
+    note: "15% points boost, no visible fee discount",
+    makerFee: "0.02",
+    takerFee: "0.05",
+    feeDiscount: "0",
+    refback: "0",
+  },
+  {
+    name: "Bulk",
+    note: "Deposit campaign, trading cost may not be the main input",
+    makerFee: "0",
+    takerFee: "0",
+    feeDiscount: "0",
+    refback: "0",
+  },
+  {
+    name: "Pacifica",
+    note: "15% points boost, editable trading-fee scenario",
+    makerFee: "0.02",
+    takerFee: "0.05",
+    feeDiscount: "0",
+    refback: "0",
+  },
+  {
+    name: "Meridian",
+    note: "15% points boost, editable trading-fee scenario",
+    makerFee: "0.02",
+    takerFee: "0.05",
+    feeDiscount: "0",
+    refback: "0",
+  },
+  {
+    name: "Reya",
+    note: "15% points boost, editable trading-fee scenario",
+    makerFee: "0.02",
+    takerFee: "0.05",
+    feeDiscount: "0",
+    refback: "0",
+  },
+]
+
 export default function FarmingCostClient() {
   const [weeklyVolume, setWeeklyVolume] = useState("100000")
   const [weeks, setWeeks] = useState("6")
@@ -29,6 +96,7 @@ export default function FarmingCostClient() {
   const [refback, setRefback] = useState("30")
   const [expectedPoints, setExpectedPoints] = useState("1000")
   const [basePointValue, setBasePointValue] = useState("1")
+  const [selectedPreset, setSelectedPreset] = useState(FEE_PRESETS[0].name)
 
   const result = useMemo(() => {
     const totalVolume = toNumber(weeklyVolume) * Math.max(toNumber(weeks), 0)
@@ -92,11 +160,54 @@ export default function FarmingCostClient() {
     ["Base point value ($)", basePointValue, setBasePointValue],
   ] as const
 
+  function applyPreset(preset: (typeof FEE_PRESETS)[number]) {
+    setSelectedPreset(preset.name)
+    setMakerFee(preset.makerFee)
+    setTakerFee(preset.takerFee)
+    setFeeDiscount(preset.feeDiscount)
+    setRefback(preset.refback)
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[0.88fr_1.12fr]">
       <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 sm:p-7">
         <div className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200/55">
           Activity assumptions
+        </div>
+        <div className="mt-5 rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.055] p-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100/60">
+                Perp fee presets
+              </div>
+              <p className="mt-1 text-xs leading-5 text-white/45">
+                Pick a venue to prefill visible referral discounts. Fees are
+                editable because project schedules can change.
+              </p>
+            </div>
+            <div className="text-xs text-white/35">
+              Active: <span className="text-cyan-100">{selectedPreset}</span>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {FEE_PRESETS.map((preset) => (
+              <button
+                key={preset.name}
+                type="button"
+                onClick={() => applyPreset(preset)}
+                className={`rounded-xl border p-3 text-left transition ${
+                  selectedPreset === preset.name
+                    ? "border-cyan-300/45 bg-cyan-300/14 text-cyan-50"
+                    : "border-white/10 bg-black/10 text-white/65 hover:border-cyan-300/25 hover:text-white"
+                }`}
+              >
+                <span className="block text-sm font-black">{preset.name}</span>
+                <span className="mt-1 block text-xs leading-5 text-white/45">
+                  {preset.note}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           {fields.map(([label, value, setter]) => (

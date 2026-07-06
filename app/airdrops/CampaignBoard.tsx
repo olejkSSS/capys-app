@@ -1,10 +1,10 @@
-"use client"
+﻿"use client"
 
 import Image from "next/image"
 import Link from "next/link"
 import { useMemo, useState } from "react"
 import {
-  CONTENT_REVIEWED_AT,
+  LIVE_DATA_REFRESH_COPY,
   PERP_GUIDES,
   PERPS,
   PERPS_CALC,
@@ -99,7 +99,7 @@ export default function CampaignBoard() {
           </label>
         </div>
         <div className="mt-4 text-xs text-white/38">
-          {rows.length} routes · Last reviewed {CONTENT_REVIEWED_AT}
+          {rows.length} routes · {LIVE_DATA_REFRESH_COPY}
         </div>
       </section>
 
@@ -137,10 +137,10 @@ export default function CampaignBoard() {
                   </span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-white/48">
-                  Best for {guide.bestFor.toLowerCase()} · {perp.farm}
+                  Best for {guide.bestFor.toLowerCase()} В· {perp.farm}
                 </p>
                 <div className="mt-2 text-xs text-white/30">
-                  Research reviewed {CONTENT_REVIEWED_AT}
+                  Terms are source-linked and should be verified before use.
                 </div>
               </div>
 
@@ -174,7 +174,7 @@ export default function CampaignBoard() {
                   rel="noopener noreferrer"
                   className="rounded-xl bg-cyan-300 px-4 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200"
                 >
-                  Open route ↗
+                  Open route в†—
                 </a>
               </div>
             </article>

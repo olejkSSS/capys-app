@@ -1,7 +1,9 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import ToolHeader from "../../components/ToolHeader"
 import { SITE_URL } from "../../data/perps"
 import FarmingCostClient from "./FarmingCostClient"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp Farming Cost & Break-Even Calculator",
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function FarmingCostCalculatorPage() {
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-6 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <ToolHeader label="Farming cost calculator" />
         <header className="py-12 sm:py-16">

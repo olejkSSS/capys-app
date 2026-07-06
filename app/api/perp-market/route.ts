@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { PERPS } from "../../data/perps"
+import { PERP_CALC_LOGOS, PERPS, PERPS_CALC } from "../../data/perps"
 import {
   PERP_VOLUME_SNAPSHOT,
   PERP_VOLUME_SNAPSHOT_DATE,
@@ -151,11 +151,14 @@ function buildRows(
         marketKey(perp.slug) === marketKey(slug) ||
         marketKey(perp.name) === marketKey(name)
     )
+    const calcLogo =
+      PERP_CALC_LOGOS[marketKey(slug) as keyof typeof PERPS_CALC] ??
+      PERP_CALC_LOGOS[marketKey(name) as keyof typeof PERPS_CALC]
 
     rowByKey.set(marketKey(slug), {
       name,
       slug,
-      logo: protocol.logo || null,
+      logo: capy?.logo ?? calcLogo ?? protocol.logo ?? null,
       chains: Array.isArray(protocol.chains) ? protocol.chains : [],
       openInterest: finiteOrNull(protocol.total24h),
       oiChange1d: finiteOrNull(protocol.change_1d),
@@ -179,11 +182,14 @@ function buildRows(
         marketKey(perp.slug) === key ||
         marketKey(perp.name) === marketKey(volume.name)
     )
+    const calcLogo =
+      PERP_CALC_LOGOS[key as keyof typeof PERPS_CALC] ??
+      PERP_CALC_LOGOS[marketKey(volume.name) as keyof typeof PERPS_CALC]
 
     rowByKey.set(key, {
       name: volume.name,
       slug: volume.slug,
-      logo: null,
+      logo: capy?.logo ?? calcLogo ?? null,
       chains: [],
       openInterest: null,
       oiChange1d: null,

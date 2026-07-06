@@ -1,8 +1,10 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
-import { CONTENT_REVIEWED_AT, PERPS, SITE_URL } from "../data/perps"
+import { LIVE_DATA_REFRESH_COPY, PERPS, SITE_URL } from "../data/perps"
 import CampaignBoard from "./CampaignBoard"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp Airdrop & Points Campaigns",
@@ -49,7 +51,7 @@ export default function AirdropsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -110,10 +112,9 @@ export default function AirdropsPage() {
         <CampaignBoard />
 
         <aside className="mt-10 rounded-2xl border border-yellow-300/15 bg-yellow-300/[0.055] p-5 text-sm leading-6 text-white/55">
-          Campaign notes last reviewed {CONTENT_REVIEWED_AT}. Capys.app provides
-          research tools and referral routing, not financial advice. Points,
-          eligibility, token allocations, and referral terms may change without
-          notice.
+          {LIVE_DATA_REFRESH_COPY} Capys.app provides research tools and
+          referral routing, not financial advice. Points, eligibility, token
+          allocations, and referral terms may change without notice.
         </aside>
       </div>
     </main>

@@ -1,8 +1,10 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { PERPS, SITE_URL } from "../data/perps"
 import ToolHeader from "../components/ToolHeader"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp DEX List: Rankings, Points & Referral Terms",
@@ -79,7 +81,7 @@ export default function PerpDexListPage() {
   ]
 
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-6 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

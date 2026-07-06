@@ -1,7 +1,9 @@
-import type { Metadata } from "next"
+﻿import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { PERP_CALC_LOGOS, PERPS, PERPS_CALC, SITE_URL } from "../data/perps"
+
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: "Perp Point Calculators",
@@ -107,7 +109,7 @@ export default function CalculatorsPage() {
   ]
 
   return (
-    <main className="min-h-screen bg-[#050814] px-4 py-8 text-white sm:px-6 lg:px-8">
+    <main className="capys-page min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -181,7 +183,7 @@ export default function CalculatorsPage() {
                     {calculator.name}
                   </span>
                   <span className="mt-1 block text-sm text-white/45 transition group-hover:text-cyan-100/70">
-                    Point value calculator →
+                    Point value calculator в†’
                   </span>
                 </span>
               </Link>

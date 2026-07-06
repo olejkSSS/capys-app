@@ -398,7 +398,7 @@ export default async function PerpGuidePage({ params }: Props) {
                   href={`/calculators/${perp.slug}-point-calculator`}
                   className="rounded-2xl bg-cyan-300 px-6 py-4 text-center text-sm font-black text-slate-950"
                 >
-                  Run calculator в†’
+                  Run calculator →
                 </Link>
               </div>
             </section>
@@ -416,7 +416,7 @@ export default async function PerpGuidePage({ params }: Props) {
                 href="/methodology"
                 className="text-sm font-semibold text-cyan-200 transition hover:text-cyan-100"
               >
-                Read the methodology в†’
+                Read the methodology →
               </Link>
             </div>
             <div className="mt-6 grid gap-3 md:grid-cols-3">
@@ -441,7 +441,7 @@ export default async function PerpGuidePage({ params }: Props) {
                 <div className="text-xs uppercase tracking-[0.18em] text-white/35">
                   Project route
                 </div>
-                <div className="mt-2 font-bold text-cyan-200">Verify current terms в†’</div>
+                <div className="mt-2 font-bold text-cyan-200">Verify current terms →</div>
               </a>
             </div>
             <p className="mt-5 text-xs leading-5 text-white/38">
@@ -458,7 +458,7 @@ export default async function PerpGuidePage({ params }: Props) {
                 <h2 className="mt-3 text-2xl font-black">Other farming routes</h2>
               </div>
               <Link href="/airdrops" className="text-sm font-semibold text-cyan-200">
-                View all в†’
+                View all →
               </Link>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-3">

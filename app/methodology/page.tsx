@@ -132,7 +132,7 @@ export default function MethodologyPage() {
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex font-bold text-cyan-200"
               >
-                Loris Tools в†’
+                Loris Tools →
               </a>
             </div>
             <div>
@@ -145,7 +145,7 @@ export default function MethodologyPage() {
                 rel="noopener noreferrer"
                 className="mt-2 inline-flex font-bold text-cyan-200"
               >
-                Message Capy в†’
+                Message Capy →
               </a>
             </div>
           </div>

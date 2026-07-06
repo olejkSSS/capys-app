@@ -379,7 +379,7 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
               href="/calculators"
               className="mt-4 inline-flex text-sm font-semibold text-cyan-200 transition hover:text-cyan-100"
             >
-              View all calculators в†’
+              View all calculators →
             </Link>
           </article>
         </section>

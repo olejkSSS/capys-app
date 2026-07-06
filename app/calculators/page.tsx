@@ -183,7 +183,7 @@ export default function CalculatorsPage() {
                     {calculator.name}
                   </span>
                   <span className="mt-1 block text-sm text-white/45 transition group-hover:text-cyan-100/70">
-                    Point value calculator в†’
+                    Point value calculator →
                   </span>
                 </span>
               </Link>

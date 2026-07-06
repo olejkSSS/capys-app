@@ -174,7 +174,7 @@ export default function CampaignBoard() {
                   rel="noopener noreferrer"
                   className="rounded-xl bg-cyan-300 px-4 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200"
                 >
-                  Open route в†—
+                  Open route ↗
                 </a>
               </div>
             </article>

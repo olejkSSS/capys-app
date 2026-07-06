@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server"
-import { PERP_CALC_LOGOS, PERPS, PERPS_CALC } from "../../data/perps"
+import {
+  GENERIC_EXCHANGE_URLS,
+  normalizeExchangeKey,
+  PERP_CALC_LOGOS,
+  PERPS,
+  PERPS_CALC,
+} from "../../data/perps"
 import {
   PERP_VOLUME_SNAPSHOT,
   PERP_VOLUME_SNAPSHOT_DATE,
@@ -11,6 +17,7 @@ export const dynamic = "force-dynamic"
 
 const OPEN_INTEREST_URL =
   "https://api.llama.fi/overview/open-interest?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true"
+const PROTOCOLS_URL = "https://api.llama.fi/protocols"
 
 type LlamaProtocol = {
   name?: string
@@ -29,6 +36,12 @@ type LlamaResponse = {
   total24h?: number | null
 }
 
+type LlamaDirectoryProtocol = {
+  name?: string
+  slug?: string
+  url?: string
+}
+
 type MarketRow = {
   name: string
   slug: string
@@ -43,6 +56,7 @@ type MarketRow = {
   volume30d: number | null
   methodologyUrl: string | null
   capyRoute: string | null
+  tradeUrl: string
   capyDetailsUrl: string | null
 }
 
@@ -88,6 +102,66 @@ async function fetchJson(url: string) {
   return (await response.json()) as LlamaResponse
 }
 
+async function fetchProtocolDirectory() {
+  try {
+    const response = await fetch(PROTOCOLS_URL, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "Capys.app market terminal",
+      },
+      next: { revalidate: 86_400 },
+    })
+
+    if (!response.ok) return new Map<string, string>()
+
+    const protocols = (await response.json()) as LlamaDirectoryProtocol[]
+    const directory = new Map<string, string>()
+
+    for (const protocol of protocols) {
+      const url = protocol.url?.trim()
+      if (!url) continue
+
+      if (protocol.slug) directory.set(marketKey(protocol.slug), url)
+      if (protocol.name) directory.set(marketKey(protocol.name), url)
+    }
+
+    return directory
+  } catch {
+    return new Map<string, string>()
+  }
+}
+
+function getKnownTradeUrl(slug: string, name: string) {
+  const candidates = [
+    normalizeExchangeKey(slug),
+    normalizeExchangeKey(name),
+    marketKey(slug),
+    marketKey(name),
+  ]
+
+  for (const key of candidates) {
+    const url = GENERIC_EXCHANGE_URLS[key]
+    if (url) return url
+  }
+
+  return null
+}
+
+function getTradeUrl(
+  slug: string,
+  name: string,
+  capyRef: string | undefined,
+  directory: Map<string, string>
+) {
+  return (
+    capyRef ??
+    getKnownTradeUrl(slug, name) ??
+    directory.get(marketKey(slug)) ??
+    directory.get(marketKey(name)) ??
+    `https://defillama.com/protocol/${slug}?tvl=false&events=false&perpVolume=true`
+  )
+}
+
 async function getVolumeData() {
   const apiKey = process.env.DEFILLAMA_API_KEY?.trim()
 
@@ -130,7 +204,8 @@ async function getVolumeData() {
 
 function buildRows(
   openInterestProtocols: LlamaProtocol[],
-  volumeProtocols: PerpVolumeSnapshot[]
+  volumeProtocols: PerpVolumeSnapshot[],
+  protocolDirectory: Map<string, string>
 ) {
   const volumeByKey = new Map<string, PerpVolumeSnapshot>()
   const rowByKey = new Map<string, MarketRow>()
@@ -169,6 +244,7 @@ function buildRows(
       volume30d: volume?.volume30d ?? null,
       methodologyUrl: protocol.methodologyURL || null,
       capyRoute: capy?.ref ?? null,
+      tradeUrl: getTradeUrl(slug, name, capy?.ref, protocolDirectory),
       capyDetailsUrl: capy ? `/perps/${capy.slug}` : null,
     })
   }
@@ -200,6 +276,7 @@ function buildRows(
       volume30d: volume.volume30d,
       methodologyUrl: null,
       capyRoute: capy?.ref ?? null,
+      tradeUrl: getTradeUrl(volume.slug, volume.name, capy?.ref, protocolDirectory),
       capyDetailsUrl: capy ? `/perps/${capy.slug}` : null,
     })
   }
@@ -217,7 +294,12 @@ export async function GET() {
       fetchJson(OPEN_INTEREST_URL),
       getVolumeData(),
     ])
-    const rows = buildRows(openInterest.protocols ?? [], volume.protocols)
+    const protocolDirectory = await fetchProtocolDirectory()
+    const rows = buildRows(
+      openInterest.protocols ?? [],
+      volume.protocols,
+      protocolDirectory
+    )
     const payload = {
       rows,
       updatedAt: new Date().toISOString(),
@@ -251,7 +333,7 @@ export async function GET() {
       )
     }
 
-    const rows = buildRows([], PERP_VOLUME_SNAPSHOT)
+    const rows = buildRows([], PERP_VOLUME_SNAPSHOT, new Map())
     return NextResponse.json(
       {
         rows,

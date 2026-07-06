@@ -18,6 +18,7 @@ type MarketRow = {
   volume30d: number | null
   methodologyUrl: string | null
   capyRoute: string | null
+  tradeUrl: string
   capyDetailsUrl: string | null
 }
 
@@ -533,19 +534,16 @@ export default function MarketTerminal() {
                           </Link>
                         )}
                         <a
-                          href={
-                            row.capyRoute ||
-                            `https://defillama.com/protocol/${row.slug}?tvl=false&events=false&perpVolume=true`
-                          }
+                          href={row.tradeUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`rounded-lg px-3 py-2 text-xs font-black transition ${
                             row.capyRoute
                               ? "bg-cyan-300 text-slate-950 hover:bg-cyan-200"
-                              : "border border-white/10 text-white/55 hover:text-white"
+                              : "border border-cyan-300/20 bg-cyan-300/[0.08] text-cyan-100 hover:border-cyan-300/40 hover:bg-cyan-300 hover:text-slate-950"
                           }`}
                         >
-                          {row.capyRoute ? "Trade" : "Data"} ↗
+                          Trade ↗
                         </a>
                       </div>
                     </td>

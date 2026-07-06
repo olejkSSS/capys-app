@@ -22,8 +22,14 @@ export default function ToolHeader({ label }: ToolHeaderProps) {
 
       <div className="flex flex-wrap gap-2">
         <Link
+          href="/"
+          className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2 text-sm font-semibold text-white/70 transition hover:border-cyan-300/30 hover:text-white"
+        >
+          ← Home
+        </Link>
+        <Link
           href="/markets"
-          className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/60 transition hover:text-white"
+          className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2 text-sm text-white/60 transition hover:border-white/20 hover:text-white"
         >
           Markets
         </Link>

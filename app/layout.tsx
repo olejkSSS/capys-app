@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SEO_PROTOCOL_KEYWORDS } from "./data/perps";
-import BackHomeDock from "./components/BackHomeDock";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://capys.app"),
@@ -122,7 +121,6 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         {children}
-        <BackHomeDock />
         <Analytics />
       </body>
     </html>

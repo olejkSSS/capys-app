@@ -4,16 +4,16 @@ import Link from "next/link"
 import { SITE_URL } from "../data/perps"
 
 export const metadata: Metadata = {
-  title: "List or Update a Perp DEX",
+  title: "Perp DEX Growth, BD & Marketing",
   description:
-    "Submit a perp DEX, correct campaign terms, or discuss a referral and research partnership with Capys.app.",
+    "Work with Capys.app on perp DEX listings, regional growth, influencer scouting, BD, campaign strategy, and full-funnel marketing.",
   alternates: {
     canonical: "/partners",
   },
   openGraph: {
-    title: "List Your Perp on Capys.app",
+    title: "Grow Your Perp with Capys.app",
     description:
-      "Project listings, campaign updates, referral terms, research pages, and community distribution.",
+      "Perp-focused BD, regional growth, influencer scouting, campaign strategy, listings, research, and distribution.",
     url: `${SITE_URL}/partners`,
     siteName: "Capys.app",
     type: "website",
@@ -27,16 +27,24 @@ const formats = [
     body: "Add a new perp route with its logo, campaign mechanics, public links, and current user benefits.",
   },
   {
-    title: "Terms update",
-    body: "Correct a referral code, points boost, fee discount, campaign status, or farming instructions.",
+    title: "BD & regional growth",
+    body: "Build market-entry partnerships, sharpen the regional offer, and connect your team with relevant communities and operators.",
   },
   {
-    title: "Research page",
-    body: "Build a useful project guide with transparent terms, calculator access, strategy notes, and risks.",
+    title: "Influencer scouting",
+    body: "Find and qualify crypto creators, KOLs, community leaders, and distribution partners that match your market and campaign goals.",
+  },
+  {
+    title: "Campaigns & paid marketing",
+    body: "Plan offers, referral mechanics, content, media budgets, creator activations, and measurable acquisition campaigns.",
+  },
+  {
+    title: "Research & positioning",
+    body: "Turn product details into a useful guide, calculator, comparison page, and clear farming narrative for new and experienced traders.",
   },
   {
     title: "Community distribution",
-    body: "Discuss an X or Telegram campaign for users actively researching perp DEX farming.",
+    body: "Reach perp-native users through X, Telegram, partner channels, educational content, and coordinated launch support.",
   },
 ]
 
@@ -61,15 +69,22 @@ export default function PartnersPage() {
 
         <header className="py-14 sm:py-20">
           <div className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-200/65">
-            Projects and partners
+            Perp growth partner
           </div>
           <h1 className="mt-4 max-w-4xl text-5xl font-black leading-[0.96] tracking-tight sm:text-7xl">
-            List your perp or update your campaign terms.
+            Grow your perp with focused BD and marketing.
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/60 sm:text-lg">
-            Capys.app is a focused perp farming hub for users comparing points,
-            fees, referral benefits, calculators, and funding routes. Send the
-            facts once and give users a page they can actually use.
+            I help perp teams with BD, regional growth, influencer and KOL
+            scouting, campaign positioning, paid acquisition, content,
+            referral offers, and community distribution. Capys.app also turns
+            your product and campaign terms into practical research pages,
+            calculators, comparisons, and routes that traders can actually use.
+          </p>
+          <p className="mt-4 max-w-3xl text-sm leading-6 text-white/45">
+            Whether you need a focused listing, a regional launch partner, a
+            creator pipeline, or full marketing support from offer design to
+            budget deployment, get in touch with the goal, market, and timeline.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a
@@ -111,7 +126,8 @@ export default function PartnersPage() {
               "Logo and approved brand assets",
               "Current campaign and eligibility rules",
               "Referral code and exact user benefit",
-              "Calculator inputs or published token assumptions",
+              "Target regions, audience, goals, and timeline",
+              "Marketing scope, creator needs, and indicative budget",
               "Best contact for future corrections",
             ].map((item) => (
               <div

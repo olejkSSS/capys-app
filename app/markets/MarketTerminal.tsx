@@ -26,6 +26,7 @@ type MarketResponse = {
   rows: MarketRow[]
   updatedAt: string
   openInterestTotal: number
+  volume24hTotal: number
   volumeMode: "live" | "snapshot"
   volumeUpdatedAt: string
   stale?: boolean
@@ -208,16 +209,6 @@ export default function MarketTerminal() {
     watchlistOnly,
   ])
 
-  const volume24h = useMemo(
-    () =>
-      (data?.rows ?? []).reduce(
-        (sum, row) =>
-          sum + (row.normalizedVolume24h ?? row.reportedVolume24h ?? 0),
-        0
-      ),
-    [data]
-  )
-
   const capyRoutes = useMemo(
     () => (data?.rows ?? []).filter((row) => row.capyRoute).length,
     [data]
@@ -266,12 +257,7 @@ export default function MarketTerminal() {
         {[
           ["Tracked protocols", data?.rows.length ?? 0],
           ["Open interest", formatCompact(data?.openInterestTotal ?? null)],
-          [
-            data?.volumeMode === "live"
-              ? "Live 24h volume"
-              : "Reference 24h volume",
-            formatCompact(volume24h),
-          ],
+          ["24h volume", formatCompact(data?.volume24hTotal ?? null)],
           ["Capy routes", capyRoutes],
         ].map(([label, value]) => (
           <div
@@ -343,7 +329,7 @@ export default function MarketTerminal() {
           </button>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-white/38">
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/38">
           <div className="flex flex-wrap items-center gap-3">
             <span>
               Showing <strong className="text-white/65">{rows.length}</strong>{" "}
@@ -361,31 +347,6 @@ export default function MarketTerminal() {
               </button>
             )}
           </div>
-          <span className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 text-emerald-200">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-              Live OI
-            </span>
-            <span className="text-white/25">·</span>
-            <span>
-              Auto-refresh every 5 minutes
-            </span>
-            <span className="text-white/25">·</span>
-            <span>
-              Volume:{" "}
-            <strong
-              className={
-                data?.volumeMode === "live"
-                  ? "text-emerald-300"
-                  : "text-amber-200"
-              }
-            >
-              {data?.volumeMode === "live"
-                ? "live Pro feed"
-                : "reference snapshot (not live)"}
-            </strong>
-            </span>
-          </span>
         </div>
       </section>
 

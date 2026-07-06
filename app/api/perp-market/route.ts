@@ -18,6 +18,7 @@ export const dynamic = "force-dynamic"
 const OPEN_INTEREST_URL =
   "https://api.llama.fi/overview/open-interest?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true"
 const PROTOCOLS_URL = "https://api.llama.fi/protocols"
+const PUBLIC_PERPS_PAGE_URL = "https://r.jina.ai/http://defillama.com/perps"
 
 type LlamaProtocol = {
   name?: string
@@ -65,6 +66,7 @@ let lastSuccessfulResponse:
       rows: MarketRow[]
       updatedAt: string
       openInterestTotal: number
+      volume24hTotal: number
       volumeMode: "live" | "snapshot"
       volumeUpdatedAt: string
     }
@@ -100,6 +102,86 @@ async function fetchJson(url: string) {
   }
 
   return (await response.json()) as LlamaResponse
+}
+
+function parseUsdCompact(value: string) {
+  const match = value
+    .trim()
+    .toLowerCase()
+    .replace(/,/g, "")
+    .match(/^\$?(-?\d+(?:\.\d+)?)\s*([kmbt])?$/)
+
+  if (!match) return null
+
+  const multipliers: Record<string, number> = {
+    k: 1_000,
+    m: 1_000_000,
+    b: 1_000_000_000,
+    t: 1_000_000_000_000,
+  }
+  const amount = Number(match[1])
+  const multiplier = match[2] ? multipliers[match[2]] : 1
+
+  return Number.isFinite(amount) ? amount * multiplier : null
+}
+
+async function fetchPublicVolumeData() {
+  const response = await fetch(PUBLIC_PERPS_PAGE_URL, {
+    headers: {
+      Accept: "text/plain",
+      "User-Agent": "Capys.app market terminal",
+    },
+    next: { revalidate: 300 },
+  })
+
+  if (!response.ok) {
+    throw new Error(`DefiLlama public page returned ${response.status}`)
+  }
+
+  const page = await response.text()
+  const protocols: PerpVolumeSnapshot[] = []
+
+  for (const line of page.split("\n")) {
+    if (!line.startsWith("|") || !line.includes("defillama.com/protocol/")) {
+      continue
+    }
+
+    const link = line.match(
+      /\]\([^)]*\)\[([^\]]+)\]\(https?:\/\/defillama\.com\/protocol\/([^?)]+)[^)]*\)/
+    )
+    if (!link) continue
+
+    const cells = line
+      .split("|")
+      .slice(1, -1)
+      .map((cell) => cell.trim())
+    if (cells.length < 6) continue
+
+    protocols.push({
+      name: link[1].trim(),
+      slug: decodeURIComponent(link[2]).trim(),
+      normalizedVolume24h: parseUsdCompact(cells[1]),
+      reportedVolume24h: parseUsdCompact(cells[2]),
+      volume7d: parseUsdCompact(cells[4]),
+      volume30d: parseUsdCompact(cells[5]),
+    })
+  }
+
+  const totalMatch = page.match(
+    /# Perp Volume \(24h\)\s+\$(\d+(?:\.\d+)?[kmbt]?)/i
+  )
+  const total24h = totalMatch ? parseUsdCompact(`$${totalMatch[1]}`) : null
+
+  if (protocols.length < 5 || total24h === null) {
+    throw new Error("DefiLlama public volume table could not be parsed")
+  }
+
+  return {
+    protocols,
+    total24h,
+    mode: "live" as const,
+    updatedAt: new Date().toISOString(),
+  }
 }
 
 async function fetchProtocolDirectory() {
@@ -166,10 +248,22 @@ async function getVolumeData() {
   const apiKey = process.env.DEFILLAMA_API_KEY?.trim()
 
   if (!apiKey) {
-    return {
-      protocols: PERP_VOLUME_SNAPSHOT,
-      mode: "snapshot" as const,
-      updatedAt: PERP_VOLUME_SNAPSHOT_DATE,
+    try {
+      return await fetchPublicVolumeData()
+    } catch {
+      return {
+        protocols: PERP_VOLUME_SNAPSHOT,
+        total24h: PERP_VOLUME_SNAPSHOT.reduce(
+          (sum, protocol) =>
+            sum +
+            (protocol.normalizedVolume24h ??
+              protocol.reportedVolume24h ??
+              0),
+          0
+        ),
+        mode: "snapshot" as const,
+        updatedAt: PERP_VOLUME_SNAPSHOT_DATE,
+      }
     }
   }
 
@@ -197,6 +291,14 @@ async function getVolumeData() {
 
   return {
     protocols,
+    total24h:
+      finiteOrNull(data.total24h) ??
+      protocols.reduce(
+        (sum, protocol) =>
+          sum +
+          (protocol.normalizedVolume24h ?? protocol.reportedVolume24h ?? 0),
+        0
+      ),
     mode: "live" as const,
     updatedAt: new Date().toISOString(),
   }
@@ -306,6 +408,7 @@ export async function GET() {
       openInterestTotal:
         finiteOrNull(openInterest.total24h) ??
         rows.reduce((sum, row) => sum + (row.openInterest ?? 0), 0),
+      volume24hTotal: volume.total24h,
       volumeMode: volume.mode,
       volumeUpdatedAt: volume.updatedAt,
     }
@@ -340,6 +443,14 @@ export async function GET() {
         updatedAt: PERP_VOLUME_SNAPSHOT_DATE,
         openInterestTotal: rows.reduce(
           (sum, row) => sum + (row.openInterest ?? 0),
+          0
+        ),
+        volume24hTotal: PERP_VOLUME_SNAPSHOT.reduce(
+          (sum, protocol) =>
+            sum +
+            (protocol.normalizedVolume24h ??
+              protocol.reportedVolume24h ??
+              0),
           0
         ),
         volumeMode: "snapshot",

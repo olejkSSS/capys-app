@@ -64,7 +64,7 @@ const tools = [
     eyebrow: "Market intelligence",
     title: "Perp Market Terminal",
     body: "Rank protocols by open interest and volume, filter chains, and save a watchlist.",
-    metric: "119",
+    metric: "Perps",
   },
 ]
 

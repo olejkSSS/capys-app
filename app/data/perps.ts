@@ -421,6 +421,12 @@ export const PERPS_CALC = {
     totalPoints: 8000000000,
     airdrop: 15,
   },
+  reya: {
+    name: "Reya",
+    fdv: 0.3,
+    totalPoints: 10000000,
+    airdrop: 15,
+  },
   ostium: {
     name: "Ostium",
     fdv: 0.3,
@@ -523,6 +529,7 @@ export const PERP_CALC_LOGOS: Partial<Record<keyof typeof PERPS_CALC, string>> =
   bullpen: "/bullpen.png",
   decibel: "/decibel.png",
   grvt: "/grvt.png",
+  reya: "/reya.png",
   nado: "/nado.png",
   o1: "/o1.png",
   ostium: "/ostium.png",

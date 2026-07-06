@@ -182,11 +182,6 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
 
   return (
     <main className="capys-page min-h-screen overflow-hidden px-4 py-10 text-white sm:px-6 lg:px-8">
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.18),transparent_32%),linear-gradient(135deg,#030610_0%,#07111f_44%,#050814_100%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
-      </div>
-
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -281,7 +276,6 @@ export default async function PerpPointCalculatorPage({ params }: Props) {
           </div>
 
           <div className="relative">
-            <div className="absolute inset-6 rounded-[2rem] bg-cyan-300/10 blur-3xl" />
             <div className="capys-terminal relative rounded-[2rem] border border-white/10 bg-[#08111f]/88 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl">
               <div className="flex items-center gap-4">
                 <Image

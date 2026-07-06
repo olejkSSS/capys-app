@@ -25,6 +25,20 @@ export const metadata: Metadata = {
 
 const updates = [
   {
+    date: "July 6, 2026",
+    category: "Design system",
+    title: "Capys Terminal visual refresh",
+    body: "Unified the site around a dark mint terminal system with denser tables, consistent surfaces, cleaner navigation, and stronger responsive behavior.",
+    href: "/",
+  },
+  {
+    date: "July 6, 2026",
+    category: "Data freshness",
+    title: "Live market refresh and safer routing",
+    body: "Added recurring DefiLlama open-interest refreshes, clearer live-versus-reference labels, official trade destinations, and resilient market fallbacks.",
+    href: "/markets",
+  },
+  {
     date: "July 5, 2026",
     category: "Market intelligence",
     title: "Perp Market Terminal",
@@ -40,17 +54,38 @@ const updates = [
   },
   {
     date: "July 4, 2026",
+    category: "Calculators and SEO",
+    title: "Expanded dedicated point calculators",
+    body: "Added protocol-specific calculator pages, logos, structured metadata, discovery feeds, and broader search coverage for perp point-value queries.",
+    href: "/calculators",
+  },
+  {
+    date: "July 4, 2026",
     category: "Research",
     title: "Perp farming guides and methodology",
     body: "Expanded project pages with practical plans, mistakes to avoid, calculator assumptions, research dates, and visible methodology.",
     href: "/methodology",
   },
   {
-    date: "July 4, 2026",
+    date: "July 2, 2026",
     category: "Funding",
-    title: "Watchlists and shareable funding views",
-    body: "Added saved symbols, shareable screener filters, and fee-adjusted funding estimates.",
+    title: "Funding screener recovery and workflow upgrade",
+    body: "Hardened the Loris data fallback, added exchange controls, row limits, sorting, watchlists, shareable filters, and fee-adjusted opportunity estimates.",
     href: "/#funding",
+  },
+  {
+    date: "June 2, 2026",
+    category: "Campaign coverage",
+    title: "Bulk, Hibachi, and referral lineup updates",
+    body: "Added new campaign routes and calculators, reordered farming tiers, refreshed referral terms, and expanded protocol artwork.",
+    href: "/#perps",
+  },
+  {
+    date: "June 1, 2026",
+    category: "Calculator coverage",
+    title: "Calculator logos and new protocol presets",
+    body: "Expanded calculator branding and presets so more perp campaigns could be estimated from dedicated pages.",
+    href: "/calculators",
   },
 ]
 
@@ -67,7 +102,7 @@ export default function UpdatesPage() {
             What changed on Capys.app.
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/60 sm:text-lg">
-            Product improvements, research reviews, and new market coverage.
+            Product improvements, research reviews, and new market coverage.{" "}
             {LIVE_DATA_REFRESH_COPY}
           </p>
         </header>

@@ -2553,8 +2553,6 @@ Calculate yours on ${SITE_URL}`
 
             {!fundingLoading && !fundingError && (
               <div className="capys-table relative overflow-hidden rounded-2xl border border-neutral-800">
-                <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-50 w-8 bg-gradient-to-r from-[#0b111d] to-transparent" />
-                <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-50 w-10 bg-gradient-to-l from-[#0b111d] to-transparent" />
                 <div
                   ref={fundingTopScrollRef}
                   onScroll={() => syncFundingScroll("top")}

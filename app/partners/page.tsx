@@ -118,7 +118,22 @@ export default function PartnersPage() {
                 key={item}
                 className="flex gap-3 rounded-2xl border border-white/8 bg-black/15 p-4 text-sm text-white/60"
               >
-                <span className="text-cyan-300">вњ“</span>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                  className="mt-0.5 shrink-0 text-cyan-300"
+                >
+                  <path
+                    d="m5 12 4 4L19 6"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 <span>{item}</span>
               </div>
             ))}

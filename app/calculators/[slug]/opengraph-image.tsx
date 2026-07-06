@@ -32,7 +32,7 @@ export default async function Image({ params }: Props) {
         style={{
           alignItems: "center",
           background:
-            "radial-gradient(circle at 18% 15%, rgba(34,211,238,0.34), transparent 34%), radial-gradient(circle at 85% 80%, rgba(16,185,129,0.22), transparent 32%), #050814",
+            "radial-gradient(circle at 16% 0%, rgba(121,247,208,0.2), transparent 34%), linear-gradient(135deg, #080b0a 0%, #070a09 52%, #060807 100%)",
           color: "white",
           display: "flex",
           height: "100%",

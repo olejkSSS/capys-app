@@ -14,7 +14,7 @@ export default function Image() {
         style={{
           alignItems: "center",
           background:
-            "radial-gradient(circle at 20% 20%, rgba(34,211,238,0.32), transparent 30%), linear-gradient(135deg, #030610 0%, #07111f 48%, #050814 100%)",
+            "radial-gradient(circle at 16% 0%, rgba(121,247,208,0.2), transparent 34%), linear-gradient(135deg, #080b0a 0%, #070a09 52%, #060807 100%)",
           color: "white",
           display: "flex",
           height: "100%",

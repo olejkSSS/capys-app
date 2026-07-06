@@ -43,6 +43,7 @@ type SortKey =
   | "oiChange1d"
 
 const WATCHLIST_KEY = "capys:market-watchlist"
+const MARKET_REFRESH_MS = 5 * 60 * 1000
 
 function formatCompact(value: number | null) {
   if (value === null || !Number.isFinite(value)) return "—"
@@ -121,11 +122,12 @@ export default function MarketTerminal() {
   useEffect(() => {
     let cancelled = false
 
-    async function load() {
+    async function load(background = false) {
       try {
-        setLoading(true)
+        if (!background) setLoading(true)
         const response = await fetch("/api/perp-market", {
           headers: { Accept: "application/json" },
+          cache: "no-store",
         })
         const payload = (await response.json()) as MarketResponse
         if (!response.ok) throw new Error(payload.error || "Market API error")
@@ -140,13 +142,18 @@ export default function MarketTerminal() {
           )
         }
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled && !background) setLoading(false)
       }
     }
 
     void load()
+    const refreshTimer = window.setInterval(() => {
+      void load(true)
+    }, MARKET_REFRESH_MS)
+
     return () => {
       cancelled = true
+      window.clearInterval(refreshTimer)
     }
   }, [])
 
@@ -259,7 +266,12 @@ export default function MarketTerminal() {
         {[
           ["Tracked protocols", data?.rows.length ?? 0],
           ["Open interest", formatCompact(data?.openInterestTotal ?? null)],
-          ["Visible 24h volume", formatCompact(volume24h)],
+          [
+            data?.volumeMode === "live"
+              ? "Live 24h volume"
+              : "Reference 24h volume",
+            formatCompact(volume24h),
+          ],
           ["Capy routes", capyRoutes],
         ].map(([label, value]) => (
           <div
@@ -349,8 +361,18 @@ export default function MarketTerminal() {
               </button>
             )}
           </div>
-          <span>
-            OI: live DefiLlama · Volume:{" "}
+          <span className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-emerald-200">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+              Live OI
+            </span>
+            <span className="text-white/25">·</span>
+            <span>
+              Auto-refresh every 5 minutes
+            </span>
+            <span className="text-white/25">·</span>
+            <span>
+              Volume:{" "}
             <strong
               className={
                 data?.volumeMode === "live"
@@ -360,19 +382,9 @@ export default function MarketTerminal() {
             >
               {data?.volumeMode === "live"
                 ? "live Pro feed"
-                : `public table snapshot${
-                    data?.volumeUpdatedAt
-                      ? ` · ${new Date(data.volumeUpdatedAt).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          }
-                        )}`
-                      : ""
-                  }`}
+                : "reference snapshot (not live)"}
             </strong>
+            </span>
           </span>
         </div>
       </section>

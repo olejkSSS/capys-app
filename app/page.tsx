@@ -2533,8 +2533,10 @@ Calculate yours on ${SITE_URL}`
                   </div>
                 </div>
 
-                <div className="text-xs text-white/35">
-                  Click a ticker to copy · click a rate to open the venue
+                <div className="max-w-md text-xs leading-5 text-white/35">
+                  The ~$ net line is a rough scenario from your capital,
+                  intervals, and fee settings above. Click a ticker to copy;
+                  click a rate to open the venue.
                 </div>
               </div>
             )}
@@ -2676,7 +2678,7 @@ Calculate yours on ${SITE_URL}`
                               }`}
                               title={`${row.netReturnPct?.toFixed(4)}% estimated net return`}
                             >
-                              ~{formatMoney(row.estimatedNetUsd, 0)} net
+                              ~{formatMoney(row.estimatedNetUsd, 0)} est. net
                             </div>
                           )}
                         </td>

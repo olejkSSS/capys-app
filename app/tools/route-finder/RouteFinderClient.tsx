@@ -5,26 +5,26 @@ import Link from "next/link"
 import { useMemo, useState } from "react"
 import { PERP_GUIDES, PERPS } from "../../data/perps"
 
-type Capital = "small" | "medium" | "large"
+type Capital = "micro" | "small" | "medium" | "large" | "whale"
 type Effort = "low" | "active"
-type Goal = "points" | "fees" | "deposit" | "private"
+type Goal = "points" | "fees" | "deposit" | "private" | "volume"
 
 const preferenceMap: Record<
   string,
   { capital: Capital[]; effort: Effort[]; goals: Goal[] }
 > = {
   variational: {
-    capital: ["small", "medium", "large"],
+    capital: ["micro", "small", "medium", "large", "whale"],
     effort: ["active"],
-    goals: ["points"],
+    goals: ["points", "volume"],
   },
   txflow: {
-    capital: ["small", "medium", "large"],
+    capital: ["micro", "small", "medium", "large", "whale"],
     effort: ["active"],
     goals: ["fees"],
   },
   risex: {
-    capital: ["small", "medium", "large"],
+    capital: ["micro", "small", "medium", "large", "whale"],
     effort: ["low", "active"],
     goals: ["private"],
   },
@@ -34,7 +34,7 @@ const preferenceMap: Record<
     goals: ["points", "fees"],
   },
   bulk: {
-    capital: ["small", "medium", "large"],
+    capital: ["small", "medium", "large", "whale"],
     effort: ["low"],
     goals: ["deposit"],
   },
@@ -44,24 +44,48 @@ const preferenceMap: Record<
     goals: ["points", "fees"],
   },
   pacifica: {
-    capital: ["medium", "large"],
+    capital: ["medium", "large", "whale"],
     effort: ["active"],
     goals: ["points"],
   },
   meridian: {
-    capital: ["small", "medium", "large"],
+    capital: ["micro", "small", "medium", "large"],
     effort: ["active"],
     goals: ["points"],
   },
   reya: {
-    capital: ["small", "medium", "large"],
+    capital: ["micro", "small", "medium", "large"],
     effort: ["active"],
     goals: ["points"],
   },
 }
 
+const capitalOptions: Array<{
+  value: Capital
+  label: string
+  hint: string
+}> = [
+  { value: "micro", label: "Under $1,000", hint: "Test routes safely" },
+  { value: "small", label: "$1,000-$5,000", hint: "Retail farming" },
+  { value: "medium", label: "$5,000-$25,000", hint: "Active wallet" },
+  { value: "large", label: "$25,000-$100,000", hint: "Serious volume" },
+  { value: "whale", label: "$100,000+", hint: "Whale flow" },
+]
+
+const goalOptions: Array<{
+  value: Goal
+  label: string
+  hint: string
+}> = [
+  { value: "points", label: "Points", hint: "Maximize boost upside" },
+  { value: "fees", label: "Lower fees", hint: "Cut trading cost" },
+  { value: "deposit", label: "Deposit", hint: "Lower-touch campaigns" },
+  { value: "private", label: "Private access", hint: "Invite-only routes" },
+  { value: "volume", label: "Whale volume", hint: "High-cap active farming" },
+]
+
 export default function RouteFinderClient() {
-  const [capital, setCapital] = useState<Capital>("medium")
+  const [capital, setCapital] = useState<Capital>("small")
   const [effort, setEffort] = useState<Effort>("active")
   const [goal, setGoal] = useState<Goal>("points")
 
@@ -74,7 +98,11 @@ export default function RouteFinderClient() {
 
         if (preferences.capital.includes(capital)) {
           score += 2
-          reasons.push("fits the selected capital range")
+          reasons.push(
+            capital === "whale"
+              ? "fits $100k+ capital"
+              : "fits the selected capital range"
+          )
         }
         if (preferences.effort.includes(effort)) {
           score += 3
@@ -93,8 +121,17 @@ export default function RouteFinderClient() {
                 ? "reduces trading costs"
                 : goal === "deposit"
                   ? "uses deposit-led participation"
-                  : "offers private access"
+                  : goal === "private"
+                    ? "offers private access"
+                    : "fits high-volume farming"
           )
+        }
+        if (capital === "whale" && perp.slug === "variational") {
+          score += 4
+          reasons.push("strong fit for whale volume")
+        }
+        if (capital === "whale" && goal === "volume" && perp.slug !== "variational") {
+          score -= 2
         }
 
         return { perp, score, reasons }
@@ -114,22 +151,19 @@ export default function RouteFinderClient() {
         <fieldset className="mt-6">
           <legend className="text-sm font-bold">Capital</legend>
           <div className="mt-3 grid gap-2">
-            {[
-              ["small", "Under $1,000"],
-              ["medium", "$1,000 – $5,000"],
-              ["large", "$5,000+"],
-            ].map(([value, label]) => (
+            {capitalOptions.map(({ value, label, hint }) => (
               <button
                 key={value}
                 type="button"
-                onClick={() => setCapital(value as Capital)}
+                onClick={() => setCapital(value)}
                 className={`rounded-xl border px-4 py-3 text-left text-sm transition ${
                   capital === value
                     ? "border-cyan-300/45 bg-cyan-300/15 text-cyan-100"
                     : "border-white/10 bg-black/10 text-white/55 hover:text-white"
                 }`}
               >
-                {label}
+                <span className="block font-semibold">{label}</span>
+                <span className="mt-1 block text-xs text-white/36">{hint}</span>
               </button>
             ))}
           </div>
@@ -161,23 +195,21 @@ export default function RouteFinderClient() {
         <fieldset className="mt-6">
           <legend className="text-sm font-bold">Primary goal</legend>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {[
-              ["points", "Points"],
-              ["fees", "Lower fees"],
-              ["deposit", "Deposit"],
-              ["private", "Private access"],
-            ].map(([value, label]) => (
+            {goalOptions.map(({ value, label, hint }) => (
               <button
                 key={value}
                 type="button"
-                onClick={() => setGoal(value as Goal)}
+                onClick={() => setGoal(value)}
                 className={`rounded-xl border px-3 py-3 text-sm transition ${
                   goal === value
                     ? "border-cyan-300/45 bg-cyan-300/15 text-cyan-100"
                     : "border-white/10 bg-black/10 text-white/55 hover:text-white"
                 }`}
               >
-                {label}
+                <span className="block font-semibold">{label}</span>
+                <span className="mt-1 block text-[11px] text-white/35">
+                  {hint}
+                </span>
               </button>
             ))}
           </div>

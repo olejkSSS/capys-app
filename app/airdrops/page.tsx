@@ -75,6 +75,12 @@ export default function AirdropsPage() {
 
           <div className="flex flex-wrap gap-2">
             <Link
+              href="/"
+              className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/40 hover:bg-cyan-300/15"
+            >
+              ← Home
+            </Link>
+            <Link
               href="/markets"
               className="rounded-xl border border-white/10 px-4 py-2 text-sm text-white/65 transition hover:text-white"
             >
